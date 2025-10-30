@@ -422,12 +422,19 @@ function addFieldToEditor(field) {
     comment: '💬',
     newspaper: '📰',
     question: '❓',
+    calculator: '🧮',
   };
 
   fieldItem.innerHTML = `
     <div class="field-header">
       <span class="field-title">${iconMap[field.icon] || '❓'} ${field.label}</span>
       <div class="field-actions">
+        <button class="field-action-btn move-up" title="Переместить вверх">
+          <i class="fas fa-arrow-up"></i>
+        </button>
+        <button class="field-action-btn move-down" title="Переместить вниз">
+          <i class="fas fa-arrow-down"></i>
+        </button>
         <button class="field-action-btn edit" title="Редактировать">
           <i class="fas fa-edit"></i>
         </button>
@@ -450,6 +457,9 @@ function addFieldToEditor(field) {
           }>Выпадающий список</option>
           <option value="radio" ${field.type === 'radio' ? 'selected' : ''}>Радиокнопки</option>
           <option value="checkbox" ${field.type === 'checkbox' ? 'selected' : ''}>Чекбокс</option>
+          <option value="computed" ${
+            field.type === 'computed' ? 'selected' : ''
+          }>Вычисляемое поле</option>
         </select>
       </div>
       <div class="field-config-item">
@@ -464,6 +474,9 @@ function addFieldToEditor(field) {
           <option value="comment" ${field.icon === 'comment' ? 'selected' : ''}>Сообщение</option>
           <option value="newspaper" ${field.icon === 'newspaper' ? 'selected' : ''}>Новости</option>
           <option value="question" ${field.icon === 'question' ? 'selected' : ''}>Вопрос</option>
+          <option value="calculator" ${
+            field.icon === 'calculator' ? 'selected' : ''
+          }>Калькулятор</option>
         </select>
       </div>
       <div class="field-config-item">
@@ -486,12 +499,28 @@ function addFieldToEditor(field) {
           field.options ? field.options.join(', ') : ''
         }" />
       </div>
+      <div class="field-config-item field-formula-container" style="display: ${
+        field.type === 'computed' ? 'block' : 'none'
+      }; grid-column: 1 / -1;">
+        <label>Формула</label>
+        <div class="formula-editor">
+          <input type="text" class="field-formula-input" value="${
+            field.formula || ''
+          }" placeholder="Пример: Заявка от {name} - {email,0,3}" />
+          <button type="button" class="add-field-variable-btn" title="Добавить переменную">
+            <i class="fas fa-plus"></i> Поле
+          </button>
+        </div>
+        <div class="formula-hint">Используйте {id_поля}, {id_поля,start} или {id_поля,start,end} для substring</div>
+      </div>
     </div>
   `;
 
   // Обработчики событий для поля
   const editBtn = fieldItem.querySelector('.edit');
   const deleteBtn = fieldItem.querySelector('.delete');
+  const moveUpBtn = fieldItem.querySelector('.move-up');
+  const moveDownBtn = fieldItem.querySelector('.move-down');
   const typeSelect = fieldItem.querySelector('.field-type');
   const labelInput = fieldItem.querySelector('.field-label');
   const placeholderInput = fieldItem.querySelector('.field-placeholder');
@@ -499,6 +528,9 @@ function addFieldToEditor(field) {
   const requiredCheckbox = fieldItem.querySelector('.field-required');
   const optionsContainer = fieldItem.querySelector('.field-options');
   const optionsInput = fieldItem.querySelector('.field-options-input');
+  const formulaContainer = fieldItem.querySelector('.field-formula-container');
+  const formulaInput = fieldItem.querySelector('.field-formula-input');
+  const addVariableBtn = fieldItem.querySelector('.add-field-variable-btn');
 
   editBtn.addEventListener('click', () => {
     const config = fieldItem.querySelector('.field-config');
@@ -514,10 +546,47 @@ function addFieldToEditor(field) {
     }
   });
 
+  // Перемещение поля вверх
+  moveUpBtn.addEventListener('click', () => {
+    const currentIndex = currentConfig.fields.findIndex((f) => f.id === field.id);
+    if (currentIndex > 0) {
+      // Меняем местами с предыдущим элементом
+      [currentConfig.fields[currentIndex - 1], currentConfig.fields[currentIndex]] = [
+        currentConfig.fields[currentIndex],
+        currentConfig.fields[currentIndex - 1],
+      ];
+
+      // Перерисовываем список полей
+      rebuildFieldsList();
+      updateConfigFromEditor();
+      renderForm();
+    }
+  });
+
+  // Перемещение поля вниз
+  moveDownBtn.addEventListener('click', () => {
+    const currentIndex = currentConfig.fields.findIndex((f) => f.id === field.id);
+    if (currentIndex < currentConfig.fields.length - 1) {
+      // Меняем местами со следующим элементом
+      [currentConfig.fields[currentIndex], currentConfig.fields[currentIndex + 1]] = [
+        currentConfig.fields[currentIndex + 1],
+        currentConfig.fields[currentIndex],
+      ];
+
+      // Перерисовываем список полей
+      rebuildFieldsList();
+      updateConfigFromEditor();
+      renderForm();
+    }
+  });
+
   typeSelect.addEventListener('change', (e) => {
     const newType = e.target.value;
     field.type = newType;
     optionsContainer.style.display = newType === 'select' || newType === 'radio' ? 'block' : 'none';
+    if (formulaContainer) {
+      formulaContainer.style.display = newType === 'computed' ? 'block' : 'none';
+    }
     updateConfigFromEditor();
     renderForm();
   });
@@ -561,7 +630,140 @@ function addFieldToEditor(field) {
     renderForm();
   });
 
+  // Обработчик для формулы
+  if (formulaInput) {
+    formulaInput.addEventListener('input', (e) => {
+      field.formula = e.target.value;
+      updateConfigFromEditor();
+      renderForm();
+    });
+  }
+
+  // Обработчик для кнопки добавления переменной
+  if (addVariableBtn) {
+    addVariableBtn.addEventListener('click', () => {
+      // Создаем выпадающий список с доступными полями
+      const availableFields = currentConfig.fields.filter(
+        (f) => f.id !== field.id && f.type !== 'computed'
+      );
+
+      if (availableFields.length === 0) {
+        alert('Нет доступных полей для вставки. Создайте сначала другие поля.');
+        return;
+      }
+
+      // Создаем временный селект
+      const fieldSelect = document.createElement('select');
+      fieldSelect.className = 'temp-field-select';
+
+      const defaultOption = document.createElement('option');
+      defaultOption.value = '';
+      defaultOption.textContent = 'Выберите поле...';
+      fieldSelect.appendChild(defaultOption);
+
+      availableFields.forEach((f) => {
+        const option = document.createElement('option');
+        option.value = f.id;
+        option.textContent = f.label;
+        fieldSelect.appendChild(option);
+      });
+
+      // Показываем как popup/dropdown
+      const popup = document.createElement('div');
+      popup.className = 'field-variable-popup';
+      popup.innerHTML = `
+        <div class="popup-content">
+          <label>Выберите поле для вставки:</label>
+          <div class="popup-select-container"></div>
+          <div class="substring-options">
+            <div class="substring-hint">Substring (необязательно):</div>
+            <div class="substring-inputs">
+              <div class="substring-input-group">
+                <label>Начало (start):</label>
+                <input type="number" class="start-index-input" placeholder="Не указано" min="0" />
+              </div>
+              <div class="substring-input-group">
+                <label>Конец (end):</label>
+                <input type="number" class="end-index-input" placeholder="Не указано (до конца)" min="0" />
+              </div>
+            </div>
+          </div>
+          <div class="popup-buttons">
+            <button type="button" class="popup-btn insert-btn">Вставить</button>
+            <button type="button" class="popup-btn cancel-btn">Отмена</button>
+          </div>
+        </div>
+      `;
+
+      popup.querySelector('.popup-select-container').appendChild(fieldSelect);
+      document.body.appendChild(popup);
+
+      const insertBtn = popup.querySelector('.insert-btn');
+      const cancelBtn = popup.querySelector('.cancel-btn');
+      const startIndexInput = popup.querySelector('.start-index-input');
+      const endIndexInput = popup.querySelector('.end-index-input');
+
+      insertBtn.addEventListener('click', () => {
+        const selectedFieldId = fieldSelect.value;
+        if (selectedFieldId) {
+          const selectedField = availableFields.find((f) => f.id === selectedFieldId);
+          if (selectedField) {
+            // Формируем placeholder
+            let placeholder = `{${selectedField.id}`;
+
+            // Добавляем substring параметры если указаны
+            const start = startIndexInput.value;
+            const end = endIndexInput.value;
+
+            if (start !== '') {
+              placeholder += `,${start}`;
+              if (end !== '') {
+                placeholder += `,${end}`;
+              }
+            }
+
+            placeholder += '}';
+
+            // Вставляем в текущую позицию курсора
+            const cursorPos = formulaInput.selectionStart;
+            const textBefore = formulaInput.value.substring(0, cursorPos);
+            const textAfter = formulaInput.value.substring(cursorPos);
+
+            formulaInput.value = textBefore + placeholder + textAfter;
+            formulaInput.focus();
+            formulaInput.selectionStart = formulaInput.selectionEnd =
+              cursorPos + placeholder.length;
+
+            field.formula = formulaInput.value;
+            updateConfigFromEditor();
+            renderForm();
+          }
+        }
+        popup.remove();
+      });
+
+      cancelBtn.addEventListener('click', () => {
+        popup.remove();
+      });
+
+      // Закрытие по клику вне попапа
+      popup.addEventListener('click', (e) => {
+        if (e.target === popup) {
+          popup.remove();
+        }
+      });
+    });
+  }
+
   fieldsList.appendChild(fieldItem);
+}
+
+// Функция для перестроения списка полей в редакторе
+function rebuildFieldsList() {
+  fieldsList.innerHTML = '';
+  currentConfig.fields.forEach((field) => {
+    addFieldToEditor(field);
+  });
 }
 
 // Функция для обновления конфига из редактора
@@ -707,6 +909,15 @@ function renderForm() {
         fieldGroup.appendChild(checkboxLabel);
         break;
 
+      case 'computed':
+        inputElement = document.createElement('input');
+        inputElement.type = 'text';
+        inputElement.readOnly = true;
+        inputElement.className = 'computed-field';
+        inputElement.dataset.formula = field.formula || '';
+        inputElement.tabIndex = -1; // Убираем из tab навигации
+        break;
+
       default: // text, email
         inputElement = document.createElement('input');
         inputElement.type = field.type;
@@ -733,6 +944,90 @@ function renderForm() {
 
     formFields.insertBefore(fieldGroup, submitBtn);
   });
+
+  // Инициализируем обработчики для автоматического вычисления
+  initComputedFields();
+}
+
+// Функция для вычисления значения по формуле
+function calculateFormula(formula, formElement) {
+  if (!formula) return '';
+
+  let result = formula;
+  const formData = new FormData(formElement);
+
+  // Заменяем все {field_id} или {field_id,start,end} на значения полей
+  const matches = formula.match(/\{([^}]+)\}/g);
+  if (matches) {
+    matches.forEach((match) => {
+      const content = match.slice(1, -1); // Убираем { и }
+      const parts = content.split(',').map((p) => p.trim());
+
+      const fieldId = parts[0];
+      const startIndex = parts.length > 1 ? parseInt(parts[1]) : null;
+      const endIndex = parts.length > 2 ? parseInt(parts[2]) : null;
+
+      let value = '';
+
+      // Получаем значение поля
+      const fieldElement = formElement.querySelector(`[name="${fieldId}"]`);
+      if (fieldElement) {
+        if (fieldElement.type === 'checkbox') {
+          value = fieldElement.checked ? 'Да' : 'Нет';
+        } else if (fieldElement.type === 'radio') {
+          const checkedRadio = formElement.querySelector(`[name="${fieldId}"]:checked`);
+          value = checkedRadio ? checkedRadio.value : '';
+        } else {
+          value = fieldElement.value || '';
+        }
+
+        // Применяем substring если указаны индексы
+        if (value && startIndex !== null) {
+          if (endIndex !== null) {
+            // {field_id,start,end} - substring(start, end)
+            value = value.substring(startIndex, endIndex);
+          } else {
+            // {field_id,start} - substring(start) до конца
+            value = value.substring(startIndex);
+          }
+        }
+      }
+
+      result = result.replace(match, value);
+    });
+  }
+
+  return result;
+}
+
+// Функция для инициализации автоматического обновления вычисляемых полей
+function initComputedFields() {
+  const form = document.getElementById('contactForm');
+  if (!form) return;
+
+  // Находим все вычисляемые поля
+  const computedFields = form.querySelectorAll('.computed-field');
+  if (computedFields.length === 0) return;
+
+  // Функция для обновления всех вычисляемых полей
+  const updateComputedFields = () => {
+    computedFields.forEach((field) => {
+      const formula = field.dataset.formula;
+      if (formula) {
+        field.value = calculateFormula(formula, form);
+      }
+    });
+  };
+
+  // Добавляем обработчики на все поля формы
+  const allInputs = form.querySelectorAll('input:not(.computed-field), select, textarea');
+  allInputs.forEach((input) => {
+    input.addEventListener('input', updateComputedFields);
+    input.addEventListener('change', updateComputedFields);
+  });
+
+  // Первичное вычисление
+  updateComputedFields();
 }
 
 // Функция для создания Discord embed
@@ -850,6 +1145,11 @@ function validateForm(formData) {
 
   // Проверяем обязательные поля из конфига
   currentConfig.fields.forEach((field) => {
+    // Пропускаем вычисляемые поля при валидации - они заполняются автоматически
+    if (field.type === 'computed') {
+      return;
+    }
+
     if (field.required) {
       const value = formData[field.id];
       if (!value || (typeof value === 'string' && !value.trim())) {

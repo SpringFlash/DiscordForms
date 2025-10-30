@@ -910,6 +910,16 @@ textarea:focus {
   background: rgba(99, 102, 241, 0.1);
 }
 
+.field-action-btn.move-up:hover {
+  color: var(--success-color);
+  background: rgba(16, 185, 129, 0.1);
+}
+
+.field-action-btn.move-down:hover {
+  color: var(--warning-color);
+  background: rgba(245, 158, 11, 0.1);
+}
+
 .field-action-btn.delete:hover {
   color: var(--error-color);
   background: rgba(239, 68, 68, 0.1);
@@ -1279,5 +1289,252 @@ textarea:focus {
   .create-form-btn {
     padding: 1rem 2rem;
     font-size: 1rem;
+  }
+}
+
+/* === СТИЛИ ДЛЯ ВЫЧИСЛЯЕМЫХ ПОЛЕЙ === */
+
+/* Редактор формул */
+.formula-editor {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.field-formula-input {
+  flex: 1;
+  padding: 0.75rem;
+  border: 2px solid var(--border-color);
+  border-radius: 8px;
+  font-size: 0.9rem;
+  font-family: 'Courier New', monospace;
+  background: var(--bg-secondary);
+}
+
+.field-formula-input:focus {
+  outline: none;
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+}
+
+.add-field-variable-btn {
+  background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+  color: white;
+  border: none;
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: var(--transition-fast);
+  white-space: nowrap;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.add-field-variable-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-md);
+}
+
+.add-field-variable-btn i {
+  font-size: 0.9rem;
+}
+
+.formula-hint {
+  margin-top: 0.5rem;
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  font-style: italic;
+}
+
+/* Вычисляемое поле в форме */
+.computed-field {
+  background: var(--bg-secondary) !important;
+  cursor: default !important;
+  color: var(--text-secondary) !important;
+  font-style: italic;
+}
+
+.computed-field:focus {
+  border-bottom-color: var(--border-color) !important;
+  outline: none !important;
+}
+
+/* Попап для выбора поля */
+.field-variable-popup {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10000;
+  animation: fadeIn 0.2s ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.popup-content {
+  background: var(--bg-primary);
+  padding: 2rem;
+  border-radius: 12px;
+  box-shadow: var(--shadow-xl);
+  min-width: 400px;
+  max-width: 90%;
+  animation: slideUp 0.3s ease;
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.popup-content label {
+  display: block;
+  margin-bottom: 1rem;
+  color: var(--text-primary);
+  font-weight: 500;
+}
+
+.popup-select-container {
+  margin-bottom: 1rem;
+}
+
+.temp-field-select {
+  width: 100%;
+  padding: 0.75rem;
+  border: 2px solid var(--border-color);
+  border-radius: 8px;
+  font-size: 1rem;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  cursor: pointer;
+}
+
+.temp-field-select:focus {
+  outline: none;
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+}
+
+/* Substring опции */
+.substring-options {
+  margin-bottom: 1.5rem;
+  padding: 1rem;
+  background: var(--bg-secondary);
+  border-radius: 8px;
+  border: 1px solid var(--border-color);
+}
+
+.substring-hint {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  font-weight: 500;
+  margin-bottom: 0.75rem;
+  font-style: italic;
+}
+
+.substring-inputs {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+.substring-input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.substring-input-group label {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+.substring-input-group input[type="number"] {
+  padding: 0.5rem;
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  font-size: 0.9rem;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+}
+
+.substring-input-group input[type="number"]:focus {
+  outline: none;
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.1);
+}
+
+.popup-buttons {
+  display: flex;
+  gap: 0.75rem;
+  justify-content: flex-end;
+}
+
+.popup-btn {
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: 8px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: var(--transition-fast);
+}
+
+.insert-btn {
+  background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+  color: white;
+}
+
+.insert-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-md);
+}
+
+.cancel-btn {
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+}
+
+.cancel-btn:hover {
+  background: var(--border-color);
+}
+
+/* Адаптивность попапа */
+@media (max-width: 640px) {
+  .popup-content {
+    min-width: auto;
+    width: 90%;
+    padding: 1.5rem;
+  }
+
+  .popup-buttons {
+    flex-direction: column;
+  }
+
+  .popup-btn {
+    width: 100%;
+  }
+
+  .substring-inputs {
+    grid-template-columns: 1fr;
   }
 }
