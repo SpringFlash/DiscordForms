@@ -1538,3 +1538,258 @@ textarea:focus {
     grid-template-columns: 1fr;
   }
 }
+
+/* === СТИЛИ ДЛЯ УСЛОВНОЙ ВИДИМОСТИ === */
+
+.field-conditional-container {
+  padding: 1rem;
+  background: var(--bg-secondary);
+  border-radius: 8px;
+  border: 1px solid var(--border-color);
+}
+
+.field-conditional-container > label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 0;
+}
+
+.field-conditional-enabled {
+  width: 18px;
+  height: 18px;
+  cursor: pointer;
+  margin: 0;
+}
+
+.conditional-config {
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--border-color);
+}
+
+.conditional-hint {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  margin-bottom: 0.75rem;
+  font-style: italic;
+}
+
+.conditional-row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.conditional-row span {
+  font-weight: 600;
+  color: var(--text-secondary);
+  font-size: 1.1rem;
+}
+
+.conditional-field-select {
+  flex: 1;
+  padding: 0.75rem;
+  border: 2px solid var(--border-color);
+  border-radius: 8px;
+  font-size: 0.9rem;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  cursor: pointer;
+  transition: var(--transition-fast);
+}
+
+.conditional-field-select:focus {
+  outline: none;
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+}
+
+.conditional-value-input {
+  flex: 1;
+  padding: 0.75rem;
+  border: 2px solid var(--border-color);
+  border-radius: 8px;
+  font-size: 0.9rem;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  transition: var(--transition-fast);
+}
+
+.conditional-value-input:focus {
+  outline: none;
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+}
+
+/* Скрытые условные поля в форме */
+.conditional-field {
+  transition: all 0.3s ease;
+}
+
+/* Адаптивность условной видимости */
+@media (max-width: 640px) {
+  .conditional-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .conditional-row span {
+    text-align: center;
+  }
+}
+
+/* === СТИЛИ ДЛЯ УСЛОВНЫХ СООБЩЕНИЙ === */
+
+.section-hint {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  margin: -0.5rem 0 1rem 0;
+  font-style: italic;
+}
+
+.conditional-messages-list {
+  margin-bottom: 1rem;
+}
+
+.conditional-message-item {
+  background: var(--bg-secondary);
+  border-radius: 8px;
+  padding: 1rem;
+  margin-bottom: 1rem;
+  border: 1px solid var(--border-color);
+}
+
+.condmsg-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 2px solid var(--border-color);
+}
+
+.condmsg-title {
+  font-weight: 600;
+  color: var(--text-primary);
+  font-size: 1rem;
+}
+
+.condmsg-config {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.condmsg-condition {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.condmsg-condition > label {
+  font-size: 0.9rem;
+  color: var(--text-primary);
+  font-weight: 500;
+  min-width: fit-content;
+}
+
+.condmsg-condition > span {
+  font-weight: 600;
+  color: var(--text-secondary);
+  font-size: 1.1rem;
+}
+
+.condmsg-field-select {
+  flex: 1;
+  min-width: 150px;
+  padding: 0.75rem;
+  border: 2px solid var(--border-color);
+  border-radius: 8px;
+  font-size: 0.9rem;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  cursor: pointer;
+  transition: var(--transition-fast);
+}
+
+.condmsg-field-select:focus {
+  outline: none;
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+}
+
+.condmsg-value-container {
+  flex: 1;
+  min-width: 150px;
+}
+
+.condmsg-value-input {
+  width: 100%;
+  padding: 0.75rem;
+  border: 2px solid var(--border-color);
+  border-radius: 8px;
+  font-size: 0.9rem;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  transition: var(--transition-fast);
+}
+
+.condmsg-value-input:focus {
+  outline: none;
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+}
+
+.condmsg-message-input {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.condmsg-message-input > label {
+  font-size: 0.9rem;
+  color: var(--text-primary);
+  font-weight: 500;
+}
+
+.condmsg-message-textarea {
+  width: 100%;
+  padding: 0.75rem;
+  border: 2px solid var(--border-color);
+  border-radius: 8px;
+  font-size: 0.9rem;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  transition: var(--transition-fast);
+  resize: vertical;
+  font-family: inherit;
+}
+
+.condmsg-message-textarea:focus {
+  outline: none;
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+}
+
+/* Адаптивность условных сообщений */
+@media (max-width: 768px) {
+  .condmsg-condition {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .condmsg-condition > span {
+    text-align: center;
+  }
+  
+  .condmsg-field-select,
+  .condmsg-value-container {
+    min-width: 100%;
+  }
+}

@@ -19,6 +19,8 @@ const submitBtn = document.querySelector('.submit-btn');
 const btnText = document.querySelector('.btn-text');
 const btnIcon = document.querySelector('.submit-btn i');
 const responseMessage = document.getElementById('response');
+const conditionalMessagesList = document.getElementById('conditionalMessagesList');
+const addConditionalMessageBtn = document.getElementById('addConditionalMessageBtn');
 
 // Элементы редактора
 const formTitleInput = document.getElementById('formTitle');
@@ -157,6 +159,7 @@ function createEmptyConfig() {
     webhookUsername: 'Форма обратной связи',
     webhookAvatarUrl: 'https://pngimg.com/uploads/discord/discord_PNG3.png',
     organization: 'LSPD',
+    conditionalMessages: [],
     fields: [
       {
         id: generateId(),
@@ -350,6 +353,11 @@ function initEditor() {
   webhookUsernameInput.value = currentConfig.webhookUsername || currentConfig.title;
   webhookAvatarUrlInput.value = currentConfig.webhookAvatarUrl || '';
 
+  // Инициализируем conditionalMessages если их нет (для обратной совместимости)
+  if (!currentConfig.conditionalMessages) {
+    currentConfig.conditionalMessages = [];
+  }
+
   // Устанавливаем выбранную организацию
   if (organizationSelect) {
     organizationSelect.value = currentConfig.organization || 'LSPD';
@@ -402,8 +410,176 @@ function initEditor() {
     renderForm();
   });
 
+  // Инициализируем условные сообщения
+  if (!currentConfig.conditionalMessages) {
+    currentConfig.conditionalMessages = [];
+  }
+  conditionalMessagesList.innerHTML = '';
+  currentConfig.conditionalMessages.forEach((condMsg) => {
+    addConditionalMessageToEditor(condMsg);
+  });
+
+  addConditionalMessageBtn.addEventListener('click', () => {
+    const newCondMsg = {
+      id: generateId(),
+      field: '',
+      value: '',
+      message: '',
+    };
+    currentConfig.conditionalMessages.push(newCondMsg);
+    addConditionalMessageToEditor(newCondMsg);
+    updateConfigFromEditor();
+  });
+
   generateUrlBtn.addEventListener('click', generateShareUrl);
   copyUrlBtn.addEventListener('click', copyShareUrl);
+}
+
+// === ФУНКЦИИ РАБОТЫ С УСЛОВНЫМИ СООБЩЕНИЯМИ ===
+
+// Функция для добавления условного сообщения в редактор
+function addConditionalMessageToEditor(condMsg) {
+  const condMsgItem = document.createElement('div');
+  condMsgItem.className = 'conditional-message-item';
+  condMsgItem.dataset.condMsgId = condMsg.id;
+
+  condMsgItem.innerHTML = `
+    <div class="condmsg-header">
+      <span class="condmsg-title">💬 Условное сообщение</span>
+      <button class="field-action-btn delete" title="Удалить">
+        <i class="fas fa-trash"></i>
+      </button>
+    </div>
+    <div class="condmsg-config">
+      <div class="condmsg-condition">
+        <label>Когда поле:</label>
+        <select class="condmsg-field-select">
+          <option value="">Выберите поле...</option>
+        </select>
+        <span>=</span>
+        <div class="condmsg-value-container">
+          <input type="text" class="condmsg-value-input" value="${
+            condMsg.value || ''
+          }" placeholder="Значение" />
+        </div>
+      </div>
+      <div class="condmsg-message-input">
+        <label>Отправить сообщение:</label>
+        <textarea class="condmsg-message-textarea" rows="3" placeholder="Введите кастомное сообщение для Discord...">${
+          condMsg.message || ''
+        }</textarea>
+      </div>
+    </div>
+  `;
+
+  const deleteBtn = condMsgItem.querySelector('.delete');
+  const fieldSelect = condMsgItem.querySelector('.condmsg-field-select');
+  const valueContainer = condMsgItem.querySelector('.condmsg-value-container');
+  const valueInput = condMsgItem.querySelector('.condmsg-value-input');
+  const messageTextarea = condMsgItem.querySelector('.condmsg-message-textarea');
+
+  // Заполняем селект полей (только select и radio)
+  function populateFieldSelect() {
+    fieldSelect.innerHTML = '<option value="">Выберите поле...</option>';
+    currentConfig.fields.forEach((f) => {
+      if (f.type === 'select' || f.type === 'radio') {
+        const option = document.createElement('option');
+        option.value = f.id;
+        option.textContent = f.label;
+        if (condMsg.field === f.id) {
+          option.selected = true;
+        }
+        fieldSelect.appendChild(option);
+      }
+    });
+  }
+
+  // Обновляем варианты значений
+  function updateValueOptions(selectedFieldId) {
+    const selectedField = currentConfig.fields.find((f) => f.id === selectedFieldId);
+
+    if (!selectedField || !selectedField.options || selectedField.options.length === 0) {
+      // Показываем обычный input
+      const input = document.createElement('input');
+      input.type = 'text';
+      input.className = 'condmsg-value-input';
+      input.value = condMsg.value || '';
+      input.placeholder = 'Значение';
+
+      input.addEventListener('input', (e) => {
+        condMsg.value = e.target.value;
+        updateConfigFromEditor();
+      });
+
+      valueContainer.innerHTML = '';
+      valueContainer.appendChild(input);
+      return;
+    }
+
+    // Создаем select с вариантами
+    const select = document.createElement('select');
+    select.className = 'condmsg-value-input';
+
+    const defaultOption = document.createElement('option');
+    defaultOption.value = '';
+    defaultOption.textContent = 'Выберите значение...';
+    select.appendChild(defaultOption);
+
+    selectedField.options.forEach((opt) => {
+      const option = document.createElement('option');
+      option.value = opt;
+      option.textContent = opt;
+      if (condMsg.value === opt) {
+        option.selected = true;
+      }
+      select.appendChild(option);
+    });
+
+    select.addEventListener('change', (e) => {
+      condMsg.value = e.target.value;
+      updateConfigFromEditor();
+    });
+
+    valueContainer.innerHTML = '';
+    valueContainer.appendChild(select);
+  }
+
+  populateFieldSelect();
+  if (condMsg.field) {
+    updateValueOptions(condMsg.field);
+  }
+
+  // Обработчики
+  deleteBtn.addEventListener('click', () => {
+    if (confirm('Удалить это условное сообщение?')) {
+      currentConfig.conditionalMessages = currentConfig.conditionalMessages.filter(
+        (cm) => cm.id !== condMsg.id
+      );
+      condMsgItem.remove();
+      updateConfigFromEditor();
+    }
+  });
+
+  fieldSelect.addEventListener('change', (e) => {
+    condMsg.field = e.target.value;
+    condMsg.value = '';
+    if (e.target.value) {
+      updateValueOptions(e.target.value);
+    }
+    updateConfigFromEditor();
+  });
+
+  valueInput.addEventListener('input', (e) => {
+    condMsg.value = e.target.value;
+    updateConfigFromEditor();
+  });
+
+  messageTextarea.addEventListener('input', (e) => {
+    condMsg.message = e.target.value;
+    updateConfigFromEditor();
+  });
+
+  conditionalMessagesList.appendChild(condMsgItem);
 }
 
 // === ФУНКЦИИ РАБОТЫ С ПОЛЯМИ ===
@@ -513,6 +689,28 @@ function addFieldToEditor(field) {
         </div>
         <div class="formula-hint">Используйте {id_поля}, {id_поля,start} или {id_поля,start,end} для substring</div>
       </div>
+      <div class="field-config-item field-conditional-container" style="grid-column: 1 / -1;">
+        <label>
+          <input type="checkbox" class="field-conditional-enabled" ${
+            field.conditional && field.conditional.enabled ? 'checked' : ''
+          } />
+          Условная видимость
+        </label>
+        <div class="conditional-config" style="display: ${
+          field.conditional && field.conditional.enabled ? 'block' : 'none'
+        };">
+          <div class="conditional-hint">Показывать это поле только если:</div>
+          <div class="conditional-row">
+            <select class="conditional-field-select">
+              <option value="">Выберите поле...</option>
+            </select>
+            <span>=</span>
+            <input type="text" class="conditional-value-input" value="${
+              field.conditional ? field.conditional.value || '' : ''
+            }" placeholder="Значение" />
+          </div>
+        </div>
+      </div>
     </div>
   `;
 
@@ -531,6 +729,92 @@ function addFieldToEditor(field) {
   const formulaContainer = fieldItem.querySelector('.field-formula-container');
   const formulaInput = fieldItem.querySelector('.field-formula-input');
   const addVariableBtn = fieldItem.querySelector('.add-field-variable-btn');
+  const conditionalEnabledCheckbox = fieldItem.querySelector('.field-conditional-enabled');
+  const conditionalConfig = fieldItem.querySelector('.conditional-config');
+  const conditionalFieldSelect = fieldItem.querySelector('.conditional-field-select');
+  const conditionalValueInput = fieldItem.querySelector('.conditional-value-input');
+
+  // Заполняем селект условных полей
+  function populateConditionalFieldSelect() {
+    conditionalFieldSelect.innerHTML = '<option value="">Выберите поле...</option>';
+
+    // Добавляем только поля с типом select или radio, которые идут до текущего поля
+    currentConfig.fields.forEach((f) => {
+      if (f.id !== field.id && (f.type === 'select' || f.type === 'radio')) {
+        const option = document.createElement('option');
+        option.value = f.id;
+        option.textContent = f.label;
+        if (field.conditional && field.conditional.field === f.id) {
+          option.selected = true;
+        }
+        conditionalFieldSelect.appendChild(option);
+      }
+    });
+  }
+
+  // Функция для обновления списка значений в зависимости от выбранного поля
+  function updateConditionalValueOptions(selectedFieldId) {
+    const selectedField = currentConfig.fields.find((f) => f.id === selectedFieldId);
+
+    if (!selectedField || !selectedField.options || selectedField.options.length === 0) {
+      // Если у поля нет вариантов, показываем обычный input
+      const input = document.createElement('input');
+      input.type = 'text';
+      input.className = 'conditional-value-input';
+      input.value = field.conditional ? field.conditional.value || '' : '';
+      input.placeholder = 'Значение';
+
+      input.addEventListener('input', (e) => {
+        if (!field.conditional) {
+          field.conditional = { enabled: true };
+        }
+        field.conditional.value = e.target.value;
+        updateConfigFromEditor();
+        renderForm();
+      });
+
+      conditionalValueInput.replaceWith(input);
+      return;
+    }
+
+    // Создаем select с вариантами из выбранного поля
+    const select = document.createElement('select');
+    select.className = 'conditional-value-input';
+
+    const defaultOption = document.createElement('option');
+    defaultOption.value = '';
+    defaultOption.textContent = 'Выберите значение...';
+    select.appendChild(defaultOption);
+
+    selectedField.options.forEach((opt) => {
+      const option = document.createElement('option');
+      option.value = opt;
+      option.textContent = opt;
+      if (field.conditional && field.conditional.value === opt) {
+        option.selected = true;
+      }
+      select.appendChild(option);
+    });
+
+    select.addEventListener('change', (e) => {
+      if (!field.conditional) {
+        field.conditional = { enabled: true };
+      }
+      field.conditional.value = e.target.value;
+      updateConfigFromEditor();
+      renderForm();
+    });
+
+    conditionalValueInput.replaceWith(select);
+  }
+
+  // Инициализируем селект
+  populateConditionalFieldSelect();
+
+  // Если уже есть выбранное поле, обновляем варианты значений
+  if (field.conditional && field.conditional.field) {
+    updateConditionalValueOptions(field.conditional.field);
+  }
 
   editBtn.addEventListener('click', () => {
     const config = fieldItem.querySelector('.field-config');
@@ -626,8 +910,15 @@ function addFieldToEditor(field) {
       .split(',')
       .map((opt) => opt.trim())
       .filter((opt) => opt);
+
     updateConfigFromEditor();
     renderForm();
+  });
+
+  // Обновляем conditional selects только когда пользователь закончил редактировать
+  optionsInput.addEventListener('blur', () => {
+    // Обновляем conditional selects для всех полей, которые зависят от текущего
+    rebuildConditionalSelects(field.id);
   });
 
   // Обработчик для формулы
@@ -638,6 +929,50 @@ function addFieldToEditor(field) {
       renderForm();
     });
   }
+
+  // Обработчики для условной видимости
+  conditionalEnabledCheckbox.addEventListener('change', (e) => {
+    const isEnabled = e.target.checked;
+    conditionalConfig.style.display = isEnabled ? 'block' : 'none';
+
+    if (isEnabled) {
+      field.conditional = {
+        enabled: true,
+        field: conditionalFieldSelect.value || '',
+        value: conditionalValueInput.value || '',
+      };
+    } else {
+      field.conditional = { enabled: false };
+    }
+
+    updateConfigFromEditor();
+    renderForm();
+  });
+
+  conditionalFieldSelect.addEventListener('change', (e) => {
+    if (!field.conditional) {
+      field.conditional = { enabled: true };
+    }
+    field.conditional.field = e.target.value;
+    field.conditional.value = ''; // Сбрасываем значение при смене поля
+
+    // Обновляем варианты значений для нового поля
+    if (e.target.value) {
+      updateConditionalValueOptions(e.target.value);
+    }
+
+    updateConfigFromEditor();
+    renderForm();
+  });
+
+  conditionalValueInput.addEventListener('input', (e) => {
+    if (!field.conditional) {
+      field.conditional = { enabled: true };
+    }
+    field.conditional.value = e.target.value;
+    updateConfigFromEditor();
+    renderForm();
+  });
 
   // Обработчик для кнопки добавления переменной
   if (addVariableBtn) {
@@ -766,6 +1101,99 @@ function rebuildFieldsList() {
   });
 }
 
+// Функция для обновления только условных селектов (без пересоздания всех полей)
+function rebuildConditionalSelects(changedFieldId) {
+  // Обновляем условные селекты в полях
+  currentConfig.fields.forEach((field) => {
+    if (
+      field.conditional &&
+      field.conditional.enabled &&
+      field.conditional.field === changedFieldId
+    ) {
+      // Находим этот field-item в DOM
+      const fieldItem = fieldsList.querySelector(`[data-field-id="${field.id}"]`);
+      if (fieldItem) {
+        const conditionalValueInput = fieldItem.querySelector('.conditional-value-input');
+        if (conditionalValueInput) {
+          // Пересоздаем input/select для значения
+          const changedField = currentConfig.fields.find((f) => f.id === changedFieldId);
+          if (changedField && changedField.options && changedField.options.length > 0) {
+            // Создаем select с новыми вариантами
+            const select = document.createElement('select');
+            select.className = 'conditional-value-input';
+
+            const defaultOption = document.createElement('option');
+            defaultOption.value = '';
+            defaultOption.textContent = 'Выберите значение...';
+            select.appendChild(defaultOption);
+
+            changedField.options.forEach((opt) => {
+              const option = document.createElement('option');
+              option.value = opt;
+              option.textContent = opt;
+              if (field.conditional.value === opt) {
+                option.selected = true;
+              }
+              select.appendChild(option);
+            });
+
+            select.addEventListener('change', (e) => {
+              field.conditional.value = e.target.value;
+              updateConfigFromEditor();
+              renderForm();
+            });
+
+            conditionalValueInput.replaceWith(select);
+          }
+        }
+      }
+    }
+  });
+
+  // Обновляем условные селекты в условных сообщениях
+  currentConfig.conditionalMessages.forEach((condMsg) => {
+    if (condMsg.field === changedFieldId) {
+      const condMsgItem = conditionalMessagesList.querySelector(
+        `[data-cond-msg-id="${condMsg.id}"]`
+      );
+      if (condMsgItem) {
+        const valueContainer = condMsgItem.querySelector('.condmsg-value-container');
+        if (valueContainer) {
+          const changedField = currentConfig.fields.find((f) => f.id === changedFieldId);
+          if (changedField && changedField.options && changedField.options.length > 0) {
+            // Создаем select с новыми вариантами
+            const select = document.createElement('select');
+            select.className = 'condmsg-value-input';
+
+            const defaultOption = document.createElement('option');
+            defaultOption.value = '';
+            defaultOption.textContent = 'Выберите значение...';
+            select.appendChild(defaultOption);
+
+            changedField.options.forEach((opt) => {
+              const option = document.createElement('option');
+              option.value = opt;
+              option.textContent = opt;
+              if (condMsg.value === opt) {
+                option.selected = true;
+              }
+              select.appendChild(option);
+            });
+
+            select.addEventListener('change', (e) => {
+              condMsg.value = e.target.value;
+              updateConfigFromEditor();
+            });
+
+            valueContainer.innerHTML = '';
+            valueContainer.appendChild(select);
+          }
+        }
+      }
+    }
+  });
+}
+
 // Функция для обновления конфига из редактора
 function updateConfigFromEditor() {
   currentConfig.title = formTitleInput.value || 'Форма обратной связи';
@@ -840,6 +1268,16 @@ function renderForm() {
   currentConfig.fields.forEach((field) => {
     const fieldGroup = document.createElement('div');
     fieldGroup.className = 'form-group';
+    fieldGroup.dataset.fieldId = field.id;
+
+    // Устанавливаем атрибуты для условной видимости
+    if (field.conditional && field.conditional.enabled) {
+      fieldGroup.dataset.conditionalField = field.conditional.field;
+      fieldGroup.dataset.conditionalValue = field.conditional.value;
+      fieldGroup.classList.add('conditional-field');
+      // По умолчанию скрываем условные поля
+      fieldGroup.style.display = 'none';
+    }
 
     const label = document.createElement('label');
     label.setAttribute('for', field.id);
@@ -947,6 +1385,9 @@ function renderForm() {
 
   // Инициализируем обработчики для автоматического вычисления
   initComputedFields();
+
+  // Инициализируем обработчики для условной видимости
+  initConditionalFields();
 }
 
 // Функция для вычисления значения по формуле
@@ -1030,6 +1471,87 @@ function initComputedFields() {
   updateComputedFields();
 }
 
+// Функция для инициализации условной видимости полей
+function initConditionalFields() {
+  const form = document.getElementById('contactForm');
+  if (!form) return;
+
+  // Находим все условные поля
+  const conditionalFields = form.querySelectorAll('.conditional-field');
+  if (conditionalFields.length === 0) return;
+
+  // Функция для проверки и обновления видимости условных полей
+  const updateConditionalVisibility = () => {
+    conditionalFields.forEach((fieldGroup) => {
+      const dependsOnFieldId = fieldGroup.dataset.conditionalField;
+      const requiredValue = fieldGroup.dataset.conditionalValue;
+
+      // Находим поле, от которого зависит видимость
+      const dependsOnField = form.querySelector(`[name="${dependsOnFieldId}"]`);
+
+      if (!dependsOnField) return;
+
+      let currentValue = '';
+
+      // Получаем текущее значение поля
+      if (dependsOnField.type === 'radio') {
+        const checkedRadio = form.querySelector(`[name="${dependsOnFieldId}"]:checked`);
+        currentValue = checkedRadio ? checkedRadio.value : '';
+      } else {
+        currentValue = dependsOnField.value;
+      }
+
+      // Показываем или скрываем поле в зависимости от условия
+      if (currentValue === requiredValue) {
+        fieldGroup.style.display = 'block';
+        // Анимация появления
+        fieldGroup.style.opacity = '0';
+        fieldGroup.style.transform = 'translateY(-10px)';
+        setTimeout(() => {
+          fieldGroup.style.transition = 'all 0.3s ease';
+          fieldGroup.style.opacity = '1';
+          fieldGroup.style.transform = 'translateY(0)';
+        }, 10);
+      } else {
+        fieldGroup.style.display = 'none';
+        // Очищаем значение скрытого поля
+        const input = fieldGroup.querySelector('input, select, textarea');
+        if (input && input.type !== 'radio' && input.type !== 'checkbox') {
+          input.value = '';
+        }
+      }
+    });
+  };
+
+  // Добавляем обработчики на все поля, от которых зависит видимость других
+  const triggerFields = new Set();
+  conditionalFields.forEach((fieldGroup) => {
+    const dependsOnFieldId = fieldGroup.dataset.conditionalField;
+    if (dependsOnFieldId) {
+      triggerFields.add(dependsOnFieldId);
+    }
+  });
+
+  triggerFields.forEach((fieldId) => {
+    const field = form.querySelector(`[name="${fieldId}"]`);
+    if (field) {
+      // Для radio кнопок обрабатываем все радио с таким именем
+      if (field.type === 'radio') {
+        const allRadios = form.querySelectorAll(`[name="${fieldId}"]`);
+        allRadios.forEach((radio) => {
+          radio.addEventListener('change', updateConditionalVisibility);
+        });
+      } else {
+        field.addEventListener('change', updateConditionalVisibility);
+        field.addEventListener('input', updateConditionalVisibility);
+      }
+    }
+  });
+
+  // Первичная проверка видимости
+  updateConditionalVisibility();
+}
+
 // Функция для создания Discord embed
 function createDiscordEmbed(formData) {
   const priorityColors = {
@@ -1099,6 +1621,28 @@ function createDiscordEmbed(formData) {
 
 // === ОСНОВНАЯ ЛОГИКА ПРИЛОЖЕНИЯ ===
 
+// Функция для выбора кастомного сообщения на основе условий
+function getConditionalMessage(formData) {
+  if (!currentConfig.conditionalMessages || currentConfig.conditionalMessages.length === 0) {
+    return currentConfig.customMessage || null;
+  }
+
+  // Проверяем каждое условное сообщение
+  for (const condMsg of currentConfig.conditionalMessages) {
+    if (condMsg.field && condMsg.value && condMsg.message) {
+      const fieldValue = formData[condMsg.field];
+
+      // Если значение поля совпадает с условием, используем это сообщение
+      if (fieldValue === condMsg.value) {
+        return condMsg.message;
+      }
+    }
+  }
+
+  // Если ни одно условие не сработало, возвращаем дефолтное сообщение
+  return currentConfig.customMessage || null;
+}
+
 // Функция для отправки данных в Discord
 async function sendToDiscord(formData) {
   if (!currentConfig.webhookUrl) {
@@ -1107,8 +1651,11 @@ async function sendToDiscord(formData) {
 
   const embed = createDiscordEmbed(formData);
 
+  // Выбираем правильное кастомное сообщение на основе условий
+  const customMessage = getConditionalMessage(formData);
+
   const payload = {
-    content: currentConfig.customMessage || null,
+    content: customMessage,
     embeds: [embed],
     username: currentConfig.webhookUsername || currentConfig.title,
     avatar_url:
@@ -1142,11 +1689,21 @@ async function sendToDiscord(formData) {
 // Функция валидации формы
 function validateForm(formData) {
   const errors = [];
+  const form = document.getElementById('contactForm');
 
   // Проверяем обязательные поля из конфига
   currentConfig.fields.forEach((field) => {
     // Пропускаем вычисляемые поля при валидации - они заполняются автоматически
     if (field.type === 'computed') {
+      return;
+    }
+
+    // Проверяем, видимо ли поле (для условных полей)
+    const fieldGroup = form.querySelector(`[data-field-id="${field.id}"]`);
+    const isVisible = !fieldGroup || fieldGroup.style.display !== 'none';
+
+    // Пропускаем скрытые условные поля
+    if (!isVisible) {
       return;
     }
 
