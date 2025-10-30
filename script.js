@@ -147,6 +147,40 @@ function createEmptyConfig() {
   };
 }
 
+// Функция для восстановления базовой структуры формы
+function restoreFormStructure() {
+  const formWrapper = document.querySelector(".form-wrapper");
+
+  formWrapper.innerHTML = `
+    <div class="header">
+      <div class="header-top">
+        <h1>Связаться с нами</h1>
+        <div class="form-menu">
+          <button id="editFormBtn" class="edit-form-btn" title="Меню формы">
+            <i class="fas fa-ellipsis-v"></i>
+          </button>
+          <div id="formDropdown" class="form-dropdown">
+            <button class="dropdown-item" id="duplicateBtn">
+              <i class="fas fa-copy"></i>
+              Дублировать и настроить
+            </button>
+          </div>
+        </div>
+      </div>
+      <p>Заполните форму и мы свяжемся с вами в ближайшее время</p>
+    </div>
+
+    <form id="contactForm" class="contact-form">
+      <button type="submit" class="submit-btn">
+        <span class="btn-text">Отправить сообщение</span>
+        <i class="fas fa-arrow-right"></i>
+      </button>
+    </form>
+
+    <div id="response" class="response-message"></div>
+  `;
+}
+
 // Функция для показа welcome screen
 function showWelcomeScreen() {
   const formWrapper = document.querySelector(".form-wrapper");
@@ -195,6 +229,7 @@ function showWelcomeScreen() {
   if (createFormBtn) {
     createFormBtn.addEventListener("click", () => {
       currentConfig = createEmptyConfig();
+      restoreFormStructure(); // Восстанавливаем структуру формы!
       initEditor();
       toggleEditorMode(true);
       renderForm();
@@ -804,6 +839,11 @@ function initApp() {
     if (loadedConfig) {
       currentConfig = loadedConfig;
       isEditorMode = urlParams.mode === "editor";
+
+      // Очищаем webhook URL в режиме editor для безопасности
+      if (isEditorMode) {
+        currentConfig.webhookUrl = "";
+      }
     }
   }
 

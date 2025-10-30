@@ -129,7 +129,7 @@ body {
 }
 
 .form-wrapper.preview {
-    pointer-events: none;
+    pointer-events: auto;
     opacity: 0.9;
     transition: var(--transition-normal);
 }
@@ -151,12 +151,20 @@ body {
 .form-wrapper.preview textarea {
     cursor: not-allowed;
     background: var(--bg-secondary);
+    pointer-events: none;
 }
 
 .form-wrapper.preview button.submit-btn {
     cursor: not-allowed;
     background: var(--text-secondary) !important;
     opacity: 0.6;
+    pointer-events: none;
+}
+
+.form-wrapper.preview label,
+.form-wrapper.preview .radio-label,
+.form-wrapper.preview .checkbox-label {
+    pointer-events: none;
 }
 
 .form-wrapper.preview::after {
@@ -276,8 +284,6 @@ select {
 
 /* Radio buttons */
 .radio-group {
-    display: flex;
-    gap: 1rem;
     margin-top: 0.5rem;
 }
 
@@ -905,10 +911,32 @@ textarea:focus {
       top: 2rem;
       right: 2rem;
       max-width: 380px;
+      max-height: calc(100vh - 4rem);
+      overflow-y: auto;
       transform: scale(0.85);
       transform-origin: top right;
       z-index: 999;
       box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+  }
+
+  /* Кастомный скроллбар для превью */
+  .form-wrapper.preview::-webkit-scrollbar {
+      width: 8px;
+  }
+
+  .form-wrapper.preview::-webkit-scrollbar-track {
+      background: rgba(0, 0, 0, 0.05);
+      border-radius: 10px;
+  }
+
+  .form-wrapper.preview::-webkit-scrollbar-thumb {
+      background: var(--primary-color);
+      border-radius: 10px;
+      opacity: 0.6;
+  }
+
+  .form-wrapper.preview::-webkit-scrollbar-thumb:hover {
+      background: var(--primary-dark);
   }
 
   .editor-panel {
