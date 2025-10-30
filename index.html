@@ -27,11 +27,7 @@
             <h3>Основные настройки</h3>
             <div class="setting-group">
               <label for="formTitle">Название формы:</label>
-              <input
-                type="text"
-                id="formTitle"
-                placeholder="Моя форма обратной связи"
-              />
+              <input type="text" id="formTitle" placeholder="Моя форма обратной связи" />
             </div>
             <div class="setting-group">
               <label for="formDescription">Описание формы:</label>
@@ -51,11 +47,7 @@
             </div>
             <div class="setting-group">
               <label for="webhookUsername">Имя автора в Discord:</label>
-              <input
-                type="text"
-                id="webhookUsername"
-                placeholder="Бот обратной связи"
-              />
+              <input type="text" id="webhookUsername" placeholder="Бот обратной связи" />
             </div>
             <div class="setting-group">
               <label for="webhookAvatarUrl">URL иконки автора:</label>
@@ -64,6 +56,17 @@
                 id="webhookAvatarUrl"
                 placeholder="https://i.imgur.com/example.png"
               />
+            </div>
+            <div class="setting-group">
+              <label>Тема оформления:</label>
+              <div class="theme-switcher">
+                <button id="lightThemeBtn" class="theme-btn active" data-theme="light">
+                  <i class="fas fa-sun"></i> Светлая
+                </button>
+                <button id="darkThemeBtn" class="theme-btn" data-theme="dark">
+                  <i class="fas fa-moon"></i> Тёмная
+                </button>
+              </div>
             </div>
             <div class="setting-group">
               <label for="customMessage">Кастомное сообщение:</label>
@@ -146,9 +149,7 @@
             <select id="subject" name="subject">
               <option value="">Выберите тему</option>
               <option value="Общий вопрос">Общий вопрос</option>
-              <option value="Техническая поддержка">
-                Техническая поддержка
-              </option>
+              <option value="Техническая поддержка">Техническая поддержка</option>
               <option value="Предложение">Предложение</option>
               <option value="Жалоба">Жалоба</option>
               <option value="Другое">Другое</option>

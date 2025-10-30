@@ -6,6 +6,9 @@ let currentConfig = null;
 // Режим работы (editor/view)
 let isEditorMode = false;
 
+// Текущая тема
+let currentTheme = 'dark';
+
 // DOM элементы
 const container = document.querySelector(".container");
 const editorPanel = document.getElementById("editorPanel");
@@ -36,6 +39,10 @@ const pageTitle = document.getElementById("pageTitle");
 const editFormBtn = document.getElementById("editFormBtn");
 const formDropdown = document.getElementById("formDropdown");
 const duplicateBtn = document.getElementById("duplicateBtn");
+
+// Элементы переключателя тем
+const lightThemeBtn = document.getElementById("lightThemeBtn");
+const darkThemeBtn = document.getElementById("darkThemeBtn");
 
 // === УТИЛИТАРНЫЕ ФУНКЦИИ ===
 
@@ -107,6 +114,35 @@ async function copyToClipboard(text) {
 // Функция для генерации уникального ID
 function generateId() {
   return Date.now().toString(36) + Math.random().toString(36).substr(2);
+}
+
+// === ФУНКЦИИ РАБОТЫ С ТЕМАМИ ===
+
+// Функция для применения темы
+function applyTheme(theme) {
+  document.documentElement.setAttribute('data-theme', theme);
+  currentTheme = theme;
+
+  // Обновляем активную кнопку в переключателе
+  if (lightThemeBtn && darkThemeBtn) {
+    lightThemeBtn.classList.toggle('active', theme === 'light');
+    darkThemeBtn.classList.toggle('active', theme === 'dark');
+  }
+
+  // Сохраняем тему в localStorage
+  localStorage.setItem('theme', theme);
+}
+
+// Функция для инициализации темы
+function initTheme() {
+  // Загружаем тему из localStorage или используем тёмную по умолчанию
+  const savedTheme = localStorage.getItem('theme') || 'dark';
+  applyTheme(savedTheme);
+}
+
+// Функция для переключения темы
+function toggleTheme(theme) {
+  applyTheme(theme);
 }
 
 // Функция для создания пустого конфига
@@ -312,6 +348,14 @@ function initEditor() {
   webhookUrlInput.addEventListener("input", updateConfigFromEditor);
   webhookUsernameInput.addEventListener("input", updateConfigFromEditor);
   webhookAvatarUrlInput.addEventListener("input", updateConfigFromEditor);
+
+  // Обработчики переключателя тем
+  if (lightThemeBtn) {
+    lightThemeBtn.addEventListener("click", () => toggleTheme('light'));
+  }
+  if (darkThemeBtn) {
+    darkThemeBtn.addEventListener("click", () => toggleTheme('dark'));
+  }
 
   addFieldBtn.addEventListener("click", () => {
     const newField = {
@@ -832,6 +876,9 @@ function validateForm(formData) {
 // Функция инициализации приложения
 function initApp() {
   const urlParams = getUrlParams();
+
+  // Инициализируем тему
+  initTheme();
 
   // Если есть конфиг в URL, загружаем его
   if (urlParams.config) {
