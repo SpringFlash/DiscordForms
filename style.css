@@ -163,6 +163,7 @@ body {
   border-radius: var(--border-radius);
   box-shadow: var(--shadow-xl);
   padding: 3rem;
+  padding-top: 1rem;
   width: 100%;
   max-width: 680px;
   position: relative;
@@ -234,6 +235,51 @@ body {
   background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
 }
 
+/* Логотип организации */
+.organization-logo {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 0 1rem;
+}
+
+.organization-logo img {
+  max-width: 80%;
+  max-height: 150px;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.1));
+  transition: var(--transition-normal);
+}
+
+.organization-logo img:hover {
+  filter: drop-shadow(0 6px 12px rgba(0, 0, 0, 0.15));
+  transform: scale(1.02);
+}
+
+/* Vinewood логотип */
+.vinewood-logo {
+  margin: 0 auto 1.5rem auto;
+  width: fit-content;
+  border-radius: 30px;
+  background-color: rgba(255, 255, 255, 0.3);
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center;
+  transition: var(--transition-normal);
+  opacity: 0.85;
+  padding: 0 10px;
+  margin-top: -10px;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.vinewood-logo:hover {
+  opacity: 1;
+  transform: scale(1.02);
+}
+
 /* Заголовок */
 .header {
   margin-bottom: 2.5rem;
@@ -244,6 +290,7 @@ body {
   font-weight: 700;
   margin: 0;
   color: var(--text-primary);
+  text-align: center;
 }
 
 .header p {

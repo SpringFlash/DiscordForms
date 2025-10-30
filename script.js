@@ -10,50 +10,52 @@ let isEditorMode = false;
 let currentTheme = 'dark';
 
 // DOM элементы
-const container = document.querySelector(".container");
-const editorPanel = document.getElementById("editorPanel");
-const formWrapper = document.querySelector(".form-wrapper");
-const formPreview = document.getElementById("formPreview");
-const contactForm = document.getElementById("contactForm");
-const submitBtn = document.querySelector(".submit-btn");
-const btnText = document.querySelector(".btn-text");
-const btnIcon = document.querySelector(".submit-btn i");
-const responseMessage = document.getElementById("response");
+const container = document.querySelector('.container');
+const editorPanel = document.getElementById('editorPanel');
+const formWrapper = document.querySelector('.form-wrapper');
+const formPreview = document.getElementById('formPreview');
+const contactForm = document.getElementById('contactForm');
+const submitBtn = document.querySelector('.submit-btn');
+const btnText = document.querySelector('.btn-text');
+const btnIcon = document.querySelector('.submit-btn i');
+const responseMessage = document.getElementById('response');
 
 // Элементы редактора
-const formTitleInput = document.getElementById("formTitle");
-const formDescriptionInput = document.getElementById("formDescription");
-const customMessageInput = document.getElementById("customMessage");
-const webhookUrlInput = document.getElementById("webhookUrl");
-const webhookUsernameInput = document.getElementById("webhookUsername");
-const webhookAvatarUrlInput = document.getElementById("webhookAvatarUrl");
-const fieldsList = document.getElementById("fieldsList");
-const addFieldBtn = document.getElementById("addFieldBtn");
-const generateUrlBtn = document.getElementById("generateUrlBtn");
-const shareUrlDiv = document.getElementById("shareUrl");
-const shareUrlInput = document.getElementById("shareUrlInput");
-const copyUrlBtn = document.getElementById("copyUrlBtn");
-const pageTitle = document.getElementById("pageTitle");
+const formTitleInput = document.getElementById('formTitle');
+const formDescriptionInput = document.getElementById('formDescription');
+const customMessageInput = document.getElementById('customMessage');
+const webhookUrlInput = document.getElementById('webhookUrl');
+const webhookUsernameInput = document.getElementById('webhookUsername');
+const webhookAvatarUrlInput = document.getElementById('webhookAvatarUrl');
+const organizationSelect = document.getElementById('organizationSelect');
+const fieldsList = document.getElementById('fieldsList');
+const addFieldBtn = document.getElementById('addFieldBtn');
+const generateUrlBtn = document.getElementById('generateUrlBtn');
+const shareUrlDiv = document.getElementById('shareUrl');
+const shareUrlInput = document.getElementById('shareUrlInput');
+const copyUrlBtn = document.getElementById('copyUrlBtn');
+const pageTitle = document.getElementById('pageTitle');
+const orgLogoImg = document.getElementById('orgLogoImg');
 
 // Кнопка редактирования формы и выпадающее меню
-const editFormBtn = document.getElementById("editFormBtn");
-const formDropdown = document.getElementById("formDropdown");
-const duplicateBtn = document.getElementById("duplicateBtn");
+const editFormBtn = document.getElementById('editFormBtn');
+const formDropdown = document.getElementById('formDropdown');
+const duplicateBtn = document.getElementById('duplicateBtn');
 
 // Элементы переключателя тем
-const lightThemeBtn = document.getElementById("lightThemeBtn");
-const darkThemeBtn = document.getElementById("darkThemeBtn");
+const lightThemeBtn = document.getElementById('lightThemeBtn');
+const darkThemeBtn = document.getElementById('darkThemeBtn');
 
 // === УТИЛИТАРНЫЕ ФУНКЦИИ ===
 
 // Функция для показа сообщений
-function showMessage(message, type = "success") {
+function showMessage(message, type = 'success') {
   responseMessage.textContent = message;
   responseMessage.className = `response-message ${type} show`;
 
   // Автоматически скрываем сообщение через 5 секунд
   setTimeout(() => {
-    responseMessage.classList.remove("show");
+    responseMessage.classList.remove('show');
   }, 5000);
 }
 
@@ -67,7 +69,7 @@ function decodeConfig(encodedConfig) {
   try {
     return JSON.parse(decodeURIComponent(atob(encodedConfig)));
   } catch (e) {
-    console.error("Ошибка декодирования конфига:", e);
+    console.error('Ошибка декодирования конфига:', e);
     return null;
   }
 }
@@ -76,8 +78,8 @@ function decodeConfig(encodedConfig) {
 function getUrlParams() {
   const params = new URLSearchParams(window.location.search);
   return {
-    config: params.get("config"),
-    mode: params.get("mode"),
+    config: params.get('config'),
+    mode: params.get('mode'),
   };
 }
 
@@ -86,18 +88,18 @@ function updateUrl(config = null, mode = null) {
   const url = new URL(window.location);
 
   if (config) {
-    url.searchParams.set("config", encodeConfig(config));
+    url.searchParams.set('config', encodeConfig(config));
   }
 
   if (mode !== null) {
     if (mode) {
-      url.searchParams.set("mode", "editor");
+      url.searchParams.set('mode', 'editor');
     } else {
-      url.searchParams.delete("mode");
+      url.searchParams.delete('mode');
     }
   }
 
-  window.history.pushState({}, "", url);
+  window.history.pushState({}, '', url);
 }
 
 // Функция для копирования текста в буфер обмена
@@ -106,7 +108,7 @@ async function copyToClipboard(text) {
     await navigator.clipboard.writeText(text);
     return true;
   } catch (err) {
-    console.error("Ошибка копирования:", err);
+    console.error('Ошибка копирования:', err);
     return false;
   }
 }
@@ -148,36 +150,37 @@ function toggleTheme(theme) {
 // Функция для создания пустого конфига
 function createEmptyConfig() {
   return {
-    title: "Моя форма",
-    description: "Описание формы",
-    customMessage: "",
-    webhookUrl: "",
-    webhookUsername: "Форма обратной связи",
-    webhookAvatarUrl: "https://pngimg.com/uploads/discord/discord_PNG3.png",
+    title: 'Моя форма',
+    description: 'Описание формы',
+    customMessage: '',
+    webhookUrl: '',
+    webhookUsername: 'Форма обратной связи',
+    webhookAvatarUrl: 'https://pngimg.com/uploads/discord/discord_PNG3.png',
+    organization: 'LSPD',
     fields: [
       {
         id: generateId(),
-        type: "text",
-        label: "Имя",
-        placeholder: "",
+        type: 'text',
+        label: 'Имя',
+        placeholder: '',
         required: true,
-        icon: "user",
+        icon: 'user',
       },
       {
         id: generateId(),
-        type: "email",
-        label: "Email",
-        placeholder: "",
+        type: 'email',
+        label: 'Email',
+        placeholder: '',
         required: true,
-        icon: "envelope",
+        icon: 'envelope',
       },
       {
         id: generateId(),
-        type: "textarea",
-        label: "Сообщение",
-        placeholder: "",
+        type: 'textarea',
+        label: 'Сообщение',
+        placeholder: '',
         required: true,
-        icon: "comment",
+        icon: 'comment',
       },
     ],
   };
@@ -185,9 +188,13 @@ function createEmptyConfig() {
 
 // Функция для восстановления базовой структуры формы
 function restoreFormStructure() {
-  const formWrapper = document.querySelector(".form-wrapper");
+  const formWrapper = document.querySelector('.form-wrapper');
 
   formWrapper.innerHTML = `
+    <div id="organizationLogo" class="organization-logo">
+      <img src="images/LSPD.png" alt="Organization Logo" id="orgLogoImg" />
+    </div>
+    <div class="vinewood-logo"></div>
     <div class="header">
       <div class="header-top">
         <h1>Связаться с нами</h1>
@@ -219,11 +226,11 @@ function restoreFormStructure() {
 
 // Функция для показа welcome screen
 function showWelcomeScreen() {
-  const formWrapper = document.querySelector(".form-wrapper");
+  const formWrapper = document.querySelector('.form-wrapper');
 
   // Обновляем title страницы
-  document.title = "Discord Forms - Создай свою форму";
-  document.getElementById("pageTitle").textContent = "Discord Forms";
+  document.title = 'Discord Forms - Создай свою форму';
+  document.getElementById('pageTitle').textContent = 'Discord Forms';
 
   formWrapper.innerHTML = `
     <div class="welcome-screen">
@@ -261,9 +268,9 @@ function showWelcomeScreen() {
   `;
 
   // Обработчик кнопки создания формы
-  const createFormBtn = document.getElementById("createFormBtn");
+  const createFormBtn = document.getElementById('createFormBtn');
   if (createFormBtn) {
-    createFormBtn.addEventListener("click", () => {
+    createFormBtn.addEventListener('click', () => {
       currentConfig = createEmptyConfig();
       restoreFormStructure(); // Восстанавливаем структуру формы!
       initEditor();
@@ -282,11 +289,11 @@ function setLoading(isLoading) {
     submitBtn.disabled = isLoading;
 
     if (isLoading) {
-      btnText.textContent = "Отправка...";
-      btnIcon.className = "fas fa-spinner loading";
+      btnText.textContent = 'Отправка...';
+      btnIcon.className = 'fas fa-spinner loading';
     } else {
-      btnText.textContent = "Отправить сообщение";
-      btnIcon.className = "fas fa-arrow-right";
+      btnText.textContent = 'Отправить сообщение';
+      btnIcon.className = 'fas fa-arrow-right';
     }
   }
 }
@@ -296,32 +303,41 @@ function toggleEditorMode(showEditor) {
   isEditorMode = showEditor;
 
   if (showEditor) {
-    editorPanel.classList.add("show");
+    editorPanel.classList.add('show');
 
     // Включаем режим редактора для контейнера
     if (container) {
-      container.classList.add("editor-mode");
+      container.classList.add('editor-mode');
     }
 
     // Делаем форму превью
     if (formPreview) {
-      formPreview.classList.add("preview");
+      formPreview.classList.add('preview');
     }
   } else {
-    editorPanel.classList.remove("show");
+    editorPanel.classList.remove('show');
 
     // Выключаем режим редактора
     if (container) {
-      container.classList.remove("editor-mode");
+      container.classList.remove('editor-mode');
     }
 
     // Убираем превью
     if (formPreview) {
-      formPreview.classList.remove("preview");
+      formPreview.classList.remove('preview');
     }
   }
 
   updateUrl(null, showEditor);
+}
+
+// Функция для обновления логотипа организации
+function updateOrganizationLogo(organization) {
+  const logoImg = document.getElementById('orgLogoImg');
+  if (logoImg) {
+    logoImg.src = `images/${organization}.png`;
+    logoImg.alt = `${organization} Logo`;
+  }
 }
 
 // Функция для инициализации редактора
@@ -329,42 +345,56 @@ function initEditor() {
   // Заполняем поля редактора текущими значениями
   formTitleInput.value = currentConfig.title;
   formDescriptionInput.value = currentConfig.description;
-  customMessageInput.value = currentConfig.customMessage || "";
+  customMessageInput.value = currentConfig.customMessage || '';
   webhookUrlInput.value = currentConfig.webhookUrl;
-  webhookUsernameInput.value =
-    currentConfig.webhookUsername || currentConfig.title;
-  webhookAvatarUrlInput.value = currentConfig.webhookAvatarUrl || "";
+  webhookUsernameInput.value = currentConfig.webhookUsername || currentConfig.title;
+  webhookAvatarUrlInput.value = currentConfig.webhookAvatarUrl || '';
+
+  // Устанавливаем выбранную организацию
+  if (organizationSelect) {
+    organizationSelect.value = currentConfig.organization || 'LSPD';
+    updateOrganizationLogo(currentConfig.organization || 'LSPD');
+  }
 
   // Очищаем список полей и добавляем существующие
-  fieldsList.innerHTML = "";
+  fieldsList.innerHTML = '';
   currentConfig.fields.forEach((field) => {
     addFieldToEditor(field);
   });
 
   // Обработчики событий редактора
-  formTitleInput.addEventListener("input", updateConfigFromEditor);
-  formDescriptionInput.addEventListener("input", updateConfigFromEditor);
-  customMessageInput.addEventListener("input", updateConfigFromEditor);
-  webhookUrlInput.addEventListener("input", updateConfigFromEditor);
-  webhookUsernameInput.addEventListener("input", updateConfigFromEditor);
-  webhookAvatarUrlInput.addEventListener("input", updateConfigFromEditor);
+  formTitleInput.addEventListener('input', updateConfigFromEditor);
+  formDescriptionInput.addEventListener('input', updateConfigFromEditor);
+  customMessageInput.addEventListener('input', updateConfigFromEditor);
+  webhookUrlInput.addEventListener('input', updateConfigFromEditor);
+  webhookUsernameInput.addEventListener('input', updateConfigFromEditor);
+  webhookAvatarUrlInput.addEventListener('input', updateConfigFromEditor);
+
+  // Обработчик для селектора организации
+  if (organizationSelect) {
+    organizationSelect.addEventListener('change', (e) => {
+      currentConfig.organization = e.target.value;
+      updateOrganizationLogo(e.target.value);
+      updateConfigFromEditor();
+    });
+  }
 
   // Обработчики переключателя тем
   if (lightThemeBtn) {
-    lightThemeBtn.addEventListener("click", () => toggleTheme('light'));
+    lightThemeBtn.addEventListener('click', () => toggleTheme('light'));
   }
   if (darkThemeBtn) {
-    darkThemeBtn.addEventListener("click", () => toggleTheme('dark'));
+    darkThemeBtn.addEventListener('click', () => toggleTheme('dark'));
   }
 
-  addFieldBtn.addEventListener("click", () => {
+  addFieldBtn.addEventListener('click', () => {
     const newField = {
       id: generateId(),
-      type: "text",
-      label: "Новое поле",
-      placeholder: "",
+      type: 'text',
+      label: 'Новое поле',
+      placeholder: '',
       required: false,
-      icon: "question",
+      icon: 'question',
     };
     currentConfig.fields.push(newField);
     addFieldToEditor(newField);
@@ -372,33 +402,31 @@ function initEditor() {
     renderForm();
   });
 
-  generateUrlBtn.addEventListener("click", generateShareUrl);
-  copyUrlBtn.addEventListener("click", copyShareUrl);
+  generateUrlBtn.addEventListener('click', generateShareUrl);
+  copyUrlBtn.addEventListener('click', copyShareUrl);
 }
 
 // === ФУНКЦИИ РАБОТЫ С ПОЛЯМИ ===
 
 // Функция для добавления поля в редактор
 function addFieldToEditor(field) {
-  const fieldItem = document.createElement("div");
-  fieldItem.className = "field-item";
+  const fieldItem = document.createElement('div');
+  fieldItem.className = 'field-item';
   fieldItem.dataset.fieldId = field.id;
 
   const iconMap = {
-    user: "👤",
-    envelope: "📧",
-    tag: "🏷️",
-    "exclamation-triangle": "⚡",
-    comment: "💬",
-    newspaper: "📰",
-    question: "❓",
+    user: '👤',
+    envelope: '📧',
+    tag: '🏷️',
+    'exclamation-triangle': '⚡',
+    comment: '💬',
+    newspaper: '📰',
+    question: '❓',
   };
 
   fieldItem.innerHTML = `
     <div class="field-header">
-      <span class="field-title">${iconMap[field.icon] || "❓"} ${
-    field.label
-  }</span>
+      <span class="field-title">${iconMap[field.icon] || '❓'} ${field.label}</span>
       <div class="field-actions">
         <button class="field-action-btn edit" title="Редактировать">
           <i class="fas fa-edit"></i>
@@ -412,50 +440,30 @@ function addFieldToEditor(field) {
       <div class="field-config-item">
         <label>Тип поля</label>
         <select class="field-type">
-          <option value="text" ${
-            field.type === "text" ? "selected" : ""
-          }>Текст</option>
-          <option value="email" ${
-            field.type === "email" ? "selected" : ""
-          }>Email</option>
+          <option value="text" ${field.type === 'text' ? 'selected' : ''}>Текст</option>
+          <option value="email" ${field.type === 'email' ? 'selected' : ''}>Email</option>
           <option value="textarea" ${
-            field.type === "textarea" ? "selected" : ""
+            field.type === 'textarea' ? 'selected' : ''
           }>Текстовая область</option>
           <option value="select" ${
-            field.type === "select" ? "selected" : ""
+            field.type === 'select' ? 'selected' : ''
           }>Выпадающий список</option>
-          <option value="radio" ${
-            field.type === "radio" ? "selected" : ""
-          }>Радиокнопки</option>
-          <option value="checkbox" ${
-            field.type === "checkbox" ? "selected" : ""
-          }>Чекбокс</option>
+          <option value="radio" ${field.type === 'radio' ? 'selected' : ''}>Радиокнопки</option>
+          <option value="checkbox" ${field.type === 'checkbox' ? 'selected' : ''}>Чекбокс</option>
         </select>
       </div>
       <div class="field-config-item">
         <label>Иконка</label>
         <select class="field-icon">
-          <option value="user" ${
-            field.icon === "user" ? "selected" : ""
-          }>Пользователь</option>
-          <option value="envelope" ${
-            field.icon === "envelope" ? "selected" : ""
-          }>Email</option>
-          <option value="tag" ${
-            field.icon === "tag" ? "selected" : ""
-          }>Тег</option>
+          <option value="user" ${field.icon === 'user' ? 'selected' : ''}>Пользователь</option>
+          <option value="envelope" ${field.icon === 'envelope' ? 'selected' : ''}>Email</option>
+          <option value="tag" ${field.icon === 'tag' ? 'selected' : ''}>Тег</option>
           <option value="exclamation-triangle" ${
-            field.icon === "exclamation-triangle" ? "selected" : ""
+            field.icon === 'exclamation-triangle' ? 'selected' : ''
           }>Приоритет</option>
-          <option value="comment" ${
-            field.icon === "comment" ? "selected" : ""
-          }>Сообщение</option>
-          <option value="newspaper" ${
-            field.icon === "newspaper" ? "selected" : ""
-          }>Новости</option>
-          <option value="question" ${
-            field.icon === "question" ? "selected" : ""
-          }>Вопрос</option>
+          <option value="comment" ${field.icon === 'comment' ? 'selected' : ''}>Сообщение</option>
+          <option value="newspaper" ${field.icon === 'newspaper' ? 'selected' : ''}>Новости</option>
+          <option value="question" ${field.icon === 'question' ? 'selected' : ''}>Вопрос</option>
         </select>
       </div>
       <div class="field-config-item">
@@ -464,96 +472,89 @@ function addFieldToEditor(field) {
       </div>
       <div class="field-config-item">
         <label>Placeholder</label>
-        <input type="text" class="field-placeholder" value="${
-          field.placeholder || ""
-        }" />
+        <input type="text" class="field-placeholder" value="${field.placeholder || ''}" />
       </div>
       <div class="field-config-item">
         <label>Обязательное</label>
-        <input type="checkbox" class="field-required" ${
-          field.required ? "checked" : ""
-        } />
+        <input type="checkbox" class="field-required" ${field.required ? 'checked' : ''} />
       </div>
       <div class="field-config-item field-options" style="display: ${
-        field.type === "select" || field.type === "radio" ? "block" : "none"
+        field.type === 'select' || field.type === 'radio' ? 'block' : 'none'
       };">
         <label>Варианты (через запятую)</label>
         <input type="text" class="field-options-input" value="${
-          field.options ? field.options.join(", ") : ""
+          field.options ? field.options.join(', ') : ''
         }" />
       </div>
     </div>
   `;
 
   // Обработчики событий для поля
-  const editBtn = fieldItem.querySelector(".edit");
-  const deleteBtn = fieldItem.querySelector(".delete");
-  const typeSelect = fieldItem.querySelector(".field-type");
-  const labelInput = fieldItem.querySelector(".field-label");
-  const placeholderInput = fieldItem.querySelector(".field-placeholder");
-  const iconSelect = fieldItem.querySelector(".field-icon");
-  const requiredCheckbox = fieldItem.querySelector(".field-required");
-  const optionsContainer = fieldItem.querySelector(".field-options");
-  const optionsInput = fieldItem.querySelector(".field-options-input");
+  const editBtn = fieldItem.querySelector('.edit');
+  const deleteBtn = fieldItem.querySelector('.delete');
+  const typeSelect = fieldItem.querySelector('.field-type');
+  const labelInput = fieldItem.querySelector('.field-label');
+  const placeholderInput = fieldItem.querySelector('.field-placeholder');
+  const iconSelect = fieldItem.querySelector('.field-icon');
+  const requiredCheckbox = fieldItem.querySelector('.field-required');
+  const optionsContainer = fieldItem.querySelector('.field-options');
+  const optionsInput = fieldItem.querySelector('.field-options-input');
 
-  editBtn.addEventListener("click", () => {
-    const config = fieldItem.querySelector(".field-config");
-    config.style.display = config.style.display === "none" ? "grid" : "none";
+  editBtn.addEventListener('click', () => {
+    const config = fieldItem.querySelector('.field-config');
+    config.style.display = config.style.display === 'none' ? 'grid' : 'none';
   });
 
-  deleteBtn.addEventListener("click", () => {
-    if (confirm("Удалить это поле?")) {
-      currentConfig.fields = currentConfig.fields.filter(
-        (f) => f.id !== field.id
-      );
+  deleteBtn.addEventListener('click', () => {
+    if (confirm('Удалить это поле?')) {
+      currentConfig.fields = currentConfig.fields.filter((f) => f.id !== field.id);
       fieldItem.remove();
       updateConfigFromEditor();
       renderForm();
     }
   });
 
-  typeSelect.addEventListener("change", (e) => {
+  typeSelect.addEventListener('change', (e) => {
     const newType = e.target.value;
     field.type = newType;
-    optionsContainer.style.display =
-      newType === "select" || newType === "radio" ? "block" : "none";
+    optionsContainer.style.display = newType === 'select' || newType === 'radio' ? 'block' : 'none';
     updateConfigFromEditor();
     renderForm();
   });
 
-  labelInput.addEventListener("input", (e) => {
+  labelInput.addEventListener('input', (e) => {
     field.label = e.target.value;
-    fieldItem.querySelector(".field-title").textContent = `${
-      iconMap[field.icon] || "❓"
-    } ${field.label}`;
+    fieldItem.querySelector('.field-title').textContent = `${iconMap[field.icon] || '❓'} ${
+      field.label
+    }`;
     updateConfigFromEditor();
     renderForm();
   });
 
-  placeholderInput.addEventListener("input", (e) => {
+  placeholderInput.addEventListener('input', (e) => {
     field.placeholder = e.target.value;
     updateConfigFromEditor();
     renderForm();
   });
 
-  iconSelect.addEventListener("change", (e) => {
+  iconSelect.addEventListener('change', (e) => {
     field.icon = e.target.value;
-    fieldItem.querySelector(".field-title").textContent = `${
-      iconMap[field.icon] || "❓"
-    } ${field.label}`;
+    fieldItem.querySelector('.field-title').textContent = `${iconMap[field.icon] || '❓'} ${
+      field.label
+    }`;
     updateConfigFromEditor();
     renderForm();
   });
 
-  requiredCheckbox.addEventListener("change", (e) => {
+  requiredCheckbox.addEventListener('change', (e) => {
     field.required = e.target.checked;
     updateConfigFromEditor();
     renderForm();
   });
 
-  optionsInput.addEventListener("input", (e) => {
+  optionsInput.addEventListener('input', (e) => {
     field.options = e.target.value
-      .split(",")
+      .split(',')
       .map((opt) => opt.trim())
       .filter((opt) => opt);
     updateConfigFromEditor();
@@ -565,20 +566,18 @@ function addFieldToEditor(field) {
 
 // Функция для обновления конфига из редактора
 function updateConfigFromEditor() {
-  currentConfig.title = formTitleInput.value || "Форма обратной связи";
-  currentConfig.description = formDescriptionInput.value || "Заполните форму";
-  currentConfig.customMessage = customMessageInput.value || "";
+  currentConfig.title = formTitleInput.value || 'Форма обратной связи';
+  currentConfig.description = formDescriptionInput.value || 'Заполните форму';
+  currentConfig.customMessage = customMessageInput.value || '';
   currentConfig.webhookUrl = webhookUrlInput.value;
-  currentConfig.webhookUsername =
-    webhookUsernameInput.value || currentConfig.title;
+  currentConfig.webhookUsername = webhookUsernameInput.value || currentConfig.title;
   currentConfig.webhookAvatarUrl =
-    webhookAvatarUrlInput.value ||
-    "https://pngimg.com/uploads/discord/discord_PNG3.png";
+    webhookAvatarUrlInput.value || 'https://pngimg.com/uploads/discord/discord_PNG3.png';
 
   // Обновляем заголовок страницы
   pageTitle.textContent = currentConfig.title;
-  document.querySelector("h1").textContent = currentConfig.title;
-  document.querySelector(".header p").textContent = currentConfig.description;
+  document.querySelector('h1').textContent = currentConfig.title;
+  document.querySelector('.header p').textContent = currentConfig.description;
 
   updateUrl(currentConfig);
 }
@@ -586,7 +585,7 @@ function updateConfigFromEditor() {
 // Функция для генерации URL для шаринга
 function generateShareUrl() {
   if (!currentConfig.webhookUrl.trim()) {
-    showMessage("Укажите Discord Webhook URL перед генерацией ссылки", "error");
+    showMessage('Укажите Discord Webhook URL перед генерацией ссылки', 'error');
     return;
   }
 
@@ -595,9 +594,9 @@ function generateShareUrl() {
   const shareUrl = `${baseUrl}?config=${encodeConfig(shareConfig)}`;
 
   shareUrlInput.value = shareUrl;
-  shareUrlDiv.style.display = "block";
+  shareUrlDiv.style.display = 'block';
 
-  showMessage("Ссылка для шаринга сгенерирована!", "success");
+  showMessage('Ссылка для шаринга сгенерирована!', 'success');
 }
 
 // Функция для копирования URL
@@ -606,64 +605,64 @@ async function copyShareUrl() {
   const success = await copyToClipboard(url);
 
   if (success) {
-    copyUrlBtn.classList.add("copied");
+    copyUrlBtn.classList.add('copied');
     copyUrlBtn.innerHTML = '<i class="fas fa-check"></i> Скопировано!';
 
     setTimeout(() => {
-      copyUrlBtn.classList.remove("copied");
+      copyUrlBtn.classList.remove('copied');
       copyUrlBtn.innerHTML = '<i class="fas fa-copy"></i> Копировать';
     }, 2000);
 
-    showMessage("Ссылка скопирована в буфер обмена!", "success");
+    showMessage('Ссылка скопирована в буфер обмена!', 'success');
   } else {
-    showMessage("Не удалось скопировать ссылку", "error");
+    showMessage('Не удалось скопировать ссылку', 'error');
   }
 }
 
 // Функция для рендеринга формы на основе конфига
 function renderForm() {
-  const formHeader = formWrapper.querySelector(".header h1");
-  const formDescription = formWrapper.querySelector(".header p");
-  const formFields = formWrapper.querySelector(".contact-form");
+  const formHeader = formWrapper.querySelector('.header h1');
+  const formDescription = formWrapper.querySelector('.header p');
+  const formFields = formWrapper.querySelector('.contact-form');
 
   // Обновляем заголовок и описание
   formHeader.textContent = currentConfig.title;
   formDescription.textContent = currentConfig.description;
 
   // Очищаем форму, оставляя кнопку отправки
-  const submitBtn = formFields.querySelector(".submit-btn");
-  formFields.innerHTML = "";
+  const submitBtn = formFields.querySelector('.submit-btn');
+  formFields.innerHTML = '';
   formFields.appendChild(submitBtn);
 
   // Добавляем поля
   currentConfig.fields.forEach((field) => {
-    const fieldGroup = document.createElement("div");
-    fieldGroup.className = "form-group";
+    const fieldGroup = document.createElement('div');
+    fieldGroup.className = 'form-group';
 
-    const label = document.createElement("label");
-    label.setAttribute("for", field.id);
+    const label = document.createElement('label');
+    label.setAttribute('for', field.id);
     label.innerHTML = `<i class="fas fa-${field.icon}"></i> ${field.label}${
-      field.required ? " *" : ""
+      field.required ? ' *' : ''
     }`;
 
     let inputElement;
 
     switch (field.type) {
-      case "textarea":
-        inputElement = document.createElement("textarea");
+      case 'textarea':
+        inputElement = document.createElement('textarea');
         inputElement.rows = 5;
         break;
 
-      case "select":
-        inputElement = document.createElement("select");
+      case 'select':
+        inputElement = document.createElement('select');
         if (field.options) {
-          const defaultOption = document.createElement("option");
-          defaultOption.value = "";
-          defaultOption.textContent = "Выберите вариант";
+          const defaultOption = document.createElement('option');
+          defaultOption.value = '';
+          defaultOption.textContent = 'Выберите вариант';
           inputElement.appendChild(defaultOption);
 
           field.options.forEach((option) => {
-            const optionElement = document.createElement("option");
+            const optionElement = document.createElement('option');
             optionElement.value = option;
             optionElement.textContent = option;
             inputElement.appendChild(optionElement);
@@ -671,18 +670,18 @@ function renderForm() {
         }
         break;
 
-      case "radio":
-        const radioGroup = document.createElement("div");
-        radioGroup.className = "radio-group";
+      case 'radio':
+        const radioGroup = document.createElement('div');
+        radioGroup.className = 'radio-group';
 
         if (field.options) {
           field.options.forEach((option, index) => {
-            const radioLabel = document.createElement("label");
-            radioLabel.className = "radio-label";
+            const radioLabel = document.createElement('label');
+            radioLabel.className = 'radio-label';
 
             radioLabel.innerHTML = `
               <input type="radio" name="${field.id}" value="${option}" ${
-              index === 0 && field.defaultValue === option ? "checked" : ""
+              index === 0 && field.defaultValue === option ? 'checked' : ''
             } />
               <span class="radio-custom"></span>
               ${option}
@@ -695,9 +694,9 @@ function renderForm() {
         inputElement = radioGroup;
         break;
 
-      case "checkbox":
-        const checkboxLabel = document.createElement("label");
-        checkboxLabel.className = "checkbox-label";
+      case 'checkbox':
+        const checkboxLabel = document.createElement('label');
+        checkboxLabel.className = 'checkbox-label';
 
         checkboxLabel.innerHTML = `
           <input type="checkbox" id="${field.id}" name="${field.id}" />
@@ -709,11 +708,11 @@ function renderForm() {
         break;
 
       default: // text, email
-        inputElement = document.createElement("input");
+        inputElement = document.createElement('input');
         inputElement.type = field.type;
     }
 
-    if (inputElement && inputElement.tagName !== "DIV") {
+    if (inputElement && inputElement.tagName !== 'DIV') {
       inputElement.id = field.id;
       inputElement.name = field.id;
       if (field.placeholder) inputElement.placeholder = field.placeholder;
@@ -722,12 +721,12 @@ function renderForm() {
       fieldGroup.appendChild(label);
       fieldGroup.appendChild(inputElement);
 
-      if (inputElement.type !== "checkbox") {
-        const inputLine = document.createElement("div");
-        inputLine.className = "input-line";
+      if (inputElement.type !== 'checkbox') {
+        const inputLine = document.createElement('div');
+        inputLine.className = 'input-line';
         fieldGroup.appendChild(inputLine);
       }
-    } else if (inputElement && inputElement.tagName === "DIV") {
+    } else if (inputElement && inputElement.tagName === 'DIV') {
       fieldGroup.appendChild(label);
       fieldGroup.appendChild(inputElement);
     }
@@ -758,15 +757,14 @@ function createDiscordEmbed(formData) {
     footer: {
       text: `${currentConfig.webhookUsername || currentConfig.title}`,
       icon_url:
-        currentConfig.webhookAvatarUrl ||
-        "https://pngimg.com/uploads/discord/discord_PNG3.png",
+        currentConfig.webhookAvatarUrl || 'https://pngimg.com/uploads/discord/discord_PNG3.png',
     },
   };
 
   // Добавляем поля из конфига
   currentConfig.fields.forEach((field, index) => {
     const value = formData[field.id];
-    if (value !== undefined && value !== "") {
+    if (value !== undefined && value !== '') {
       let displayValue = value;
       let fieldName = field.label;
 
@@ -784,13 +782,13 @@ function createDiscordEmbed(formData) {
       fieldName = `${index + 1}) ${fieldName}:`;
 
       // Обрабатываем разные типы полей
-      if (field.type === "checkbox") {
-        displayValue = value === "on" ? "✅ Да" : "❌ Нет";
+      if (field.type === 'checkbox') {
+        displayValue = value === 'on' ? '✅ Да' : '❌ Нет';
       }
 
       // Ограничиваем длину для Discord
-      if (typeof displayValue === "string" && displayValue.length > 1024) {
-        displayValue = displayValue.substring(0, 1021) + "...";
+      if (typeof displayValue === 'string' && displayValue.length > 1024) {
+        displayValue = displayValue.substring(0, 1021) + '...';
       }
 
       embed.fields.push({
@@ -809,7 +807,7 @@ function createDiscordEmbed(formData) {
 // Функция для отправки данных в Discord
 async function sendToDiscord(formData) {
   if (!currentConfig.webhookUrl) {
-    return { success: false, message: "Webhook URL не настроен" };
+    return { success: false, message: 'Webhook URL не настроен' };
   }
 
   const embed = createDiscordEmbed(formData);
@@ -819,29 +817,26 @@ async function sendToDiscord(formData) {
     embeds: [embed],
     username: currentConfig.webhookUsername || currentConfig.title,
     avatar_url:
-      currentConfig.webhookAvatarUrl ||
-      "https://pngimg.com/uploads/discord/discord_PNG3.png",
+      currentConfig.webhookAvatarUrl || 'https://pngimg.com/uploads/discord/discord_PNG3.png',
   };
 
   try {
     const response = await fetch(currentConfig.webhookUrl, {
-      method: "POST",
+      method: 'POST',
       headers: {
-        "Content-Type": "application/json",
+        'Content-Type': 'application/json',
       },
       body: JSON.stringify(payload),
     });
 
     if (response.ok) {
-      return { success: true, message: "Сообщение успешно отправлено! 🎉" };
+      return { success: true, message: 'Сообщение успешно отправлено! 🎉' };
     } else {
       const errorData = await response.json().catch(() => ({}));
-      throw new Error(
-        `HTTP ${response.status}: ${errorData.message || "Неизвестная ошибка"}`
-      );
+      throw new Error(`HTTP ${response.status}: ${errorData.message || 'Неизвестная ошибка'}`);
     }
   } catch (error) {
-    console.error("Ошибка отправки в Discord:", error);
+    console.error('Ошибка отправки в Discord:', error);
     return {
       success: false,
       message: `Ошибка при отправке: ${error.message}. Попробуйте еще раз.`,
@@ -857,13 +852,13 @@ function validateForm(formData) {
   currentConfig.fields.forEach((field) => {
     if (field.required) {
       const value = formData[field.id];
-      if (!value || (typeof value === "string" && !value.trim())) {
+      if (!value || (typeof value === 'string' && !value.trim())) {
         errors.push(`Поле "${field.label}" обязательно для заполнения`);
       }
     }
 
     // Специальная валидация для email
-    if (field.type === "email" && formData[field.id]) {
+    if (field.type === 'email' && formData[field.id]) {
       if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData[field.id])) {
         errors.push(`Введите корректный email адрес в поле "${field.label}"`);
       }
@@ -885,11 +880,11 @@ function initApp() {
     const loadedConfig = decodeConfig(urlParams.config);
     if (loadedConfig) {
       currentConfig = loadedConfig;
-      isEditorMode = urlParams.mode === "editor";
+      isEditorMode = urlParams.mode === 'editor';
 
       // Очищаем webhook URL в режиме editor для безопасности
       if (isEditorMode) {
-        currentConfig.webhookUrl = "";
+        currentConfig.webhookUrl = '';
       }
     }
   }
@@ -911,6 +906,9 @@ function initApp() {
   // Рендерим форму
   renderForm();
 
+  // Устанавливаем логотип организации
+  updateOrganizationLogo(currentConfig.organization || 'LSPD');
+
   // Инициализируем обработчики формы
   initFormHandlers();
 }
@@ -921,30 +919,30 @@ function initFormHandlers() {
 
   // Обработчик кнопки меню (три точки)
   if (editFormBtn && formDropdown) {
-    editFormBtn.addEventListener("click", (e) => {
+    editFormBtn.addEventListener('click', (e) => {
       e.stopPropagation();
-      formDropdown.classList.toggle("show");
+      formDropdown.classList.toggle('show');
     });
 
     // Закрытие меню при клике вне его
-    document.addEventListener("click", () => {
-      if (formDropdown.classList.contains("show")) {
-        formDropdown.classList.remove("show");
+    document.addEventListener('click', () => {
+      if (formDropdown.classList.contains('show')) {
+        formDropdown.classList.remove('show');
       }
     });
 
     // Обработчик кнопки "Дублировать и настроить"
     if (duplicateBtn) {
-      duplicateBtn.addEventListener("click", () => {
-        formDropdown.classList.remove("show");
+      duplicateBtn.addEventListener('click', () => {
+        formDropdown.classList.remove('show');
 
         // Если редактор не инициализирован, инициализируем его
         if (!isEditorMode) {
           initEditor();
           // Очищаем webhook URL при дублировании
           if (webhookUrlInput) {
-            webhookUrlInput.value = "";
-            currentConfig.webhookUrl = "";
+            webhookUrlInput.value = '';
+            currentConfig.webhookUrl = '';
           }
         }
         // Переключаем режим редактора
@@ -953,7 +951,7 @@ function initFormHandlers() {
     }
   }
 
-  contactForm.addEventListener("submit", async (e) => {
+  contactForm.addEventListener('submit', async (e) => {
     e.preventDefault();
 
     // Получаем данные формы
@@ -968,7 +966,7 @@ function initFormHandlers() {
     // Валидация
     const errors = validateForm(data);
     if (errors.length > 0) {
-      showMessage(errors.join(". "), "error");
+      showMessage(errors.join('. '), 'error');
       return;
     }
 
@@ -980,24 +978,22 @@ function initFormHandlers() {
       const result = await sendToDiscord(data);
 
       if (result.success) {
-        showMessage(result.message, "success");
+        showMessage(result.message, 'success');
         contactForm.reset(); // Очищаем форму после успешной отправки
 
         // Анимация успеха
         if (submitBtn) {
-          submitBtn.style.background =
-            "linear-gradient(135deg, #10b981, #059669)";
+          submitBtn.style.background = 'linear-gradient(135deg, #10b981, #059669)';
           setTimeout(() => {
-            submitBtn.style.background =
-              "linear-gradient(135deg, #6366f1, #4f46e5)";
+            submitBtn.style.background = 'linear-gradient(135deg, #6366f1, #4f46e5)';
           }, 3000);
         }
       } else {
-        showMessage(result.message, "error");
+        showMessage(result.message, 'error');
       }
     } catch (error) {
-      console.error("Неожиданная ошибка:", error);
-      showMessage("Произошла неожиданная ошибка. Попробуйте еще раз.", "error");
+      console.error('Неожиданная ошибка:', error);
+      showMessage('Произошла неожиданная ошибка. Попробуйте еще раз.', 'error');
     } finally {
       setLoading(false);
     }
@@ -1005,17 +1001,17 @@ function initFormHandlers() {
 }
 
 // Анимации для интерактивности
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener('DOMContentLoaded', () => {
   // Анимация появления формы
-  const formWrapper = document.querySelector(".form-wrapper");
+  const formWrapper = document.querySelector('.form-wrapper');
   if (formWrapper) {
-    formWrapper.style.opacity = "0";
-    formWrapper.style.transform = "translateY(30px)";
+    formWrapper.style.opacity = '0';
+    formWrapper.style.transform = 'translateY(30px)';
 
     setTimeout(() => {
-      formWrapper.style.transition = "all 0.8s ease-out";
-      formWrapper.style.opacity = "1";
-      formWrapper.style.transform = "translateY(0)";
+      formWrapper.style.transition = 'all 0.8s ease-out';
+      formWrapper.style.opacity = '1';
+      formWrapper.style.transform = 'translateY(0)';
     }, 100);
   }
 
@@ -1024,7 +1020,7 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 // Обработчик изменения истории браузера (для работы кнопок назад/вперёд)
-window.addEventListener("popstate", () => {
+window.addEventListener('popstate', () => {
   // Перезагружаем страницу при изменении URL
   window.location.reload();
 });

@@ -58,6 +58,14 @@
               />
             </div>
             <div class="setting-group">
+              <label for="organizationSelect">Организация:</label>
+              <select id="organizationSelect">
+                <option value="LSPD">LSPD</option>
+                <option value="LSSD">LSSD</option>
+                <option value="WN">Weazel News</option>
+              </select>
+            </div>
+            <div class="setting-group">
               <label>Тема оформления:</label>
               <div class="theme-switcher">
                 <button id="lightThemeBtn" class="theme-btn active" data-theme="light">
@@ -104,6 +112,10 @@
       </div>
 
       <div class="form-wrapper" id="formPreview">
+        <div id="organizationLogo" class="organization-logo">
+          <img src="images/LSPD.png" alt="Organization Logo" id="orgLogoImg" />
+        </div>
+        <div class="vinewood-logo">VINEWOOD</div>
         <div class="header">
           <div class="header-top">
             <h1>Связаться с нами</h1>
