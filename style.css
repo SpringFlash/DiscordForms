@@ -323,6 +323,17 @@ select {
   padding-right: 2rem;
 }
 
+/* Select options для тёмной темы */
+[data-theme='dark'] select {
+  background-color: var(--bg-primary);
+  color-scheme: dark;
+}
+
+[data-theme='dark'] select option {
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+}
+
 /* Radio buttons */
 .radio-group {
   margin-top: 0.5rem;
