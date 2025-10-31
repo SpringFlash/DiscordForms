@@ -17,16 +17,19 @@
   --border-color: #e5e7eb;
   --border-radius: 12px;
   --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
+    0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1),
+    0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1),
+    0 10px 10px -5px rgba(0, 0, 0, 0.04);
   --transition-fast: all 0.15s ease;
   --transition-normal: all 0.3s ease;
   --transition-slow: all 0.5s ease;
 }
 
 /* Тёмная тема */
-[data-theme='dark'] {
+[data-theme="dark"] {
   --primary-color: #8b5cf6;
   --primary-dark: #7c3aed;
   --primary-light: #c4b5fd;
@@ -42,9 +45,12 @@
   --bg-dark: #0f172a;
   --border-color: #374151;
   --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.3);
-  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.4), 0 2px 4px -1px rgba(0, 0, 0, 0.3);
-  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.4), 0 4px 6px -2px rgba(0, 0, 0, 0.3);
-  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.4), 0 10px 10px -5px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.4),
+    0 2px 4px -1px rgba(0, 0, 0, 0.3);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.4),
+    0 4px 6px -2px rgba(0, 0, 0, 0.3);
+  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.4),
+    0 10px 10px -5px rgba(0, 0, 0, 0.3);
 }
 
 /* Reset и базовые стили */
@@ -55,7 +61,8 @@
 }
 
 body {
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+    sans-serif;
   background: linear-gradient(135deg, var(--bg-secondary) 0%, #e0e7ff 100%);
   color: var(--text-primary);
   line-height: 1.6;
@@ -65,7 +72,7 @@ body {
 }
 
 /* Тёмная тема для body */
-[data-theme='dark'] body {
+[data-theme="dark"] body {
   background: linear-gradient(135deg, var(--bg-dark) 0%, #1e293b 100%);
 }
 
@@ -112,14 +119,18 @@ body {
 .decoration-3 {
   position: absolute;
   border-radius: 50%;
-  background: linear-gradient(45deg, var(--primary-light), var(--primary-color));
+  background: linear-gradient(
+    45deg,
+    var(--primary-light),
+    var(--primary-color)
+  );
   opacity: 0.1;
 }
 
 /* Тёмная тема для декоративных элементов */
-[data-theme='dark'] .decoration-1,
-[data-theme='dark'] .decoration-2,
-[data-theme='dark'] .decoration-3 {
+[data-theme="dark"] .decoration-1,
+[data-theme="dark"] .decoration-2,
+[data-theme="dark"] .decoration-3 {
   opacity: 0.05;
 }
 
@@ -210,7 +221,7 @@ body {
 }
 
 .form-wrapper.preview::after {
-  content: 'Превью';
+  content: "Превью";
   position: absolute;
   top: 1rem;
   right: 1rem;
@@ -226,13 +237,17 @@ body {
 }
 
 .form-wrapper::before {
-  content: '';
+  content: "";
   position: absolute;
   top: 0;
   left: 0;
   right: 0;
   height: 4px;
-  background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+  background: linear-gradient(
+    90deg,
+    var(--primary-color),
+    var(--secondary-color)
+  );
 }
 
 /* Логотип организации */
@@ -321,8 +336,9 @@ body {
 }
 
 /* Поля ввода */
-input[type='text'],
-input[type='email'],
+input[type="text"],
+input[type="email"],
+input[type="url"],
 select,
 textarea {
   width: 100%;
@@ -371,12 +387,12 @@ select {
 }
 
 /* Select options для тёмной темы */
-[data-theme='dark'] select {
+[data-theme="dark"] select {
   background-color: var(--bg-primary);
   color-scheme: dark;
 }
 
-[data-theme='dark'] select option {
+[data-theme="dark"] select option {
   background-color: var(--bg-primary);
   color: var(--text-primary);
 }
@@ -394,7 +410,7 @@ select {
   position: relative;
 }
 
-.radio-label input[type='radio'] {
+.radio-label input[type="radio"] {
   position: absolute;
   opacity: 0;
   cursor: pointer;
@@ -410,13 +426,13 @@ select {
   transition: var(--transition-normal);
 }
 
-.radio-label input[type='radio']:checked + .radio-custom {
+.radio-label input[type="radio"]:checked + .radio-custom {
   border-color: var(--primary-color);
   background: var(--primary-color);
 }
 
 .radio-custom::after {
-  content: '';
+  content: "";
   position: absolute;
   top: 50%;
   left: 50%;
@@ -428,7 +444,7 @@ select {
   transition: var(--transition-normal);
 }
 
-.radio-label input[type='radio']:checked + .radio-custom::after {
+.radio-label input[type="radio"]:checked + .radio-custom::after {
   transform: translate(-50%, -50%) scale(1);
 }
 
@@ -443,7 +459,7 @@ select {
   width: fit-content;
 }
 
-.checkbox-label input[type='checkbox'] {
+.checkbox-label input[type="checkbox"] {
   position: absolute;
   opacity: 0;
   cursor: pointer;
@@ -463,13 +479,13 @@ select {
   flex-shrink: 0;
 }
 
-.checkbox-label input[type='checkbox']:checked + .checkbox-custom {
+.checkbox-label input[type="checkbox"]:checked + .checkbox-custom {
   border-color: var(--primary-color);
   background: var(--primary-color);
 }
 
 .checkbox-custom::after {
-  content: '✓';
+  content: "✓";
   position: absolute;
   top: 50%;
   left: 50%;
@@ -480,7 +496,7 @@ select {
   transition: var(--transition-normal);
 }
 
-.checkbox-label input[type='checkbox']:checked + .checkbox-custom::after {
+.checkbox-label input[type="checkbox"]:checked + .checkbox-custom::after {
   transform: translate(-50%, -50%) scale(1);
 }
 
@@ -488,7 +504,11 @@ select {
 .submit-btn {
   width: 100%;
   padding: 1rem 2rem;
-  background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+  background: linear-gradient(
+    135deg,
+    var(--primary-color),
+    var(--primary-dark)
+  );
   color: white;
   border: none;
   border-radius: var(--border-radius);
@@ -515,13 +535,18 @@ select {
 }
 
 .submit-btn::before {
-  content: '';
+  content: "";
   position: absolute;
   top: 0;
   left: -100%;
   width: 100%;
   height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.2),
+    transparent
+  );
   transition: var(--transition-slow);
 }
 
@@ -742,7 +767,7 @@ textarea:focus {
 }
 
 .dropdown-item::before {
-  content: '';
+  content: "";
   position: absolute;
   left: 0;
   top: 0;
@@ -754,7 +779,11 @@ textarea:focus {
 }
 
 .dropdown-item:hover {
-  background: linear-gradient(90deg, rgba(99, 102, 241, 0.08) 0%, transparent 100%);
+  background: linear-gradient(
+    90deg,
+    rgba(99, 102, 241, 0.08) 0%,
+    transparent 100%
+  );
   color: var(--primary-color);
 }
 
@@ -797,7 +826,11 @@ textarea:focus {
 }
 
 .editor-header {
-  background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+  background: linear-gradient(
+    135deg,
+    var(--primary-color),
+    var(--primary-dark)
+  );
   color: white;
   padding: 1.5rem;
 }
@@ -846,7 +879,7 @@ textarea:focus {
   font-size: 0.9rem;
 }
 
-.setting-group input,
+.setting-group input:not([type="checkbox"]),
 .setting-group textarea,
 .setting-group select {
   width: 100%;
@@ -855,6 +888,36 @@ textarea:focus {
   border-radius: 8px;
   font-size: 1rem;
   transition: var(--transition-fast);
+}
+
+.checkbox-setting {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  cursor: pointer;
+  padding: 0.5rem;
+  border-radius: 6px;
+  transition: var(--transition-fast);
+  margin: 0;
+}
+
+.checkbox-setting:hover {
+  background: rgba(99, 102, 241, 0.05);
+}
+
+.checkbox-setting input[type="checkbox"] {
+  width: 20px;
+  height: 20px;
+  cursor: pointer;
+  margin: 0;
+  accent-color: var(--primary-color);
+}
+
+.checkbox-setting span {
+  font-size: 0.95rem;
+  color: var(--text-primary);
+  font-weight: 500;
+  user-select: none;
 }
 
 .setting-group input:focus,
@@ -883,6 +946,22 @@ textarea:focus {
   justify-content: space-between;
   align-items: center;
   margin-bottom: 0.5rem;
+  cursor: pointer;
+  padding: 0.25rem;
+  margin: -0.25rem -0.25rem 0.5rem -0.25rem;
+  border-radius: 4px;
+  transition: var(--transition-fast);
+}
+
+.field-header:hover {
+  background: rgba(99, 102, 241, 0.05);
+}
+
+.field-header-left {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
 }
 
 .field-title {
@@ -890,9 +969,40 @@ textarea:focus {
   color: var(--text-primary);
 }
 
+.field-required-inline {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  cursor: pointer;
+  margin: 0;
+  padding: 0.2rem 0.5rem;
+  border-radius: 4px;
+  transition: var(--transition-fast);
+}
+
+.field-required-inline:hover {
+  background: rgba(99, 102, 241, 0.08);
+}
+
+.field-required-inline input[type="checkbox"] {
+  width: 14px;
+  height: 14px;
+  cursor: pointer;
+  margin: 0;
+  accent-color: var(--primary-color);
+}
+
+.field-required-inline span {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  font-weight: 500;
+  user-select: none;
+}
+
 .field-actions {
   display: flex;
   gap: 0.5rem;
+  cursor: default;
 }
 
 .field-action-btn {
@@ -920,6 +1030,11 @@ textarea:focus {
   background: rgba(245, 158, 11, 0.1);
 }
 
+.field-action-btn.clone:hover {
+  color: var(--primary-color);
+  background: rgba(99, 102, 241, 0.1);
+}
+
 .field-action-btn.delete:hover {
   color: var(--error-color);
   background: rgba(239, 68, 68, 0.1);
@@ -942,8 +1057,8 @@ textarea:focus {
   margin-bottom: 0.25rem;
 }
 
-.field-config-item input[type='text'],
-.field-config-item input[type='url'],
+.field-config-item input[type="text"],
+.field-config-item input[type="url"],
 .field-config-item select {
   padding: 0.5rem;
   border: 1px solid var(--border-color);
@@ -951,7 +1066,7 @@ textarea:focus {
   font-size: 0.9rem;
 }
 
-.field-config-item input[type='checkbox'] {
+.field-config-item input[type="checkbox"] {
   width: 20px;
   height: 20px;
   cursor: pointer;
@@ -975,21 +1090,76 @@ textarea:focus {
   box-shadow: var(--shadow-md);
 }
 
-.generate-url-btn {
-  background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+/* Группа кнопок для URL */
+.url-buttons-group {
+  display: flex;
+  gap: 0.75rem;
+  width: 100%;
+}
+
+.generate-url-btn,
+.shorten-url-btn {
+  background: linear-gradient(
+    135deg,
+    var(--primary-color),
+    var(--primary-dark)
+  );
   color: white;
   border: none;
-  padding: 1rem 2rem;
+  padding: 1rem 1.5rem;
   border-radius: 8px;
   cursor: pointer;
   font-weight: 500;
   transition: var(--transition-fast);
-  width: 100%;
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  font-size: 0.95rem;
 }
 
-.generate-url-btn:hover {
+.shorten-url-btn {
+  background: linear-gradient(
+    135deg,
+    var(--success-color),
+    #059669
+  );
+}
+
+.generate-url-btn:hover,
+.shorten-url-btn:hover {
   transform: translateY(-1px);
   box-shadow: var(--shadow-md);
+}
+
+.generate-url-btn:disabled,
+.shorten-url-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.generate-url-btn.copied,
+.shorten-url-btn.copied {
+  background: linear-gradient(135deg, var(--success-color), #059669);
+}
+
+.generate-url-btn i,
+.shorten-url-btn i {
+  font-size: 1rem;
+}
+
+/* Адаптив для мобильных */
+@media (max-width: 640px) {
+  .url-buttons-group {
+    flex-direction: column;
+  }
+  
+  .generate-url-btn,
+  .shorten-url-btn {
+    width: 100%;
+  }
 }
 
 .share-url {
@@ -1142,7 +1312,11 @@ textarea:focus {
 .welcome-icon {
   width: 100px;
   height: 100px;
-  background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+  background: linear-gradient(
+    135deg,
+    var(--primary-color),
+    var(--primary-dark)
+  );
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -1172,7 +1346,11 @@ textarea:focus {
 .welcome-title {
   font-size: 3rem;
   font-weight: 700;
-  background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+  background: linear-gradient(
+    135deg,
+    var(--primary-color),
+    var(--primary-dark)
+  );
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -1223,7 +1401,11 @@ textarea:focus {
 
 .create-form-btn {
   padding: 1.25rem 3rem;
-  background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+  background: linear-gradient(
+    135deg,
+    var(--primary-color),
+    var(--primary-dark)
+  );
   color: white;
   border: none;
   border-radius: 50px;
@@ -1307,7 +1489,7 @@ textarea:focus {
   border: 2px solid var(--border-color);
   border-radius: 8px;
   font-size: 0.9rem;
-  font-family: 'Courier New', monospace;
+  font-family: "Courier New", monospace;
   background: var(--bg-secondary);
 }
 
@@ -1318,7 +1500,11 @@ textarea:focus {
 }
 
 .add-field-variable-btn {
-  background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+  background: linear-gradient(
+    135deg,
+    var(--primary-color),
+    var(--primary-dark)
+  );
   color: white;
   border: none;
   padding: 0.75rem 1rem;
@@ -1359,6 +1545,20 @@ textarea:focus {
 .computed-field:focus {
   border-bottom-color: var(--border-color) !important;
   outline: none !important;
+}
+
+.computed-field textarea {
+  background: var(--bg-secondary) !important;
+  cursor: default !important;
+  color: var(--text-secondary) !important;
+  font-style: italic;
+  resize: none;
+  border: none;
+  border-bottom: 2px solid var(--border-color);
+  padding: 8px 0;
+  font-family: inherit;
+  font-size: inherit;
+  line-height: 1.4;
 }
 
 /* Попап для выбора поля */
@@ -1500,7 +1700,11 @@ textarea:focus {
 }
 
 .insert-btn {
-  background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+  background: linear-gradient(
+    135deg,
+    var(--primary-color),
+    var(--primary-dark)
+  );
   color: white;
 }
 
@@ -1542,34 +1746,88 @@ textarea:focus {
 /* === СТИЛИ ДЛЯ УСЛОВНОЙ ВИДИМОСТИ === */
 
 .field-conditional-container {
-  padding: 1rem;
+  padding: 0;
   background: var(--bg-secondary);
   border-radius: 8px;
   border: 1px solid var(--border-color);
+  overflow: hidden;
 }
 
-.field-conditional-container > label {
+.section-header-with-toggle {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+  gap: 1rem;
+}
+
+.section-header-with-toggle h3 {
+  margin: 0;
+  flex: 1;
+}
+
+.advanced-settings-toggle {
   display: flex;
   align-items: center;
   gap: 0.5rem;
   cursor: pointer;
+  user-select: none;
+  white-space: nowrap;
+}
+
+.advanced-settings-toggle input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+  accent-color: var(--primary-color);
+}
+
+.advanced-settings-toggle .toggle-text {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  font-weight: 500;
+  transition: var(--transition-fast);
+}
+
+.advanced-settings-toggle:hover .toggle-text {
+  color: var(--primary-color);
+}
+
+.conditional-section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.875rem 1rem;
+  cursor: pointer;
+  background: var(--bg-secondary);
+  transition: var(--transition-fast);
+  user-select: none;
+}
+
+.conditional-section-header:hover {
+  background: rgba(99, 102, 241, 0.08);
+}
+
+.conditional-section-header span {
   font-size: 0.95rem;
   font-weight: 600;
   color: var(--text-primary);
-  margin-bottom: 0;
 }
 
-.field-conditional-enabled {
-  width: 18px;
-  height: 18px;
-  cursor: pointer;
-  margin: 0;
+.conditional-toggle-icon {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  transition: transform 0.3s ease;
+}
+
+.conditional-toggle-icon.open {
+  transform: rotate(180deg);
 }
 
 .conditional-config {
-  margin-top: 1rem;
-  padding-top: 1rem;
+  padding: 1rem;
   border-top: 1px solid var(--border-color);
+  background: var(--bg-primary);
 }
 
 .conditional-hint {
@@ -1626,6 +1884,46 @@ textarea:focus {
   box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
 }
 
+/* Стили для множественного выбора условий */
+.conditional-value-container {
+  flex: 1;
+}
+
+.conditional-checkboxes {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 0.75rem;
+  border: 2px solid var(--border-color);
+  border-radius: 8px;
+  background: var(--bg-primary);
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.conditional-checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  padding: 0.25rem;
+  border-radius: 4px;
+  transition: var(--transition-fast);
+  font-size: 0.9rem;
+  color: var(--text-primary);
+}
+
+.conditional-checkbox-label:hover {
+  background: var(--bg-secondary);
+}
+
+.conditional-checkbox-label input[type="checkbox"] {
+  cursor: pointer;
+  width: 18px;
+  height: 18px;
+  accent-color: var(--primary-color);
+}
+
 /* Скрытые условные поля в форме */
 .conditional-field {
   transition: all 0.3s ease;
@@ -1637,10 +1935,112 @@ textarea:focus {
     flex-direction: column;
     align-items: stretch;
   }
-  
+
   .conditional-row span {
     text-align: center;
   }
+}
+
+/* === СТИЛИ ДЛЯ КАСТОМНОЙ ОТПРАВКИ === */
+
+.field-custom-webhook-container {
+  padding: 0;
+  background: var(--bg-secondary);
+  border-radius: 8px;
+  border: 1px solid var(--border-color);
+  overflow: hidden;
+}
+
+.custom-webhook-section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.875rem 1rem;
+  cursor: pointer;
+  background: var(--bg-secondary);
+  transition: var(--transition-fast);
+  user-select: none;
+}
+
+.custom-webhook-section-header:hover {
+  background: rgba(99, 102, 241, 0.08);
+}
+
+.custom-webhook-section-header span {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.custom-webhook-toggle-icon {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  transition: transform 0.3s ease;
+}
+
+.custom-webhook-toggle-icon.open {
+  transform: rotate(180deg);
+}
+
+.custom-webhook-config {
+  padding: 1rem;
+  border-top: 1px solid var(--border-color);
+  background: var(--bg-primary);
+}
+
+.custom-webhook-hint {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  margin-bottom: 0.75rem;
+  font-style: italic;
+}
+
+.custom-webhook-url-input {
+  width: 100%;
+  padding: 0.75rem;
+  border: 2px solid var(--border-color);
+  border-radius: 8px;
+  font-size: 0.9rem;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  transition: var(--transition-fast);
+  font-family: "Courier New", monospace;
+}
+
+.custom-webhook-url-input:focus {
+  outline: none;
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+}
+
+.custom-webhook-split-lines {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 0.75rem;
+  cursor: pointer;
+  padding: 0.5rem;
+  border-radius: 6px;
+  transition: var(--transition-fast);
+}
+
+.custom-webhook-split-lines:hover {
+  background: rgba(99, 102, 241, 0.05);
+}
+
+.custom-webhook-split-lines input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  cursor: pointer;
+  margin: 0;
+  accent-color: var(--primary-color);
+}
+
+.custom-webhook-split-lines span {
+  font-size: 0.9rem;
+  color: var(--text-primary);
+  font-weight: 500;
+  user-select: none;
 }
 
 /* === СТИЛИ ДЛЯ УСЛОВНЫХ СООБЩЕНИЙ === */
@@ -1783,11 +2183,11 @@ textarea:focus {
     flex-direction: column;
     align-items: stretch;
   }
-  
+
   .condmsg-condition > span {
     text-align: center;
   }
-  
+
   .condmsg-field-select,
   .condmsg-value-container {
     min-width: 100%;
