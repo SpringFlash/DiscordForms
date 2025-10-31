@@ -2,10 +2,10 @@
 
 // Функция для инициализации условной видимости полей
 function initConditionalFields() {
-  const form = document.getElementById("contactForm");
+  const form = document.getElementById('contactForm');
   if (!form) return;
 
-  const conditionalFields = form.querySelectorAll(".conditional-field");
+  const conditionalFields = form.querySelectorAll('.conditional-field');
   if (conditionalFields.length === 0) return;
 
   const updateConditionalVisibility = () => {
@@ -17,13 +17,11 @@ function initConditionalFields() {
 
       if (!dependsOnField) return;
 
-      let currentValue = "";
+      let currentValue = '';
 
-      if (dependsOnField.type === "radio") {
-        const checkedRadio = form.querySelector(
-          `[name="${dependsOnFieldId}"]:checked`
-        );
-        currentValue = checkedRadio ? checkedRadio.value : "";
+      if (dependsOnField.type === 'radio') {
+        const checkedRadio = form.querySelector(`[name="${dependsOnFieldId}"]:checked`);
+        currentValue = checkedRadio ? checkedRadio.value : '';
       } else {
         currentValue = dependsOnField.value;
       }
@@ -41,21 +39,42 @@ function initConditionalFields() {
 
       const isConditionMet = requiredValues.includes(currentValue);
 
+      // Получаем все инпуты в группе (для radio может быть несколько)
+      const inputs = fieldGroup.querySelectorAll('input, select, textarea');
+
       if (isConditionMet) {
-        fieldGroup.style.display = "block";
-        fieldGroup.style.opacity = "0";
-        fieldGroup.style.transform = "translateY(-10px)";
+        fieldGroup.style.display = 'block';
+        fieldGroup.style.opacity = '0';
+        fieldGroup.style.transform = 'translateY(-10px)';
         setTimeout(() => {
-          fieldGroup.style.transition = "all 0.3s ease";
-          fieldGroup.style.opacity = "1";
-          fieldGroup.style.transform = "translateY(0)";
+          fieldGroup.style.transition = 'all 0.3s ease';
+          fieldGroup.style.opacity = '1';
+          fieldGroup.style.transform = 'translateY(0)';
         }, 10);
+
+        // Восстанавливаем required атрибут, если он был сохранен
+        inputs.forEach((input) => {
+          if (input.dataset.wasRequired === 'true') {
+            input.required = true;
+          }
+        });
       } else {
-        fieldGroup.style.display = "none";
-        const input = fieldGroup.querySelector("input, select, textarea");
-        if (input && input.type !== "radio" && input.type !== "checkbox") {
-          input.value = "";
-        }
+        fieldGroup.style.display = 'none';
+
+        // Сохраняем и удаляем required атрибут, чтобы браузер не валидировал скрытые поля
+        inputs.forEach((input) => {
+          if (input.required) {
+            input.dataset.wasRequired = 'true';
+            input.required = false;
+          }
+
+          // Очищаем значение
+          if (input.type !== 'radio' && input.type !== 'checkbox') {
+            input.value = '';
+          } else if (input.type === 'checkbox') {
+            input.checked = false;
+          }
+        });
       }
     });
   };
@@ -71,14 +90,14 @@ function initConditionalFields() {
   triggerFields.forEach((fieldId) => {
     const field = form.querySelector(`[name="${fieldId}"]`);
     if (field) {
-      if (field.type === "radio") {
+      if (field.type === 'radio') {
         const allRadios = form.querySelectorAll(`[name="${fieldId}"]`);
         allRadios.forEach((radio) => {
-          radio.addEventListener("change", updateConditionalVisibility);
+          radio.addEventListener('change', updateConditionalVisibility);
         });
       } else {
-        field.addEventListener("change", updateConditionalVisibility);
-        field.addEventListener("input", updateConditionalVisibility);
+        field.addEventListener('change', updateConditionalVisibility);
+        field.addEventListener('input', updateConditionalVisibility);
       }
     }
   });
@@ -88,8 +107,8 @@ function initConditionalFields() {
 
 // Функция для добавления условного сообщения в редактор
 function addConditionalMessageToEditor(condMsg) {
-  const condMsgItem = document.createElement("div");
-  condMsgItem.className = "conditional-message-item";
+  const condMsgItem = document.createElement('div');
+  condMsgItem.className = 'conditional-message-item';
   condMsgItem.dataset.condMsgId = condMsg.id;
 
   condMsgItem.innerHTML = `
@@ -111,25 +130,23 @@ function addConditionalMessageToEditor(condMsg) {
       <div class="condmsg-message-input">
         <label>Отправить сообщение:</label>
         <textarea class="condmsg-message-textarea" rows="3" placeholder="Введите кастомное сообщение для Discord...">${
-          condMsg.message || ""
+          condMsg.message || ''
         }</textarea>
       </div>
     </div>
   `;
 
-  const deleteBtn = condMsgItem.querySelector(".delete");
-  const fieldSelect = condMsgItem.querySelector(".condmsg-field-select");
-  const valueContainer = condMsgItem.querySelector(".condmsg-value-container");
-  const valueInput = condMsgItem.querySelector(".condmsg-value-input");
-  const messageTextarea = condMsgItem.querySelector(
-    ".condmsg-message-textarea"
-  );
+  const deleteBtn = condMsgItem.querySelector('.delete');
+  const fieldSelect = condMsgItem.querySelector('.condmsg-field-select');
+  const valueContainer = condMsgItem.querySelector('.condmsg-value-container');
+  const valueInput = condMsgItem.querySelector('.condmsg-value-input');
+  const messageTextarea = condMsgItem.querySelector('.condmsg-message-textarea');
 
   function populateFieldSelect() {
     fieldSelect.innerHTML = '<option value="">Выберите поле...</option>';
     currentConfig.fields.forEach((f) => {
-      if (f.type === "select" || f.type === "radio") {
-        const option = document.createElement("option");
+      if (f.type === 'select' || f.type === 'radio') {
+        const option = document.createElement('option');
         option.value = f.id;
         option.textContent = f.label;
         if (condMsg.field === f.id) {
@@ -141,34 +158,28 @@ function addConditionalMessageToEditor(condMsg) {
   }
 
   function updateValueOptions(selectedFieldId) {
-    const selectedField = currentConfig.fields.find(
-      (f) => f.id === selectedFieldId
-    );
+    const selectedField = currentConfig.fields.find((f) => f.id === selectedFieldId);
 
-    if (
-      !selectedField ||
-      !selectedField.options ||
-      selectedField.options.length === 0
-    ) {
-      const input = document.createElement("input");
-      input.type = "text";
-      input.className = "condmsg-value-input";
-      input.value = condMsg.value || "";
-      input.placeholder = "Значение";
+    if (!selectedField || !selectedField.options || selectedField.options.length === 0) {
+      const input = document.createElement('input');
+      input.type = 'text';
+      input.className = 'condmsg-value-input';
+      input.value = condMsg.value || '';
+      input.placeholder = 'Значение';
 
-      input.addEventListener("input", (e) => {
+      input.addEventListener('input', (e) => {
         condMsg.value = e.target.value;
         updateConfigFromEditor();
       });
 
-      valueContainer.innerHTML = "";
+      valueContainer.innerHTML = '';
       valueContainer.appendChild(input);
       return;
     }
 
     // Создаем контейнер с чекбоксами для множественного выбора
-    const checkboxContainer = document.createElement("div");
-    checkboxContainer.className = "conditional-checkboxes";
+    const checkboxContainer = document.createElement('div');
+    checkboxContainer.className = 'conditional-checkboxes';
 
     // Получаем текущие выбранные значения
     let currentValues = [];
@@ -184,18 +195,16 @@ function addConditionalMessageToEditor(condMsg) {
     }
 
     selectedField.options.forEach((opt) => {
-      const label = document.createElement("label");
-      label.className = "conditional-checkbox-label";
+      const label = document.createElement('label');
+      label.className = 'conditional-checkbox-label';
 
-      const checkbox = document.createElement("input");
-      checkbox.type = "checkbox";
+      const checkbox = document.createElement('input');
+      checkbox.type = 'checkbox';
       checkbox.value = opt;
       checkbox.checked = currentValues.includes(opt);
 
-      checkbox.addEventListener("change", () => {
-        const allCheckboxes = checkboxContainer.querySelectorAll(
-          'input[type="checkbox"]'
-        );
+      checkbox.addEventListener('change', () => {
+        const allCheckboxes = checkboxContainer.querySelectorAll('input[type="checkbox"]');
         const selectedValues = Array.from(allCheckboxes)
           .filter((cb) => cb.checked)
           .map((cb) => cb.value);
@@ -205,11 +214,11 @@ function addConditionalMessageToEditor(condMsg) {
       });
 
       label.appendChild(checkbox);
-      label.appendChild(document.createTextNode(" " + opt));
+      label.appendChild(document.createTextNode(' ' + opt));
       checkboxContainer.appendChild(label);
     });
 
-    valueContainer.innerHTML = "";
+    valueContainer.innerHTML = '';
     valueContainer.appendChild(checkboxContainer);
   }
 
@@ -218,25 +227,26 @@ function addConditionalMessageToEditor(condMsg) {
     updateValueOptions(condMsg.field);
   }
 
-  deleteBtn.addEventListener("click", () => {
-    if (confirm("Удалить это условное сообщение?")) {
-      currentConfig.conditionalMessages =
-        currentConfig.conditionalMessages.filter((cm) => cm.id !== condMsg.id);
+  deleteBtn.addEventListener('click', () => {
+    if (confirm('Удалить это условное сообщение?')) {
+      currentConfig.conditionalMessages = currentConfig.conditionalMessages.filter(
+        (cm) => cm.id !== condMsg.id
+      );
       condMsgItem.remove();
       updateConfigFromEditor();
     }
   });
 
-  fieldSelect.addEventListener("change", (e) => {
+  fieldSelect.addEventListener('change', (e) => {
     condMsg.field = e.target.value;
-    condMsg.value = "";
+    condMsg.value = '';
     if (e.target.value) {
       updateValueOptions(e.target.value);
     }
     updateConfigFromEditor();
   });
 
-  messageTextarea.addEventListener("input", (e) => {
+  messageTextarea.addEventListener('input', (e) => {
     condMsg.message = e.target.value;
     updateConfigFromEditor();
   });

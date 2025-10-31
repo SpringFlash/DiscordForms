@@ -21,8 +21,7 @@ function createDiscordEmbed(formData) {
     footer: {
       text: `${currentConfig.webhookUsername || currentConfig.title}`,
       icon_url:
-        currentConfig.webhookAvatarUrl ||
-        "https://pngimg.com/uploads/discord/discord_PNG3.png",
+        currentConfig.webhookAvatarUrl || 'https://pngimg.com/uploads/discord/discord_PNG3.png',
     },
   };
 
@@ -38,16 +37,16 @@ function createDiscordEmbed(formData) {
     }
 
     const value = formData[field.id];
-    if (value !== undefined && value !== "") {
+    if (value !== undefined && value !== '') {
       let displayValue = value;
       let fieldName = `${questionIndex}) ${field.label}:`;
 
-      if (field.type === "checkbox") {
-        displayValue = value === "on" ? "✅ Да" : "❌ Нет";
+      if (field.type === 'checkbox') {
+        displayValue = value === 'on' ? '✅ Да' : '❌ Нет';
       }
 
-      if (typeof displayValue === "string" && displayValue.length > 1024) {
-        displayValue = displayValue.substring(0, 1021) + "...";
+      if (typeof displayValue === 'string' && displayValue.length > 1024) {
+        displayValue = displayValue.substring(0, 1021) + '...';
       }
 
       questionIndex++;
@@ -78,15 +77,15 @@ function createPlainTextMessage(formData) {
     }
 
     const value = formData[field.id];
-    if (value !== undefined && value !== "") {
+    if (value !== undefined && value !== '') {
       let displayValue = value;
 
-      if (field.type === "checkbox") {
-        displayValue = value === "on" ? "✅ Да" : "❌ Нет";
+      if (field.type === 'checkbox') {
+        displayValue = value === 'on' ? '✅ Да' : '❌ Нет';
       }
 
       message += `**${questionIndex}) ${field.label}:**${
-        ["textarea", "computed"].includes(field.type) ? "\n" : " "
+        ['textarea', 'computed'].includes(field.type) ? '\n' : ' '
       }${displayValue}\n`;
       questionIndex++;
     }
@@ -94,40 +93,45 @@ function createPlainTextMessage(formData) {
   return message;
 }
 function getConditionalMessage(formData) {
-  if (
-    !currentConfig.conditionalMessages ||
-    currentConfig.conditionalMessages.length === 0
-  ) {
-    return currentConfig.customMessage || null;
-  }
-  for (const condMsg of currentConfig.conditionalMessages) {
-    if (condMsg.field && condMsg.value && condMsg.message) {
-      const fieldValue = formData[condMsg.field];
+  const matchedMessages = [];
 
-      // Поддержка массива значений для условия "включает"
-      let requiredValues = [];
-      try {
-        requiredValues = JSON.parse(condMsg.value);
-        if (!Array.isArray(requiredValues)) {
+  // Собираем все условные сообщения, которые подходят по условию
+  if (currentConfig.conditionalMessages && currentConfig.conditionalMessages.length > 0) {
+    for (const condMsg of currentConfig.conditionalMessages) {
+      if (condMsg.field && condMsg.value && condMsg.message) {
+        const fieldValue = formData[condMsg.field];
+
+        // Поддержка массива значений для условия "включает"
+        let requiredValues = [];
+        try {
+          requiredValues = JSON.parse(condMsg.value);
+          if (!Array.isArray(requiredValues)) {
+            requiredValues = [condMsg.value];
+          }
+        } catch (e) {
           requiredValues = [condMsg.value];
         }
-      } catch (e) {
-        requiredValues = [condMsg.value];
-      }
 
-      if (requiredValues.includes(fieldValue)) {
-        return condMsg.message;
+        if (requiredValues.includes(fieldValue)) {
+          matchedMessages.push(condMsg.message);
+        }
       }
     }
   }
 
-  return currentConfig.customMessage || null;
+  // Если есть кастомное сообщение по умолчанию, добавляем его
+  if (currentConfig.customMessage) {
+    matchedMessages.push(currentConfig.customMessage);
+  }
+
+  // Если есть хотя бы одно сообщение, склеиваем их через двойной перенос строки
+  return matchedMessages.length > 0 ? matchedMessages.join('\n') : null;
 }
 
 // Функция для отправки данных в Discord
 async function sendToDiscord(formData) {
   if (!currentConfig.webhookUrl) {
-    return { success: false, message: "Webhook URL не настроен" };
+    return { success: false, message: 'Webhook URL не настроен' };
   }
 
   const customMessage = getConditionalMessage(formData);
@@ -144,8 +148,7 @@ async function sendToDiscord(formData) {
       content: finalContent,
       username: currentConfig.webhookUsername || currentConfig.title,
       avatar_url:
-        currentConfig.webhookAvatarUrl ||
-        "https://pngimg.com/uploads/discord/discord_PNG3.png",
+        currentConfig.webhookAvatarUrl || 'https://pngimg.com/uploads/discord/discord_PNG3.png',
     };
   } else {
     // Отправка как embed
@@ -155,26 +158,23 @@ async function sendToDiscord(formData) {
       embeds: [embed],
       username: currentConfig.webhookUsername || currentConfig.title,
       avatar_url:
-        currentConfig.webhookAvatarUrl ||
-        "https://pngimg.com/uploads/discord/discord_PNG3.png",
+        currentConfig.webhookAvatarUrl || 'https://pngimg.com/uploads/discord/discord_PNG3.png',
     };
   }
 
   try {
     // Отправка на основной webhook
     const response = await fetch(currentConfig.webhookUrl, {
-      method: "POST",
+      method: 'POST',
       headers: {
-        "Content-Type": "application/json",
+        'Content-Type': 'application/json',
       },
       body: JSON.stringify(payload),
     });
 
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({}));
-      throw new Error(
-        `HTTP ${response.status}: ${errorData.message || "Неизвестная ошибка"}`
-      );
+      throw new Error(`HTTP ${response.status}: ${errorData.message || 'Неизвестная ошибка'}`);
     }
 
     // Обработка полей с кастомными настройками отправки
@@ -192,12 +192,10 @@ async function sendToDiscord(formData) {
         // Если включена опция splitLines для многострочных полей
         if (
           field.customWebhook.splitLines &&
-          (field.type === "textarea" || field.type === "computed") &&
+          (field.type === 'textarea' || field.type === 'computed') &&
           formData[field.id]
         ) {
-          const lines = formData[field.id]
-            .split("\n")
-            .filter((line) => line.trim() !== "");
+          const lines = formData[field.id].split('\n').filter((line) => line.trim() !== '');
 
           // Отправляем каждую строку отдельным сообщением
           lines.forEach((line, index) => {
@@ -206,21 +204,18 @@ async function sendToDiscord(formData) {
               username: currentConfig.webhookUsername || currentConfig.title,
               avatar_url:
                 currentConfig.webhookAvatarUrl ||
-                "https://pngimg.com/uploads/discord/discord_PNG3.png",
+                'https://pngimg.com/uploads/discord/discord_PNG3.png',
             };
 
             customWebhookPromises.push(
               fetch(webhookUrl, {
-                method: "POST",
+                method: 'POST',
                 headers: {
-                  "Content-Type": "application/json",
+                  'Content-Type': 'application/json',
                 },
                 body: JSON.stringify(linePayload),
               }).catch((error) => {
-                console.error(
-                  `Ошибка отправки строки ${index + 1} поля ${field.label}:`,
-                  error
-                );
+                console.error(`Ошибка отправки строки ${index + 1} поля ${field.label}:`, error);
               })
             );
           });
@@ -228,16 +223,13 @@ async function sendToDiscord(formData) {
           // Обычная отправка формы на кастомный webhook (только если URL указан)
           customWebhookPromises.push(
             fetch(webhookUrl, {
-              method: "POST",
+              method: 'POST',
               headers: {
-                "Content-Type": "application/json",
+                'Content-Type': 'application/json',
               },
               body: JSON.stringify(payload),
             }).catch((error) => {
-              console.error(
-                `Ошибка отправки на кастомный webhook поля ${field.label}:`,
-                error
-              );
+              console.error(`Ошибка отправки на кастомный webhook поля ${field.label}:`, error);
             })
           );
         }
@@ -246,9 +238,9 @@ async function sendToDiscord(formData) {
       await Promise.allSettled(customWebhookPromises);
     }
 
-    return { success: true, message: "Сообщение успешно отправлено! 🎉" };
+    return { success: true, message: 'Сообщение успешно отправлено! 🎉' };
   } catch (error) {
-    console.error("Ошибка отправки в Discord:", error);
+    console.error('Ошибка отправки в Discord:', error);
     return {
       success: false,
       message: `Ошибка при отправке: ${error.message}. Попробуйте еще раз.`,
