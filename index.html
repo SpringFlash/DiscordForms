@@ -4,6 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title id="pageTitle">Форма обратной связи</title>
+    <link rel="icon" type="image/x-icon" id="faviconLink" href="images/favicon/favicon.ico" />
     <link rel="stylesheet" href="style.css" />
     <link
       href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
@@ -27,11 +28,7 @@
             <h3>Основные настройки</h3>
             <div class="setting-group">
               <label for="formTitle">Название формы:</label>
-              <input
-                type="text"
-                id="formTitle"
-                placeholder="Моя форма обратной связи"
-              />
+              <input type="text" id="formTitle" placeholder="Моя форма обратной связи" />
             </div>
             <div class="setting-group">
               <label for="formDescription">Описание формы:</label>
@@ -51,11 +48,7 @@
             </div>
             <div class="setting-group">
               <label for="webhookUsername">Имя автора в Discord:</label>
-              <input
-                type="text"
-                id="webhookUsername"
-                placeholder="Бот обратной связи"
-              />
+              <input type="text" id="webhookUsername" placeholder="Бот обратной связи" />
             </div>
             <div class="setting-group">
               <label for="webhookAvatarUrl">URL иконки автора:</label>
@@ -82,11 +75,7 @@
             <div class="setting-group">
               <label>Тема оформления:</label>
               <div class="theme-switcher">
-                <button
-                  id="lightThemeBtn"
-                  class="theme-btn active"
-                  data-theme="light"
-                >
+                <button id="lightThemeBtn" class="theme-btn active" data-theme="light">
                   <i class="fas fa-sun"></i> Светлая
                 </button>
                 <button id="darkThemeBtn" class="theme-btn" data-theme="dark">
@@ -95,9 +84,7 @@
               </div>
             </div>
             <div class="setting-group">
-              <label for="customMessage"
-                >Кастомное сообщение (по умолчанию):</label
-              >
+              <label for="customMessage">Кастомное сообщение (по умолчанию):</label>
               <textarea
                 id="customMessage"
                 rows="3"
@@ -109,8 +96,7 @@
           <div class="editor-section">
             <h3>Условные сообщения</h3>
             <p class="section-hint">
-              Отправляйте разные сообщения в Discord в зависимости от выбранных
-              значений
+              Отправляйте разные сообщения в Discord в зависимости от выбранных значений
             </p>
             <div id="conditionalMessagesList" class="conditional-messages-list">
               <!-- Условные сообщения будут добавляться динамически -->
@@ -205,9 +191,7 @@
             <select id="subject" name="subject">
               <option value="">Выберите тему</option>
               <option value="Общий вопрос">Общий вопрос</option>
-              <option value="Техническая поддержка">
-                Техническая поддержка
-              </option>
+              <option value="Техническая поддержка">Техническая поддержка</option>
               <option value="Предложение">Предложение</option>
               <option value="Жалоба">Жалоба</option>
               <option value="Другое">Другое</option>

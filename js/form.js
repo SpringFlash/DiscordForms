@@ -38,6 +38,25 @@ function updateOrganizationLogo(organization) {
   }
 }
 
+// Функция для обновления favicon в зависимости от организации
+function updateFavicon(organization) {
+  const faviconLink = document.getElementById("faviconLink");
+  if (faviconLink) {
+    let faviconPath = "images/favicon/favicon.ico"; // по умолчанию
+
+    // Устанавливаем favicon в зависимости от организации
+    if (organization === "LSPD") {
+      faviconPath = "images/favicon/lspd.ico";
+    } else if (organization === "LSSD") {
+      faviconPath = "images/favicon/lssd.ico";
+    } else if (organization === "WN") {
+      faviconPath = "images/favicon/wn.ico";
+    }
+
+    faviconLink.href = faviconPath;
+  }
+}
+
 // Функция для восстановления базовой структуры формы
 function restoreFormStructure() {
   const formWrapper = document.querySelector(".form-wrapper");

@@ -21,6 +21,7 @@ function initEditor() {
   if (organizationSelect) {
     organizationSelect.value = currentConfig.organization || "LSPD";
     updateOrganizationLogo(currentConfig.organization || "LSPD");
+    updateFavicon(currentConfig.organization || "LSPD");
   }
 
   // Инициализация чекбокса расширенных настроек
@@ -55,6 +56,7 @@ function initEditor() {
     organizationSelect.addEventListener("change", (e) => {
       currentConfig.organization = e.target.value;
       updateOrganizationLogo(e.target.value);
+      updateFavicon(e.target.value);
       updateConfigFromEditor();
     });
   }

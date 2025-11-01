@@ -32,6 +32,7 @@ function initApp() {
   renderForm();
 
   updateOrganizationLogo(currentConfig.organization || "LSPD");
+  updateFavicon(currentConfig.organization || "LSPD");
 
   initFormHandlers();
 }
