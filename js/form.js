@@ -5,24 +5,24 @@ function toggleEditorMode(showEditor) {
   isEditorMode = showEditor;
 
   if (showEditor) {
-    editorPanel.classList.add("show");
+    editorPanel.classList.add('show');
 
     if (container) {
-      container.classList.add("editor-mode");
+      container.classList.add('editor-mode');
     }
 
     if (formPreview) {
-      formPreview.classList.add("preview");
+      formPreview.classList.add('preview');
     }
   } else {
-    editorPanel.classList.remove("show");
+    editorPanel.classList.remove('show');
 
     if (container) {
-      container.classList.remove("editor-mode");
+      container.classList.remove('editor-mode');
     }
 
     if (formPreview) {
-      formPreview.classList.remove("preview");
+      formPreview.classList.remove('preview');
     }
   }
 
@@ -31,7 +31,7 @@ function toggleEditorMode(showEditor) {
 
 // Функция для обновления логотипа организации
 function updateOrganizationLogo(organization) {
-  const logoImg = document.getElementById("orgLogoImg");
+  const logoImg = document.getElementById('orgLogoImg');
   if (logoImg) {
     logoImg.src = `images/${organization}.png`;
     logoImg.alt = `${organization} Logo`;
@@ -40,17 +40,17 @@ function updateOrganizationLogo(organization) {
 
 // Функция для обновления favicon в зависимости от организации
 function updateFavicon(organization) {
-  const faviconLink = document.getElementById("faviconLink");
+  const faviconLink = document.getElementById('faviconLink');
   if (faviconLink) {
-    let faviconPath = "images/favicon/favicon.ico"; // по умолчанию
+    let faviconPath = 'images/favicon/favicon.ico'; // по умолчанию
 
     // Устанавливаем favicon в зависимости от организации
-    if (organization === "LSPD") {
-      faviconPath = "images/favicon/lspd.ico";
-    } else if (organization === "LSSD") {
-      faviconPath = "images/favicon/lssd.ico";
-    } else if (organization === "WN") {
-      faviconPath = "images/favicon/wn.ico";
+    if (organization === 'LSPD') {
+      faviconPath = 'images/favicon/lspd.ico';
+    } else if (organization === 'LSSD') {
+      faviconPath = 'images/favicon/lssd.ico';
+    } else if (organization === 'WN') {
+      faviconPath = 'images/favicon/wn.ico';
     }
 
     faviconLink.href = faviconPath;
@@ -59,7 +59,7 @@ function updateFavicon(organization) {
 
 // Функция для восстановления базовой структуры формы
 function restoreFormStructure() {
-  const formWrapper = document.querySelector(".form-wrapper");
+  const formWrapper = document.querySelector('.form-wrapper');
 
   formWrapper.innerHTML = `
     <div id="organizationLogo" class="organization-logo">
@@ -97,10 +97,10 @@ function restoreFormStructure() {
 
 // Функция для показа welcome screen
 function showWelcomeScreen() {
-  const formWrapper = document.querySelector(".form-wrapper");
+  const formWrapper = document.querySelector('.form-wrapper');
 
-  document.title = "Discord Forms - Создай свою форму";
-  document.getElementById("pageTitle").textContent = "Discord Forms";
+  document.title = 'Discord Forms - Создай свою форму';
+  document.getElementById('pageTitle').textContent = 'Discord Forms';
 
   formWrapper.innerHTML = `
     <div class="welcome-screen">
@@ -137,9 +137,9 @@ function showWelcomeScreen() {
     </div>
   `;
 
-  const createFormBtn = document.getElementById("createFormBtn");
+  const createFormBtn = document.getElementById('createFormBtn');
   if (createFormBtn) {
-    createFormBtn.addEventListener("click", () => {
+    createFormBtn.addEventListener('click', () => {
       currentConfig = createEmptyConfig();
       restoreFormStructure();
       initEditor();
@@ -152,53 +152,53 @@ function showWelcomeScreen() {
 
 // Функция для рендеринга формы на основе конфига
 function renderForm() {
-  const formHeader = formWrapper.querySelector(".header h1");
-  const formDescription = formWrapper.querySelector(".header p");
-  const formFields = formWrapper.querySelector(".contact-form");
+  const formHeader = formWrapper.querySelector('.header h1');
+  const formDescription = formWrapper.querySelector('.header p');
+  const formFields = formWrapper.querySelector('.contact-form');
 
   formHeader.textContent = currentConfig.title;
   formDescription.textContent = currentConfig.description;
 
-  const submitBtn = formFields.querySelector(".submit-btn");
-  formFields.innerHTML = "";
+  const submitBtn = formFields.querySelector('.submit-btn');
+  formFields.innerHTML = '';
   formFields.appendChild(submitBtn);
 
   currentConfig.fields.forEach((field) => {
-    const fieldGroup = document.createElement("div");
-    fieldGroup.className = "form-group";
+    const fieldGroup = document.createElement('div');
+    fieldGroup.className = 'form-group';
     fieldGroup.dataset.fieldId = field.id;
 
     if (field.conditional && field.conditional.enabled) {
       fieldGroup.dataset.conditionalField = field.conditional.field;
       fieldGroup.dataset.conditionalValue = field.conditional.value;
-      fieldGroup.classList.add("conditional-field");
-      fieldGroup.style.display = "none";
+      fieldGroup.classList.add('conditional-field');
+      fieldGroup.style.display = 'none';
     }
 
-    const label = document.createElement("label");
-    label.setAttribute("for", field.id);
+    const label = document.createElement('label');
+    label.setAttribute('for', field.id);
     label.innerHTML = `<i class="fas fa-${field.icon}"></i> ${field.label}${
-      field.required ? " *" : ""
+      field.required ? ' *' : ''
     }`;
 
     let inputElement;
 
     switch (field.type) {
-      case "textarea":
-        inputElement = document.createElement("textarea");
+      case 'textarea':
+        inputElement = document.createElement('textarea');
         inputElement.rows = 5;
         break;
 
-      case "select":
-        inputElement = document.createElement("select");
+      case 'select':
+        inputElement = document.createElement('select');
         if (field.options) {
-          const defaultOption = document.createElement("option");
-          defaultOption.value = "";
-          defaultOption.textContent = "Выберите вариант";
+          const defaultOption = document.createElement('option');
+          defaultOption.value = '';
+          defaultOption.textContent = 'Выберите вариант';
           inputElement.appendChild(defaultOption);
 
           field.options.forEach((option) => {
-            const optionElement = document.createElement("option");
+            const optionElement = document.createElement('option');
             optionElement.value = option;
             optionElement.textContent = option;
             inputElement.appendChild(optionElement);
@@ -206,18 +206,18 @@ function renderForm() {
         }
         break;
 
-      case "radio":
-        const radioGroup = document.createElement("div");
-        radioGroup.className = "radio-group";
+      case 'radio':
+        const radioGroup = document.createElement('div');
+        radioGroup.className = 'radio-group';
 
         if (field.options) {
           field.options.forEach((option, index) => {
-            const radioLabel = document.createElement("label");
-            radioLabel.className = "radio-label";
+            const radioLabel = document.createElement('label');
+            radioLabel.className = 'radio-label';
 
             radioLabel.innerHTML = `
               <input type="radio" name="${field.id}" value="${option}" ${
-              index === 0 && field.defaultValue === option ? "checked" : ""
+              index === 0 && field.defaultValue === option ? 'checked' : ''
             } />
               <span class="radio-custom"></span>
               ${option}
@@ -230,9 +230,9 @@ function renderForm() {
         inputElement = radioGroup;
         break;
 
-      case "checkbox":
-        const checkboxLabel = document.createElement("label");
-        checkboxLabel.className = "checkbox-label";
+      case 'checkbox':
+        const checkboxLabel = document.createElement('label');
+        checkboxLabel.className = 'checkbox-label';
 
         checkboxLabel.innerHTML = `
           <input type="checkbox" id="${field.id}" name="${field.id}" />
@@ -243,34 +243,33 @@ function renderForm() {
         fieldGroup.appendChild(checkboxLabel);
         break;
 
-      case "computed":
-        const formula = field.formula || "";
-        const hasMultilineOperations =
-          formula.includes(",map,") || formula.includes(",lines,");
+      case 'computed':
+        const formula = field.formula || '';
+        const hasMultilineOperations = formula.includes(',map,') || formula.includes(',lines,');
 
         if (hasMultilineOperations) {
-          inputElement = document.createElement("textarea");
+          inputElement = document.createElement('textarea');
           inputElement.rows = 3;
           inputElement.readOnly = true;
-          inputElement.className = "computed-field";
+          inputElement.className = 'computed-field';
           inputElement.dataset.formula = formula;
           inputElement.tabIndex = -1;
         } else {
-          inputElement = document.createElement("input");
-          inputElement.type = "text";
+          inputElement = document.createElement('input');
+          inputElement.type = 'text';
           inputElement.readOnly = true;
-          inputElement.className = "computed-field";
+          inputElement.className = 'computed-field';
           inputElement.dataset.formula = formula;
           inputElement.tabIndex = -1;
         }
         break;
 
       default:
-        inputElement = document.createElement("input");
+        inputElement = document.createElement('input');
         inputElement.type = field.type;
     }
 
-    if (inputElement && inputElement.tagName !== "DIV") {
+    if (inputElement && inputElement.tagName !== 'DIV') {
       inputElement.id = field.id;
       inputElement.name = field.id;
       if (field.placeholder) inputElement.placeholder = field.placeholder;
@@ -279,12 +278,12 @@ function renderForm() {
       fieldGroup.appendChild(label);
       fieldGroup.appendChild(inputElement);
 
-      if (inputElement.type !== "checkbox") {
-        const inputLine = document.createElement("div");
-        inputLine.className = "input-line";
+      if (inputElement.type !== 'checkbox') {
+        const inputLine = document.createElement('div');
+        inputLine.className = 'input-line';
         fieldGroup.appendChild(inputLine);
       }
-    } else if (inputElement && inputElement.tagName === "DIV") {
+    } else if (inputElement && inputElement.tagName === 'DIV') {
       fieldGroup.appendChild(label);
       fieldGroup.appendChild(inputElement);
     }
@@ -299,15 +298,15 @@ function renderForm() {
 // Функция валидации формы
 function validateForm(formData) {
   const errors = [];
-  const form = document.getElementById("contactForm");
+  const form = document.getElementById('contactForm');
 
   currentConfig.fields.forEach((field) => {
-    if (field.type === "computed") {
+    if (field.type === 'computed') {
       return;
     }
 
     const fieldGroup = form.querySelector(`[data-field-id="${field.id}"]`);
-    const isVisible = !fieldGroup || fieldGroup.style.display !== "none";
+    const isVisible = !fieldGroup || fieldGroup.style.display !== 'none';
 
     if (!isVisible) {
       return;
@@ -315,12 +314,12 @@ function validateForm(formData) {
 
     if (field.required) {
       const value = formData[field.id];
-      if (!value || (typeof value === "string" && !value.trim())) {
+      if (!value || (typeof value === 'string' && !value.trim())) {
         errors.push(`Поле "${field.label}" обязательно для заполнения`);
       }
     }
 
-    if (field.type === "email" && formData[field.id]) {
+    if (field.type === 'email' && formData[field.id]) {
       if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData[field.id])) {
         errors.push(`Введите корректный email адрес в поле "${field.label}"`);
       }
@@ -335,26 +334,26 @@ function initFormHandlers() {
   if (!contactForm) return;
 
   if (editFormBtn && formDropdown) {
-    editFormBtn.addEventListener("click", (e) => {
+    editFormBtn.addEventListener('click', (e) => {
       e.stopPropagation();
-      formDropdown.classList.toggle("show");
+      formDropdown.classList.toggle('show');
     });
 
-    document.addEventListener("click", () => {
-      if (formDropdown.classList.contains("show")) {
-        formDropdown.classList.remove("show");
+    document.addEventListener('click', () => {
+      if (formDropdown.classList.contains('show')) {
+        formDropdown.classList.remove('show');
       }
     });
 
     if (duplicateBtn) {
-      duplicateBtn.addEventListener("click", () => {
-        formDropdown.classList.remove("show");
+      duplicateBtn.addEventListener('click', () => {
+        formDropdown.classList.remove('show');
 
         if (!isEditorMode) {
           initEditor();
           if (webhookUrlInput) {
-            webhookUrlInput.value = "";
-            currentConfig.webhookUrl = "";
+            webhookUrlInput.value = '';
+            currentConfig.webhookUrl = '';
           }
         }
         toggleEditorMode(!isEditorMode);
@@ -362,19 +361,27 @@ function initFormHandlers() {
     }
   }
 
-  contactForm.addEventListener("submit", async (e) => {
+  contactForm.addEventListener('submit', async (e) => {
     e.preventDefault();
 
     const formData = new FormData(contactForm);
     const data = {};
 
     for (let [key, value] of formData.entries()) {
+      // Проверяем видимость поля для вычисляемых полей
+      if (currentConfig.fields.find((f) => f.id === key && f.type === 'computed')) {
+        const fieldGroup = contactForm.querySelector(`[data-field-id="${key}"]`);
+        const isVisible = !fieldGroup || fieldGroup.style.display !== 'none';
+        if (!isVisible) {
+          continue; // Пропускаем скрытые вычисляемые поля
+        }
+      }
       data[key] = value;
     }
 
     const errors = validateForm(data);
     if (errors.length > 0) {
-      showMessage(errors.join(". "), "error");
+      showMessage(errors.join('. '), 'error');
       return;
     }
 
@@ -384,23 +391,21 @@ function initFormHandlers() {
       const result = await sendToDiscord(data);
 
       if (result.success) {
-        showMessage(result.message, "success");
+        showMessage(result.message, 'success');
         contactForm.reset();
 
         if (submitBtn) {
-          submitBtn.style.background =
-            "linear-gradient(135deg, #10b981, #059669)";
+          submitBtn.style.background = 'linear-gradient(135deg, #10b981, #059669)';
           setTimeout(() => {
-            submitBtn.style.background =
-              "linear-gradient(135deg, #6366f1, #4f46e5)";
+            submitBtn.style.background = 'linear-gradient(135deg, #6366f1, #4f46e5)';
           }, 3000);
         }
       } else {
-        showMessage(result.message, "error");
+        showMessage(result.message, 'error');
       }
     } catch (error) {
-      console.error("Неожиданная ошибка:", error);
-      showMessage("Произошла неожиданная ошибка. Попробуйте еще раз.", "error");
+      console.error('Неожиданная ошибка:', error);
+      showMessage('Произошла неожиданная ошибка. Попробуйте еще раз.', 'error');
     } finally {
       setLoading(false);
     }
