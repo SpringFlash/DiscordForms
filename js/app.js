@@ -10,10 +10,10 @@ function initApp() {
     const loadedConfig = decodeConfig(urlParams.config);
     if (loadedConfig) {
       currentConfig = loadedConfig;
-      isEditorMode = urlParams.mode === "editor";
+      isEditorMode = urlParams.mode === 'editor';
 
       if (isEditorMode) {
-        currentConfig.webhookUrl = "";
+        currentConfig.webhookUrl = '';
       }
     }
   }
@@ -31,23 +31,28 @@ function initApp() {
 
   renderForm();
 
-  updateOrganizationLogo(currentConfig.organization || "LSPD");
-  updateFavicon(currentConfig.organization || "LSPD");
+  // Обновляем заголовок и описание формы из конфига
+  document.querySelector('h1').textContent = currentConfig.title;
+  document.querySelector('.header p').textContent = currentConfig.description;
+  pageTitle.textContent = currentConfig.title;
+
+  updateOrganizationLogo(currentConfig.organization || 'LSPD');
+  updateFavicon(currentConfig.organization || 'LSPD');
 
   initFormHandlers();
 }
 
 // Анимации для интерактивности
-document.addEventListener("DOMContentLoaded", () => {
-  const formWrapper = document.querySelector(".form-wrapper");
+document.addEventListener('DOMContentLoaded', () => {
+  const formWrapper = document.querySelector('.form-wrapper');
   if (formWrapper) {
-    formWrapper.style.opacity = "0";
-    formWrapper.style.transform = "translateY(30px)";
+    formWrapper.style.opacity = '0';
+    formWrapper.style.transform = 'translateY(30px)';
 
     setTimeout(() => {
-      formWrapper.style.transition = "all 0.8s ease-out";
-      formWrapper.style.opacity = "1";
-      formWrapper.style.transform = "translateY(0)";
+      formWrapper.style.transition = 'all 0.8s ease-out';
+      formWrapper.style.opacity = '1';
+      formWrapper.style.transform = 'translateY(0)';
     }, 100);
   }
 
@@ -55,6 +60,6 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 // Обработчик изменения истории браузера
-window.addEventListener("popstate", () => {
+window.addEventListener('popstate', () => {
   window.location.reload();
 });
