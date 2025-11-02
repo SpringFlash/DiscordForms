@@ -248,7 +248,12 @@ function addFieldToEditor(field) {
         currentConfig.showAdvancedSettings ? "block" : "none"
       };">
         <div class="conditional-section-header">
-          <span>Условная видимость</span>
+          <label class="conditional-checkbox-label-header">
+            <input type="checkbox" class="conditional-enabled-checkbox" ${
+              field.conditional && field.conditional.enabled ? "checked" : ""
+            } />
+            <span>Условная видимость</span>
+          </label>
           <i class="fas fa-chevron-down conditional-toggle-icon ${
             field.conditional && field.conditional.enabled ? "open" : ""
           }"></i>
@@ -258,7 +263,9 @@ function addFieldToEditor(field) {
         };">
           <div class="conditional-hint">Показывать это поле только если:</div>
           <div class="conditional-row">
-            <select class="conditional-field-select">
+            <select class="conditional-field-select" ${
+              field.conditional && field.conditional.enabled ? "" : "disabled"
+            }>
               <option value="">Выберите поле...</option>
             </select>
             <span>включает</span>
@@ -270,7 +277,12 @@ function addFieldToEditor(field) {
         currentConfig.showAdvancedSettings ? "block" : "none"
       };">
         <div class="custom-webhook-section-header">
-          <span>Кастомная отправка</span>
+          <label class="custom-webhook-checkbox-label-header">
+            <input type="checkbox" class="custom-webhook-enabled-checkbox" ${
+              field.customWebhook && field.customWebhook.enabled ? "checked" : ""
+            } />
+            <span>Кастомная отправка</span>
+          </label>
           <i class="fas fa-chevron-down custom-webhook-toggle-icon ${
             field.customWebhook && field.customWebhook.enabled ? "open" : ""
           }"></i>
@@ -279,7 +291,11 @@ function addFieldToEditor(field) {
           field.customWebhook && field.customWebhook.enabled ? "block" : "none"
         };">
           <div class="custom-webhook-hint">Отправлять форму с этим полем на отдельный webhook:</div>
-          <input type="url" class="custom-webhook-url-input" value="" placeholder="https://discord.com/api/webhooks/..." />
+          <input type="url" class="custom-webhook-url-input" value="${
+            field.customWebhook && field.customWebhook.url ? field.customWebhook.url : ""
+          }" placeholder="https://discord.com/api/webhooks/..." ${
+            field.customWebhook && field.customWebhook.enabled ? "" : "disabled"
+          } />
           <label class="custom-webhook-split-lines" style="display: ${
             field.type === "textarea" || field.type === "computed"
               ? "flex"
@@ -289,6 +305,8 @@ function addFieldToEditor(field) {
               field.customWebhook && field.customWebhook.splitLines
                 ? "checked"
                 : ""
+            } ${
+              field.customWebhook && field.customWebhook.enabled ? "" : "disabled"
             } />
             <span>Каждая строка отдельным сообщением</span>
           </label>
@@ -325,6 +343,9 @@ function setupFieldEventHandlers(fieldItem, field) {
     ".conditional-toggle-icon"
   );
   const conditionalConfig = fieldItem.querySelector(".conditional-config");
+  const conditionalEnabledCheckbox = fieldItem.querySelector(
+    ".conditional-enabled-checkbox"
+  );
   const conditionalFieldSelect = fieldItem.querySelector(
     ".conditional-field-select"
   );
@@ -338,6 +359,9 @@ function setupFieldEventHandlers(fieldItem, field) {
     ".custom-webhook-toggle-icon"
   );
   const customWebhookConfig = fieldItem.querySelector(".custom-webhook-config");
+  const customWebhookEnabledCheckbox = fieldItem.querySelector(
+    ".custom-webhook-enabled-checkbox"
+  );
   const customWebhookUrlInput = fieldItem.querySelector(
     ".custom-webhook-url-input"
   );
@@ -373,6 +397,8 @@ function setupFieldEventHandlers(fieldItem, field) {
     const container = fieldItem.querySelector(".conditional-value-container");
     if (!container) return;
 
+    const isEnabled = field.conditional && field.conditional.enabled;
+
     if (
       !selectedField ||
       !selectedField.options ||
@@ -383,6 +409,7 @@ function setupFieldEventHandlers(fieldItem, field) {
       input.className = "conditional-value-input";
       input.value = field.conditional ? field.conditional.value || "" : "";
       input.placeholder = "Значение";
+      input.disabled = !isEnabled;
 
       input.addEventListener("input", (e) => {
         if (!field.conditional) {
@@ -423,6 +450,7 @@ function setupFieldEventHandlers(fieldItem, field) {
       checkbox.type = "checkbox";
       checkbox.value = opt;
       checkbox.checked = currentValues.includes(opt);
+      checkbox.disabled = !isEnabled;
 
       checkbox.addEventListener("change", () => {
         const allCheckboxes = checkboxContainer.querySelectorAll(
@@ -633,21 +661,45 @@ function setupFieldEventHandlers(fieldItem, field) {
     });
   }
 
-  conditionalSectionHeader.addEventListener("click", () => {
-    const isCurrentlyOpen = field.conditional && field.conditional.enabled;
+  conditionalSectionHeader.addEventListener("click", (e) => {
+    // Игнорируем клики по чекбоксу
+    if (e.target === conditionalEnabledCheckbox || e.target.closest('.conditional-checkbox-label-header')) {
+      return;
+    }
+
+    const isCurrentlyOpen = conditionalConfig.style.display === "block";
     const newState = !isCurrentlyOpen;
 
     conditionalConfig.style.display = newState ? "block" : "none";
     conditionalToggleIcon.classList.toggle("open", newState);
+  });
 
-    if (newState) {
+  conditionalEnabledCheckbox.addEventListener("change", (e) => {
+    const isEnabled = e.target.checked;
+
+    if (isEnabled) {
       field.conditional = {
         enabled: true,
         field: conditionalFieldSelect.value || "",
         value: field.conditional ? field.conditional.value || "" : "",
       };
+      conditionalConfig.style.display = "block";
+      conditionalToggleIcon.classList.add("open");
+      conditionalFieldSelect.disabled = false;
+      
+      // Включаем все поля внутри conditional-value-container
+      const valueInputs = conditionalValueContainer.querySelectorAll('input, select');
+      valueInputs.forEach(input => input.disabled = false);
     } else {
-      field.conditional = { enabled: false };
+      if (!field.conditional) {
+        field.conditional = {};
+      }
+      field.conditional.enabled = false;
+      conditionalFieldSelect.disabled = true;
+      
+      // Отключаем все поля внутри conditional-value-container
+      const valueInputs = conditionalValueContainer.querySelectorAll('input, select');
+      valueInputs.forEach(input => input.disabled = true);
     }
 
     updateConfigFromEditor();
@@ -671,20 +723,43 @@ function setupFieldEventHandlers(fieldItem, field) {
 
   // Обработчик для conditionalValueContainer теперь внутри updateConditionalValueOptions
 
-  customWebhookSectionHeader.addEventListener("click", () => {
-    const isCurrentlyOpen = field.customWebhook && field.customWebhook.enabled;
+  customWebhookSectionHeader.addEventListener("click", (e) => {
+    // Игнорируем клики по чекбоксу
+    if (e.target === customWebhookEnabledCheckbox || e.target.closest('.custom-webhook-checkbox-label-header')) {
+      return;
+    }
+
+    const isCurrentlyOpen = customWebhookConfig.style.display === "block";
     const newState = !isCurrentlyOpen;
 
     customWebhookConfig.style.display = newState ? "block" : "none";
     customWebhookToggleIcon.classList.toggle("open", newState);
+  });
 
-    if (newState) {
+  customWebhookEnabledCheckbox.addEventListener("change", (e) => {
+    const isEnabled = e.target.checked;
+
+    if (isEnabled) {
       field.customWebhook = {
         enabled: true,
         url: customWebhookUrlInput.value || "",
+        splitLines: field.customWebhook ? field.customWebhook.splitLines : false,
       };
+      customWebhookConfig.style.display = "block";
+      customWebhookToggleIcon.classList.add("open");
+      customWebhookUrlInput.disabled = false;
+      if (customWebhookSplitLinesCheckbox) {
+        customWebhookSplitLinesCheckbox.disabled = false;
+      }
     } else {
-      field.customWebhook = { enabled: false };
+      if (!field.customWebhook) {
+        field.customWebhook = {};
+      }
+      field.customWebhook.enabled = false;
+      customWebhookUrlInput.disabled = true;
+      if (customWebhookSplitLinesCheckbox) {
+        customWebhookSplitLinesCheckbox.disabled = true;
+      }
     }
 
     updateConfigFromEditor();
