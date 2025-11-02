@@ -66,9 +66,104 @@ function generateShareUrl() {
   return `${baseUrl}?config=${encodeConfig(shareConfig)}`;
 }
 
+// Функция для получения состояния TinyURL (включая captcha_token)
+async function getTinyUrlState() {
+  try {
+    const response = await fetch('https://tinyurl.com/app/api/state', {
+      method: 'GET',
+      headers: {
+        Accept: '*/*',
+        'Accept-Language': 'ru-RU,ru;q=0.8,en-US;q=0.5,en;q=0.3',
+        'X-Requested-With': 'XMLHttpRequest',
+        Priority: 'u=1, i',
+        'Sec-Fetch-Dest': 'empty',
+        'Sec-Fetch-Mode': 'cors',
+        'Sec-Fetch-Site': 'same-origin',
+        Referer: 'https://tinyurl.com/',
+        'Sec-GPC': '1',
+        'User-Agent':
+          'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36',
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error('Ошибка получения состояния TinyURL:', error);
+    throw error;
+  }
+}
+
+// Функция для генерации captcha_token через Cloudflare Turnstile
+async function generateCaptchaToken(siteKey) {
+  return new Promise((resolve, reject) => {
+    // Проверяем, загружен ли Turnstile
+    if (typeof window.turnstile === 'undefined') {
+      // Загружаем скрипт Turnstile
+      const script = document.createElement('script');
+      script.src = 'https://challenges.cloudflare.com/turnstile/v0/api.js';
+      script.async = true;
+      script.defer = true;
+
+      script.onload = () => {
+        // После загрузки скрипта рендерим виджет
+        renderTurnstile(siteKey, resolve, reject);
+      };
+
+      script.onerror = () => {
+        reject(new Error('Не удалось загрузить Turnstile'));
+      };
+
+      document.head.appendChild(script);
+    } else {
+      // Если уже загружен, сразу рендерим
+      renderTurnstile(siteKey, resolve, reject);
+    }
+  });
+}
+
+// Вспомогательная функция для рендеринга Turnstile виджета
+function renderTurnstile(siteKey, resolve, reject) {
+  // Создаем временный контейнер для виджета
+  const container = document.createElement('div');
+  container.style.display = 'none';
+  document.body.appendChild(container);
+
+  try {
+    window.turnstile.render(container, {
+      sitekey: siteKey,
+      callback: (token) => {
+        // Удаляем контейнер после получения токена
+        document.body.removeChild(container);
+        resolve(token);
+      },
+      'error-callback': () => {
+        document.body.removeChild(container);
+        reject(new Error('Ошибка генерации Turnstile токена'));
+      },
+    });
+  } catch (error) {
+    document.body.removeChild(container);
+    reject(error);
+  }
+}
+
 // Функция для сокращения ссылки через TinyURL API
 async function shortenUrlWithTinyUrl(longUrl) {
   try {
+    // Получаем актуальное состояние
+    const state = await getTinyUrlState();
+
+    // Извлекаем site_key из ответа state
+    const siteKey = state?.captcha?.site_key || '0x4AAAAAAAWaftO6M9nMBXRA';
+
+    // Генерируем captcha_token через Turnstile
+    const captchaToken = await generateCaptchaToken(siteKey);
+
     const response = await fetch('https://tinyurl.com/app/api/url/create', {
       method: 'POST',
       headers: {
@@ -80,6 +175,10 @@ async function shortenUrlWithTinyUrl(longUrl) {
         'Sec-Fetch-Dest': 'empty',
         'Sec-Fetch-Mode': 'cors',
         'Sec-Fetch-Site': 'same-origin',
+        Referer: 'https://tinyurl.com/',
+        'Sec-GPC': '1',
+        'User-Agent':
+          'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36',
       },
       body: JSON.stringify({
         url: longUrl,
@@ -88,7 +187,7 @@ async function shortenUrlWithTinyUrl(longUrl) {
         description: '',
         team: null,
         tags: [],
-        captcha_token: '1.484nz3fkkp', // Фиксированный токен, может потребоваться обновление
+        captcha_token: captchaToken,
         expires_at: null,
         errors: { errors: {} },
         busy: true,
