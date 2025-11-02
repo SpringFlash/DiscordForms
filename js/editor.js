@@ -113,7 +113,6 @@ function initEditor() {
   });
 
   generateUrlBtn.addEventListener("click", generateAndCopyShareUrl);
-  shortenUrlBtn.addEventListener("click", generateAndCopyShortUrl);
 }
 
 // Функция для добавления поля в редактор
