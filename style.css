@@ -17,19 +17,16 @@
   --border-color: #e5e7eb;
   --border-radius: 12px;
   --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
-    0 2px 4px -1px rgba(0, 0, 0, 0.06);
-  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1),
-    0 4px 6px -2px rgba(0, 0, 0, 0.05);
-  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1),
-    0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
   --transition-fast: all 0.15s ease;
   --transition-normal: all 0.3s ease;
   --transition-slow: all 0.5s ease;
 }
 
 /* Тёмная тема */
-[data-theme="dark"] {
+[data-theme='dark'] {
   --primary-color: #8b5cf6;
   --primary-dark: #7c3aed;
   --primary-light: #c4b5fd;
@@ -45,12 +42,9 @@
   --bg-dark: #0f172a;
   --border-color: #374151;
   --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.3);
-  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.4),
-    0 2px 4px -1px rgba(0, 0, 0, 0.3);
-  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.4),
-    0 4px 6px -2px rgba(0, 0, 0, 0.3);
-  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.4),
-    0 10px 10px -5px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.4), 0 2px 4px -1px rgba(0, 0, 0, 0.3);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.4), 0 4px 6px -2px rgba(0, 0, 0, 0.3);
+  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.4), 0 10px 10px -5px rgba(0, 0, 0, 0.3);
 }
 
 /* Reset и базовые стили */
@@ -61,8 +55,7 @@
 }
 
 body {
-  font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
-    sans-serif;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   background: linear-gradient(135deg, var(--bg-secondary) 0%, #e0e7ff 100%);
   color: var(--text-primary);
   line-height: 1.6;
@@ -72,7 +65,7 @@ body {
 }
 
 /* Тёмная тема для body */
-[data-theme="dark"] body {
+[data-theme='dark'] body {
   background: linear-gradient(135deg, var(--bg-dark) 0%, #1e293b 100%);
 }
 
@@ -119,18 +112,14 @@ body {
 .decoration-3 {
   position: absolute;
   border-radius: 50%;
-  background: linear-gradient(
-    45deg,
-    var(--primary-light),
-    var(--primary-color)
-  );
+  background: linear-gradient(45deg, var(--primary-light), var(--primary-color));
   opacity: 0.1;
 }
 
 /* Тёмная тема для декоративных элементов */
-[data-theme="dark"] .decoration-1,
-[data-theme="dark"] .decoration-2,
-[data-theme="dark"] .decoration-3 {
+[data-theme='dark'] .decoration-1,
+[data-theme='dark'] .decoration-2,
+[data-theme='dark'] .decoration-3 {
   opacity: 0.05;
 }
 
@@ -221,7 +210,7 @@ body {
 }
 
 .form-wrapper.preview::after {
-  content: "Превью";
+  content: 'Превью';
   position: absolute;
   top: 1rem;
   right: 1rem;
@@ -237,17 +226,13 @@ body {
 }
 
 .form-wrapper::before {
-  content: "";
+  content: '';
   position: absolute;
   top: 0;
   left: 0;
   right: 0;
   height: 4px;
-  background: linear-gradient(
-    90deg,
-    var(--primary-color),
-    var(--secondary-color)
-  );
+  background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
 }
 
 /* Логотип организации */
@@ -336,9 +321,9 @@ body {
 }
 
 /* Поля ввода */
-input[type="text"],
-input[type="email"],
-input[type="url"],
+input[type='text'],
+input[type='email'],
+input[type='url'],
 select,
 textarea {
   width: 100%;
@@ -387,12 +372,12 @@ select {
 }
 
 /* Select options для тёмной темы */
-[data-theme="dark"] select {
+[data-theme='dark'] select {
   background-color: var(--bg-primary);
   color-scheme: dark;
 }
 
-[data-theme="dark"] select option {
+[data-theme='dark'] select option {
   background-color: var(--bg-primary);
   color: var(--text-primary);
 }
@@ -410,7 +395,7 @@ select {
   position: relative;
 }
 
-.radio-label input[type="radio"] {
+.radio-label input[type='radio'] {
   position: absolute;
   opacity: 0;
   cursor: pointer;
@@ -426,13 +411,13 @@ select {
   transition: var(--transition-normal);
 }
 
-.radio-label input[type="radio"]:checked + .radio-custom {
+.radio-label input[type='radio']:checked + .radio-custom {
   border-color: var(--primary-color);
   background: var(--primary-color);
 }
 
 .radio-custom::after {
-  content: "";
+  content: '';
   position: absolute;
   top: 50%;
   left: 50%;
@@ -444,7 +429,7 @@ select {
   transition: var(--transition-normal);
 }
 
-.radio-label input[type="radio"]:checked + .radio-custom::after {
+.radio-label input[type='radio']:checked + .radio-custom::after {
   transform: translate(-50%, -50%) scale(1);
 }
 
@@ -459,7 +444,7 @@ select {
   width: fit-content;
 }
 
-.checkbox-label input[type="checkbox"] {
+.checkbox-label input[type='checkbox'] {
   position: absolute;
   opacity: 0;
   cursor: pointer;
@@ -479,13 +464,13 @@ select {
   flex-shrink: 0;
 }
 
-.checkbox-label input[type="checkbox"]:checked + .checkbox-custom {
+.checkbox-label input[type='checkbox']:checked + .checkbox-custom {
   border-color: var(--primary-color);
   background: var(--primary-color);
 }
 
 .checkbox-custom::after {
-  content: "✓";
+  content: '✓';
   position: absolute;
   top: 50%;
   left: 50%;
@@ -496,7 +481,7 @@ select {
   transition: var(--transition-normal);
 }
 
-.checkbox-label input[type="checkbox"]:checked + .checkbox-custom::after {
+.checkbox-label input[type='checkbox']:checked + .checkbox-custom::after {
   transform: translate(-50%, -50%) scale(1);
 }
 
@@ -504,11 +489,7 @@ select {
 .submit-btn {
   width: 100%;
   padding: 1rem 2rem;
-  background: linear-gradient(
-    135deg,
-    var(--primary-color),
-    var(--primary-dark)
-  );
+  background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
   color: white;
   border: none;
   border-radius: var(--border-radius);
@@ -535,18 +516,13 @@ select {
 }
 
 .submit-btn::before {
-  content: "";
+  content: '';
   position: absolute;
   top: 0;
   left: -100%;
   width: 100%;
   height: 100%;
-  background: linear-gradient(
-    90deg,
-    transparent,
-    rgba(255, 255, 255, 0.2),
-    transparent
-  );
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
   transition: var(--transition-slow);
 }
 
@@ -767,7 +743,7 @@ textarea:focus {
 }
 
 .dropdown-item::before {
-  content: "";
+  content: '';
   position: absolute;
   left: 0;
   top: 0;
@@ -779,11 +755,7 @@ textarea:focus {
 }
 
 .dropdown-item:hover {
-  background: linear-gradient(
-    90deg,
-    rgba(99, 102, 241, 0.08) 0%,
-    transparent 100%
-  );
+  background: linear-gradient(90deg, rgba(99, 102, 241, 0.08) 0%, transparent 100%);
   color: var(--primary-color);
 }
 
@@ -826,11 +798,7 @@ textarea:focus {
 }
 
 .editor-header {
-  background: linear-gradient(
-    135deg,
-    var(--primary-color),
-    var(--primary-dark)
-  );
+  background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
   color: white;
   padding: 1.5rem;
 }
@@ -879,7 +847,7 @@ textarea:focus {
   font-size: 0.9rem;
 }
 
-.setting-group input:not([type="checkbox"]),
+.setting-group input:not([type='checkbox']),
 .setting-group textarea,
 .setting-group select {
   width: 100%;
@@ -905,7 +873,7 @@ textarea:focus {
   background: rgba(99, 102, 241, 0.05);
 }
 
-.checkbox-setting input[type="checkbox"] {
+.checkbox-setting input[type='checkbox'] {
   width: 20px;
   height: 20px;
   cursor: pointer;
@@ -984,7 +952,7 @@ textarea:focus {
   background: rgba(99, 102, 241, 0.08);
 }
 
-.field-required-inline input[type="checkbox"] {
+.field-required-inline input[type='checkbox'] {
   width: 14px;
   height: 14px;
   cursor: pointer;
@@ -1057,8 +1025,8 @@ textarea:focus {
   margin-bottom: 0.25rem;
 }
 
-.field-config-item input[type="text"],
-.field-config-item input[type="url"],
+.field-config-item input[type='text'],
+.field-config-item input[type='url'],
 .field-config-item select {
   padding: 0.5rem;
   border: 1px solid var(--border-color);
@@ -1066,7 +1034,7 @@ textarea:focus {
   font-size: 0.9rem;
 }
 
-.field-config-item input[type="checkbox"] {
+.field-config-item input[type='checkbox'] {
   width: 20px;
   height: 20px;
   cursor: pointer;
@@ -1099,11 +1067,7 @@ textarea:focus {
 
 .generate-url-btn,
 .shorten-url-btn {
-  background: linear-gradient(
-    135deg,
-    var(--primary-color),
-    var(--primary-dark)
-  );
+  background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
   color: white;
   border: none;
   padding: 1rem 1.5rem;
@@ -1117,14 +1081,11 @@ textarea:focus {
   justify-content: center;
   gap: 0.5rem;
   font-size: 0.95rem;
+  width: 30%;
 }
 
 .shorten-url-btn {
-  background: linear-gradient(
-    135deg,
-    var(--success-color),
-    #059669
-  );
+  background: linear-gradient(135deg, var(--success-color), #059669);
 }
 
 .generate-url-btn:hover,
@@ -1155,7 +1116,7 @@ textarea:focus {
   .url-buttons-group {
     flex-direction: column;
   }
-  
+
   .generate-url-btn,
   .shorten-url-btn {
     width: 100%;
@@ -1312,11 +1273,7 @@ textarea:focus {
 .welcome-icon {
   width: 100px;
   height: 100px;
-  background: linear-gradient(
-    135deg,
-    var(--primary-color),
-    var(--primary-dark)
-  );
+  background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -1346,11 +1303,7 @@ textarea:focus {
 .welcome-title {
   font-size: 3rem;
   font-weight: 700;
-  background: linear-gradient(
-    135deg,
-    var(--primary-color),
-    var(--primary-dark)
-  );
+  background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -1401,11 +1354,7 @@ textarea:focus {
 
 .create-form-btn {
   padding: 1.25rem 3rem;
-  background: linear-gradient(
-    135deg,
-    var(--primary-color),
-    var(--primary-dark)
-  );
+  background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
   color: white;
   border: none;
   border-radius: 50px;
@@ -1489,7 +1438,7 @@ textarea:focus {
   border: 2px solid var(--border-color);
   border-radius: 8px;
   font-size: 0.9rem;
-  font-family: "Courier New", monospace;
+  font-family: 'Courier New', monospace;
   background: var(--bg-secondary);
 }
 
@@ -1500,11 +1449,7 @@ textarea:focus {
 }
 
 .add-field-variable-btn {
-  background: linear-gradient(
-    135deg,
-    var(--primary-color),
-    var(--primary-dark)
-  );
+  background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
   color: white;
   border: none;
   padding: 0.75rem 1rem;
@@ -1669,7 +1614,7 @@ textarea:focus {
   font-weight: 500;
 }
 
-.substring-input-group input[type="number"] {
+.substring-input-group input[type='number'] {
   padding: 0.5rem;
   border: 1px solid var(--border-color);
   border-radius: 6px;
@@ -1678,7 +1623,7 @@ textarea:focus {
   color: var(--text-primary);
 }
 
-.substring-input-group input[type="number"]:focus {
+.substring-input-group input[type='number']:focus {
   outline: none;
   border-color: var(--primary-color);
   box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.1);
@@ -1700,11 +1645,7 @@ textarea:focus {
 }
 
 .insert-btn {
-  background: linear-gradient(
-    135deg,
-    var(--primary-color),
-    var(--primary-dark)
-  );
+  background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
   color: white;
 }
 
@@ -1775,7 +1716,7 @@ textarea:focus {
   white-space: nowrap;
 }
 
-.advanced-settings-toggle input[type="checkbox"] {
+.advanced-settings-toggle input[type='checkbox'] {
   width: 16px;
   height: 16px;
   cursor: pointer;
@@ -1917,7 +1858,7 @@ textarea:focus {
   background: var(--bg-secondary);
 }
 
-.conditional-checkbox-label input[type="checkbox"] {
+.conditional-checkbox-label input[type='checkbox'] {
   cursor: pointer;
   width: 18px;
   height: 18px;
@@ -2004,7 +1945,7 @@ textarea:focus {
   background: var(--bg-primary);
   color: var(--text-primary);
   transition: var(--transition-fast);
-  font-family: "Courier New", monospace;
+  font-family: 'Courier New', monospace;
 }
 
 .custom-webhook-url-input:focus {
@@ -2028,7 +1969,7 @@ textarea:focus {
   background: rgba(99, 102, 241, 0.05);
 }
 
-.custom-webhook-split-lines input[type="checkbox"] {
+.custom-webhook-split-lines input[type='checkbox'] {
   width: 18px;
   height: 18px;
   cursor: pointer;
