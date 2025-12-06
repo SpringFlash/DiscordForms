@@ -1041,6 +1041,132 @@ textarea:focus {
   margin: 0;
 }
 
+/* Поле "Название поля" с иконкой в одной строке */
+.field-label-with-icon {
+  grid-column: 1 / -1;
+}
+
+.field-label-container {
+  display: flex;
+  gap: 1rem;
+  align-items: flex-end;
+}
+
+.field-label-wrapper {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.field-icon-wrapper {
+  display: flex;
+  flex-direction: column;
+  width: fit-content;
+  min-width: 60px;
+}
+
+.field-icon-wrapper .emoji-picker-wrapper {
+  width: 100%;
+  position: relative;
+}
+
+.field-icon-wrapper .emoji-picker-btn {
+  width: 100%;
+  min-width: 60px;
+  padding: 0.5rem;
+  height: 38px;
+  justify-content: center;
+  align-items: center;
+  display: flex;
+}
+
+.field-icon-wrapper .emoji-display {
+  font-size: 1.5rem;
+  line-height: 1;
+}
+
+/* Emoji Picker Styles */
+.emoji-picker-wrapper {
+  position: relative;
+}
+
+.emoji-picker-btn {
+  width: 100%;
+  padding: 0.75rem;
+  border: 2px solid var(--border-color);
+  border-radius: 8px;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  transition: var(--transition-fast);
+  font-size: 1rem;
+}
+
+.emoji-picker-btn:hover {
+  border-color: var(--primary-color);
+  background: var(--bg-secondary);
+}
+
+.emoji-picker-btn:focus {
+  outline: none;
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+}
+
+.emoji-display {
+  font-size: 1.5rem;
+  line-height: 1;
+}
+
+.emoji-picker-btn i {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  transition: var(--transition-fast);
+}
+
+emoji-picker {
+  position: absolute;
+  top: calc(100% + 0.5rem);
+  right: 0;
+  z-index: 10001;
+  --emoji-size: 1.5rem;
+  --num-columns: 8;
+  --border-radius: 8px;
+}
+
+/* Override emoji-picker-element styles to match theme */
+emoji-picker {
+  --rgb-background: var(--bg-primary);
+  --rgb-color: var(--text-primary);
+  --rgb-accent: var(--primary-color);
+  --font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  border: 2px solid var(--border-color);
+  border-radius: var(--border-radius);
+  box-shadow: var(--shadow-lg);
+}
+
+/* Dark theme support for emoji-picker */
+[data-theme='dark'] emoji-picker {
+  --rgb-background: var(--bg-primary);
+  --rgb-color: var(--text-primary);
+  --rgb-accent: var(--primary-color);
+}
+
+/* Responsive emoji picker */
+@media (max-width: 640px) {
+  emoji-picker {
+    --num-columns: 6;
+    --emoji-size: 1.25rem;
+    right: 0;
+    left: auto;
+    width: 100%;
+    max-width: 100vw;
+  }
+}
+
 .add-field-btn {
   background: linear-gradient(135deg, var(--success-color), #059669);
   color: white;

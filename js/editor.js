@@ -4,11 +4,10 @@
 function initEditor() {
   formTitleInput.value = currentConfig.title;
   formDescriptionInput.value = currentConfig.description;
-  customMessageInput.value = currentConfig.customMessage || "";
+  customMessageInput.value = currentConfig.customMessage || '';
   webhookUrlInput.value = currentConfig.webhookUrl;
-  webhookUsernameInput.value =
-    currentConfig.webhookUsername || currentConfig.title;
-  webhookAvatarUrlInput.value = currentConfig.webhookAvatarUrl || "";
+  webhookUsernameInput.value = currentConfig.webhookUsername || currentConfig.title;
+  webhookAvatarUrlInput.value = currentConfig.webhookAvatarUrl || '';
 
   if (sendAsPlainTextCheckbox) {
     sendAsPlainTextCheckbox.checked = currentConfig.sendAsPlainText || false;
@@ -19,41 +18,36 @@ function initEditor() {
   }
 
   if (organizationSelect) {
-    organizationSelect.value = currentConfig.organization || "LSPD";
-    updateOrganizationLogo(currentConfig.organization || "LSPD");
-    updateFavicon(currentConfig.organization || "LSPD");
+    organizationSelect.value = currentConfig.organization || 'LSPD';
+    updateOrganizationLogo(currentConfig.organization || 'LSPD');
+    updateFavicon(currentConfig.organization || 'LSPD');
   }
 
   // Инициализация чекбокса расширенных настроек
-  const advancedSettingsCheckbox = document.getElementById(
-    "advancedSettingsCheckbox"
-  );
+  const advancedSettingsCheckbox = document.getElementById('advancedSettingsCheckbox');
   if (advancedSettingsCheckbox) {
-    advancedSettingsCheckbox.checked =
-      currentConfig.showAdvancedSettings || false;
-    updateAdvancedSettingsVisibility(
-      currentConfig.showAdvancedSettings || false
-    );
+    advancedSettingsCheckbox.checked = currentConfig.showAdvancedSettings || false;
+    updateAdvancedSettingsVisibility(currentConfig.showAdvancedSettings || false);
   }
 
-  fieldsList.innerHTML = "";
+  fieldsList.innerHTML = '';
   currentConfig.fields.forEach((field) => {
     addFieldToEditor(field);
   });
 
-  formTitleInput.addEventListener("input", updateConfigFromEditor);
-  formDescriptionInput.addEventListener("input", updateConfigFromEditor);
-  customMessageInput.addEventListener("input", updateConfigFromEditor);
-  webhookUrlInput.addEventListener("input", updateConfigFromEditor);
-  webhookUsernameInput.addEventListener("input", updateConfigFromEditor);
-  webhookAvatarUrlInput.addEventListener("input", updateConfigFromEditor);
+  formTitleInput.addEventListener('input', updateConfigFromEditor);
+  formDescriptionInput.addEventListener('input', updateConfigFromEditor);
+  customMessageInput.addEventListener('input', updateConfigFromEditor);
+  webhookUrlInput.addEventListener('input', updateConfigFromEditor);
+  webhookUsernameInput.addEventListener('input', updateConfigFromEditor);
+  webhookAvatarUrlInput.addEventListener('input', updateConfigFromEditor);
 
   if (sendAsPlainTextCheckbox) {
-    sendAsPlainTextCheckbox.addEventListener("change", updateConfigFromEditor);
+    sendAsPlainTextCheckbox.addEventListener('change', updateConfigFromEditor);
   }
 
   if (organizationSelect) {
-    organizationSelect.addEventListener("change", (e) => {
+    organizationSelect.addEventListener('change', (e) => {
       currentConfig.organization = e.target.value;
       updateOrganizationLogo(e.target.value);
       updateFavicon(e.target.value);
@@ -62,29 +56,29 @@ function initEditor() {
   }
 
   if (lightThemeBtn) {
-    lightThemeBtn.addEventListener("click", () => toggleTheme("light"));
+    lightThemeBtn.addEventListener('click', () => toggleTheme('light'));
   }
   if (darkThemeBtn) {
-    darkThemeBtn.addEventListener("click", () => toggleTheme("dark"));
+    darkThemeBtn.addEventListener('click', () => toggleTheme('dark'));
   }
 
   // Обработчик чекбокса расширенных настроек
   if (advancedSettingsCheckbox) {
-    advancedSettingsCheckbox.addEventListener("change", (e) => {
+    advancedSettingsCheckbox.addEventListener('change', (e) => {
       currentConfig.showAdvancedSettings = e.target.checked;
       updateAdvancedSettingsVisibility(e.target.checked);
       updateConfigFromEditor();
     });
   }
 
-  addFieldBtn.addEventListener("click", () => {
+  addFieldBtn.addEventListener('click', () => {
     const newField = {
       id: generateId(),
-      type: "text",
-      label: "Новое поле",
-      placeholder: "",
+      type: 'text',
+      label: 'Новое поле',
+      placeholder: '',
       required: false,
-      icon: "question",
+      icon: 'question',
     };
     currentConfig.fields.push(newField);
     addFieldToEditor(newField);
@@ -95,42 +89,38 @@ function initEditor() {
   if (!currentConfig.conditionalMessages) {
     currentConfig.conditionalMessages = [];
   }
-  conditionalMessagesList.innerHTML = "";
+  conditionalMessagesList.innerHTML = '';
   currentConfig.conditionalMessages.forEach((condMsg) => {
     addConditionalMessageToEditor(condMsg);
   });
 
-  addConditionalMessageBtn.addEventListener("click", () => {
+  addConditionalMessageBtn.addEventListener('click', () => {
     const newCondMsg = {
       id: generateId(),
-      field: "",
-      value: "",
-      message: "",
+      field: '',
+      value: '',
+      message: '',
     };
     currentConfig.conditionalMessages.push(newCondMsg);
     addConditionalMessageToEditor(newCondMsg);
     updateConfigFromEditor();
   });
 
-  generateUrlBtn.addEventListener("click", generateAndCopyShareUrl);
+  generateUrlBtn.addEventListener('click', generateAndCopyShareUrl);
 }
 
 // Функция для добавления поля в редактор
 function addFieldToEditor(field) {
-  const fieldItem = document.createElement("div");
-  fieldItem.className = "field-item";
+  const fieldItem = document.createElement('div');
+  fieldItem.className = 'field-item';
   fieldItem.dataset.fieldId = field.id;
 
   fieldItem.innerHTML = `
     <div class="field-header">
       <div class="field-header-left">
-        <span class="field-title">${iconMap[field.icon] || "❓"} ${
-    field.label
-  }</span>
+        <span class="field-title">${iconMap[field.icon] || field.icon || '❓'} ${field.label}</span>
         <label class="field-required-inline">
-          <input type="checkbox" class="field-required" ${
-            field.required ? "checked" : ""
-          } />
+          <input type="checkbox" class="field-required" ${field.required ? 'checked' : ''} />
           <span>обязательное</span>
         </label>
       </div>
@@ -150,86 +140,62 @@ function addFieldToEditor(field) {
       </div>
     </div>
     <div class="field-config">
+      <div class="field-config-item field-label-with-icon" style="grid-column: 1 / -1;">
+        <div class="field-label-container">
+          <div class="field-label-wrapper">
+            <label>Название поля</label>
+            <input type="text" class="field-label" value="${field.label}" />
+          </div>
+          <div class="field-icon-wrapper">
+            <label style="visibility: hidden;">Иконка</label>
+            <div class="emoji-picker-wrapper">
+              <button type="button" class="emoji-picker-btn" data-field-id="${field.id}">
+                <span class="emoji-display">${iconMap[field.icon] || field.icon || '❓'}</span>
+              </button>
+              <emoji-picker class="emoji-picker-popup" data-field-id="${
+                field.id
+              }" style="display: none;"></emoji-picker>
+            </div>
+          </div>
+        </div>
+      </div>
       <div class="field-config-item">
         <label>Тип поля</label>
         <select class="field-type">
-          <option value="text" ${
-            field.type === "text" ? "selected" : ""
-          }>Текст</option>
-          <option value="email" ${
-            field.type === "email" ? "selected" : ""
-          }>Email</option>
+          <option value="text" ${field.type === 'text' ? 'selected' : ''}>Текст</option>
+          <option value="email" ${field.type === 'email' ? 'selected' : ''}>Email</option>
           <option value="textarea" ${
-            field.type === "textarea" ? "selected" : ""
+            field.type === 'textarea' ? 'selected' : ''
           }>Текстовая область</option>
           <option value="select" ${
-            field.type === "select" ? "selected" : ""
+            field.type === 'select' ? 'selected' : ''
           }>Выпадающий список</option>
-          <option value="radio" ${
-            field.type === "radio" ? "selected" : ""
-          }>Радиокнопки</option>
-          <option value="checkbox" ${
-            field.type === "checkbox" ? "selected" : ""
-          }>Чекбокс</option>
+          <option value="radio" ${field.type === 'radio' ? 'selected' : ''}>Радиокнопки</option>
+          <option value="checkbox" ${field.type === 'checkbox' ? 'selected' : ''}>Чекбокс</option>
           <option value="computed" ${
-            field.type === "computed" ? "selected" : ""
+            field.type === 'computed' ? 'selected' : ''
           }>Вычисляемое поле</option>
         </select>
       </div>
       <div class="field-config-item">
-        <label>Иконка</label>
-        <select class="field-icon">
-          <option value="user" ${
-            field.icon === "user" ? "selected" : ""
-          }>Пользователь</option>
-          <option value="envelope" ${
-            field.icon === "envelope" ? "selected" : ""
-          }>Email</option>
-          <option value="tag" ${
-            field.icon === "tag" ? "selected" : ""
-          }>Тег</option>
-          <option value="exclamation-triangle" ${
-            field.icon === "exclamation-triangle" ? "selected" : ""
-          }>Приоритет</option>
-          <option value="comment" ${
-            field.icon === "comment" ? "selected" : ""
-          }>Сообщение</option>
-          <option value="newspaper" ${
-            field.icon === "newspaper" ? "selected" : ""
-          }>Новости</option>
-          <option value="question" ${
-            field.icon === "question" ? "selected" : ""
-          }>Вопрос</option>
-          <option value="calculator" ${
-            field.icon === "calculator" ? "selected" : ""
-          }>Калькулятор</option>
-        </select>
-      </div>
-      <div class="field-config-item">
-        <label>Название поля</label>
-        <input type="text" class="field-label" value="${field.label}" />
-      </div>
-      <div class="field-config-item">
         <label>Placeholder</label>
-        <input type="text" class="field-placeholder" value="${
-          field.placeholder || ""
-        }" />
+        <input type="text" class="field-placeholder" value="${field.placeholder || ''}" />
       </div>
       <div class="field-config-item field-options" style="display: ${
-        field.type === "select" || field.type === "radio" ? "block" : "none"
+        field.type === 'select' || field.type === 'radio' ? 'block' : 'none'
       };">
         <label>Варианты (через запятую)</label>
         <input type="text" class="field-options-input" value="${
-          field.options ? field.options.join(", ") : ""
+          field.options ? field.options.join(', ') : ''
         }" />
       </div>
       <div class="field-config-item field-formula-container" style="display: ${
-        field.type === "computed" ? "block" : "none"
+        field.type === 'computed' ? 'block' : 'none'
       }; grid-column: 1 / -1;">
         <label>Формула</label>
         <div class="formula-editor">
           <input type="text" class="field-formula-input" value="${
-            field.formula || ""
+            field.formula || ''
           }" placeholder="Пример: Заявка от {name} - {email,0,3}" />
           <button type="button" class="add-field-variable-btn" title="Добавить переменную">
             <i class="fas fa-plus"></i> Поле
@@ -245,26 +211,26 @@ function addFieldToEditor(field) {
         </div>
       </div>
       <div class="field-config-item field-conditional-container" style="grid-column: 1 / -1; display: ${
-        currentConfig.showAdvancedSettings ? "block" : "none"
+        currentConfig.showAdvancedSettings ? 'block' : 'none'
       };">
         <div class="conditional-section-header">
           <label class="conditional-checkbox-label-header">
             <input type="checkbox" class="conditional-enabled-checkbox" ${
-              field.conditional && field.conditional.enabled ? "checked" : ""
+              field.conditional && field.conditional.enabled ? 'checked' : ''
             } />
             <span>Условная видимость</span>
           </label>
           <i class="fas fa-chevron-down conditional-toggle-icon ${
-            field.conditional && field.conditional.enabled ? "open" : ""
+            field.conditional && field.conditional.enabled ? 'open' : ''
           }"></i>
         </div>
         <div class="conditional-config" style="display: ${
-          field.conditional && field.conditional.enabled ? "block" : "none"
+          field.conditional && field.conditional.enabled ? 'block' : 'none'
         };">
           <div class="conditional-hint">Показывать это поле только если:</div>
           <div class="conditional-row">
             <select class="conditional-field-select" ${
-              field.conditional && field.conditional.enabled ? "" : "disabled"
+              field.conditional && field.conditional.enabled ? '' : 'disabled'
             }>
               <option value="">Выберите поле...</option>
             </select>
@@ -274,40 +240,34 @@ function addFieldToEditor(field) {
         </div>
       </div>
       <div class="field-config-item field-custom-webhook-container" style="grid-column: 1 / -1; display: ${
-        currentConfig.showAdvancedSettings ? "block" : "none"
+        currentConfig.showAdvancedSettings ? 'block' : 'none'
       };">
         <div class="custom-webhook-section-header">
           <label class="custom-webhook-checkbox-label-header">
             <input type="checkbox" class="custom-webhook-enabled-checkbox" ${
-              field.customWebhook && field.customWebhook.enabled ? "checked" : ""
+              field.customWebhook && field.customWebhook.enabled ? 'checked' : ''
             } />
             <span>Кастомная отправка</span>
           </label>
           <i class="fas fa-chevron-down custom-webhook-toggle-icon ${
-            field.customWebhook && field.customWebhook.enabled ? "open" : ""
+            field.customWebhook && field.customWebhook.enabled ? 'open' : ''
           }"></i>
         </div>
         <div class="custom-webhook-config" style="display: ${
-          field.customWebhook && field.customWebhook.enabled ? "block" : "none"
+          field.customWebhook && field.customWebhook.enabled ? 'block' : 'none'
         };">
           <div class="custom-webhook-hint">Отправлять форму с этим полем на отдельный webhook:</div>
           <input type="url" class="custom-webhook-url-input" value="${
-            field.customWebhook && field.customWebhook.url ? field.customWebhook.url : ""
+            field.customWebhook && field.customWebhook.url ? field.customWebhook.url : ''
           }" placeholder="https://discord.com/api/webhooks/..." ${
-            field.customWebhook && field.customWebhook.enabled ? "" : "disabled"
-          } />
+    field.customWebhook && field.customWebhook.enabled ? '' : 'disabled'
+  } />
           <label class="custom-webhook-split-lines" style="display: ${
-            field.type === "textarea" || field.type === "computed"
-              ? "flex"
-              : "none"
+            field.type === 'textarea' || field.type === 'computed' ? 'flex' : 'none'
           };">
             <input type="checkbox" class="custom-webhook-split-lines-checkbox" ${
-              field.customWebhook && field.customWebhook.splitLines
-                ? "checked"
-                : ""
-            } ${
-              field.customWebhook && field.customWebhook.enabled ? "" : "disabled"
-            } />
+              field.customWebhook && field.customWebhook.splitLines ? 'checked' : ''
+            } ${field.customWebhook && field.customWebhook.enabled ? '' : 'disabled'} />
             <span>Каждая строка отдельным сообщением</span>
           </label>
         </div>
@@ -321,64 +281,45 @@ function addFieldToEditor(field) {
 
 // Функция для настройки обработчиков событий поля
 function setupFieldEventHandlers(fieldItem, field) {
-  const fieldHeader = fieldItem.querySelector(".field-header");
-  const cloneBtn = fieldItem.querySelector(".clone");
-  const deleteBtn = fieldItem.querySelector(".delete");
-  const moveUpBtn = fieldItem.querySelector(".move-up");
-  const moveDownBtn = fieldItem.querySelector(".move-down");
-  const typeSelect = fieldItem.querySelector(".field-type");
-  const labelInput = fieldItem.querySelector(".field-label");
-  const placeholderInput = fieldItem.querySelector(".field-placeholder");
-  const iconSelect = fieldItem.querySelector(".field-icon");
-  const requiredCheckbox = fieldItem.querySelector(".field-required");
-  const optionsContainer = fieldItem.querySelector(".field-options");
-  const optionsInput = fieldItem.querySelector(".field-options-input");
-  const formulaContainer = fieldItem.querySelector(".field-formula-container");
-  const formulaInput = fieldItem.querySelector(".field-formula-input");
-  const addVariableBtn = fieldItem.querySelector(".add-field-variable-btn");
-  const conditionalSectionHeader = fieldItem.querySelector(
-    ".conditional-section-header"
-  );
-  const conditionalToggleIcon = fieldItem.querySelector(
-    ".conditional-toggle-icon"
-  );
-  const conditionalConfig = fieldItem.querySelector(".conditional-config");
-  const conditionalEnabledCheckbox = fieldItem.querySelector(
-    ".conditional-enabled-checkbox"
-  );
-  const conditionalFieldSelect = fieldItem.querySelector(
-    ".conditional-field-select"
-  );
-  const conditionalValueContainer = fieldItem.querySelector(
-    ".conditional-value-container"
-  );
-  const customWebhookSectionHeader = fieldItem.querySelector(
-    ".custom-webhook-section-header"
-  );
-  const customWebhookToggleIcon = fieldItem.querySelector(
-    ".custom-webhook-toggle-icon"
-  );
-  const customWebhookConfig = fieldItem.querySelector(".custom-webhook-config");
-  const customWebhookEnabledCheckbox = fieldItem.querySelector(
-    ".custom-webhook-enabled-checkbox"
-  );
-  const customWebhookUrlInput = fieldItem.querySelector(
-    ".custom-webhook-url-input"
-  );
-  const customWebhookSplitLinesLabel = fieldItem.querySelector(
-    ".custom-webhook-split-lines"
-  );
+  const fieldHeader = fieldItem.querySelector('.field-header');
+  const cloneBtn = fieldItem.querySelector('.clone');
+  const deleteBtn = fieldItem.querySelector('.delete');
+  const moveUpBtn = fieldItem.querySelector('.move-up');
+  const moveDownBtn = fieldItem.querySelector('.move-down');
+  const typeSelect = fieldItem.querySelector('.field-type');
+  const labelInput = fieldItem.querySelector('.field-label');
+  const placeholderInput = fieldItem.querySelector('.field-placeholder');
+  const emojiPickerBtn = fieldItem.querySelector('.emoji-picker-btn');
+  const emojiPickerPopup = fieldItem.querySelector('emoji-picker');
+  const emojiDisplay = fieldItem.querySelector('.emoji-display');
+  const requiredCheckbox = fieldItem.querySelector('.field-required');
+  const optionsContainer = fieldItem.querySelector('.field-options');
+  const optionsInput = fieldItem.querySelector('.field-options-input');
+  const formulaContainer = fieldItem.querySelector('.field-formula-container');
+  const formulaInput = fieldItem.querySelector('.field-formula-input');
+  const addVariableBtn = fieldItem.querySelector('.add-field-variable-btn');
+  const conditionalSectionHeader = fieldItem.querySelector('.conditional-section-header');
+  const conditionalToggleIcon = fieldItem.querySelector('.conditional-toggle-icon');
+  const conditionalConfig = fieldItem.querySelector('.conditional-config');
+  const conditionalEnabledCheckbox = fieldItem.querySelector('.conditional-enabled-checkbox');
+  const conditionalFieldSelect = fieldItem.querySelector('.conditional-field-select');
+  const conditionalValueContainer = fieldItem.querySelector('.conditional-value-container');
+  const customWebhookSectionHeader = fieldItem.querySelector('.custom-webhook-section-header');
+  const customWebhookToggleIcon = fieldItem.querySelector('.custom-webhook-toggle-icon');
+  const customWebhookConfig = fieldItem.querySelector('.custom-webhook-config');
+  const customWebhookEnabledCheckbox = fieldItem.querySelector('.custom-webhook-enabled-checkbox');
+  const customWebhookUrlInput = fieldItem.querySelector('.custom-webhook-url-input');
+  const customWebhookSplitLinesLabel = fieldItem.querySelector('.custom-webhook-split-lines');
   const customWebhookSplitLinesCheckbox = fieldItem.querySelector(
-    ".custom-webhook-split-lines-checkbox"
+    '.custom-webhook-split-lines-checkbox'
   );
 
   function populateConditionalFieldSelect() {
-    conditionalFieldSelect.innerHTML =
-      '<option value="">Выберите поле...</option>';
+    conditionalFieldSelect.innerHTML = '<option value="">Выберите поле...</option>';
 
     currentConfig.fields.forEach((f) => {
-      if (f.id !== field.id && (f.type === "select" || f.type === "radio")) {
-        const option = document.createElement("option");
+      if (f.id !== field.id && (f.type === 'select' || f.type === 'radio')) {
+        const option = document.createElement('option');
         option.value = f.id;
         option.textContent = f.label;
         if (field.conditional && field.conditional.field === f.id) {
@@ -390,28 +331,22 @@ function setupFieldEventHandlers(fieldItem, field) {
   }
 
   function updateConditionalValueOptions(selectedFieldId) {
-    const selectedField = currentConfig.fields.find(
-      (f) => f.id === selectedFieldId
-    );
+    const selectedField = currentConfig.fields.find((f) => f.id === selectedFieldId);
 
-    const container = fieldItem.querySelector(".conditional-value-container");
+    const container = fieldItem.querySelector('.conditional-value-container');
     if (!container) return;
 
     const isEnabled = field.conditional && field.conditional.enabled;
 
-    if (
-      !selectedField ||
-      !selectedField.options ||
-      selectedField.options.length === 0
-    ) {
-      const input = document.createElement("input");
-      input.type = "text";
-      input.className = "conditional-value-input";
-      input.value = field.conditional ? field.conditional.value || "" : "";
-      input.placeholder = "Значение";
+    if (!selectedField || !selectedField.options || selectedField.options.length === 0) {
+      const input = document.createElement('input');
+      input.type = 'text';
+      input.className = 'conditional-value-input';
+      input.value = field.conditional ? field.conditional.value || '' : '';
+      input.placeholder = 'Значение';
       input.disabled = !isEnabled;
 
-      input.addEventListener("input", (e) => {
+      input.addEventListener('input', (e) => {
         if (!field.conditional) {
           field.conditional = { enabled: true };
         }
@@ -420,14 +355,14 @@ function setupFieldEventHandlers(fieldItem, field) {
         renderForm();
       });
 
-      container.innerHTML = "";
+      container.innerHTML = '';
       container.appendChild(input);
       return;
     }
 
     // Создаем контейнер с чекбоксами для множественного выбора
-    const checkboxContainer = document.createElement("div");
-    checkboxContainer.className = "conditional-checkboxes";
+    const checkboxContainer = document.createElement('div');
+    checkboxContainer.className = 'conditional-checkboxes';
 
     // Получаем текущие выбранные значения
     let currentValues = [];
@@ -443,19 +378,17 @@ function setupFieldEventHandlers(fieldItem, field) {
     }
 
     selectedField.options.forEach((opt) => {
-      const label = document.createElement("label");
-      label.className = "conditional-checkbox-label";
+      const label = document.createElement('label');
+      label.className = 'conditional-checkbox-label';
 
-      const checkbox = document.createElement("input");
-      checkbox.type = "checkbox";
+      const checkbox = document.createElement('input');
+      checkbox.type = 'checkbox';
       checkbox.value = opt;
       checkbox.checked = currentValues.includes(opt);
       checkbox.disabled = !isEnabled;
 
-      checkbox.addEventListener("change", () => {
-        const allCheckboxes = checkboxContainer.querySelectorAll(
-          'input[type="checkbox"]'
-        );
+      checkbox.addEventListener('change', () => {
+        const allCheckboxes = checkboxContainer.querySelectorAll('input[type="checkbox"]');
         const selectedValues = Array.from(allCheckboxes)
           .filter((cb) => cb.checked)
           .map((cb) => cb.value);
@@ -469,11 +402,11 @@ function setupFieldEventHandlers(fieldItem, field) {
       });
 
       label.appendChild(checkbox);
-      label.appendChild(document.createTextNode(" " + opt));
+      label.appendChild(document.createTextNode(' ' + opt));
       checkboxContainer.appendChild(label);
     });
 
-    container.innerHTML = "";
+    container.innerHTML = '';
     container.appendChild(checkboxContainer);
   }
 
@@ -483,27 +416,22 @@ function setupFieldEventHandlers(fieldItem, field) {
     updateConditionalValueOptions(field.conditional.field);
   }
 
-  fieldHeader.addEventListener("click", (e) => {
+  fieldHeader.addEventListener('click', (e) => {
     // Игнорируем клики по кнопкам и чекбоксу
-    if (
-      e.target.closest(".field-actions") ||
-      e.target.closest(".field-required-inline")
-    ) {
+    if (e.target.closest('.field-actions') || e.target.closest('.field-required-inline')) {
       return;
     }
-    const config = fieldItem.querySelector(".field-config");
-    config.style.display = config.style.display === "none" ? "grid" : "none";
+    const config = fieldItem.querySelector('.field-config');
+    config.style.display = config.style.display === 'none' ? 'grid' : 'none';
   });
 
-  cloneBtn.addEventListener("click", () => {
-    const currentIndex = currentConfig.fields.findIndex(
-      (f) => f.id === field.id
-    );
+  cloneBtn.addEventListener('click', () => {
+    const currentIndex = currentConfig.fields.findIndex((f) => f.id === field.id);
 
     // Создаем глубокую копию поля
     const clonedField = JSON.parse(JSON.stringify(field));
     clonedField.id = generateId();
-    clonedField.label = field.label + " (копия)";
+    clonedField.label = field.label + ' (копия)';
 
     // Вставляем клонированное поле после текущего
     currentConfig.fields.splice(currentIndex + 1, 0, clonedField);
@@ -511,7 +439,7 @@ function setupFieldEventHandlers(fieldItem, field) {
     rebuildFieldsList();
 
     // Если клонировали селект/радио, обновляем селекты полей
-    if (field.type === "select" || field.type === "radio") {
+    if (field.type === 'select' || field.type === 'radio') {
       rebuildConditionalFieldSelects();
     }
 
@@ -519,14 +447,11 @@ function setupFieldEventHandlers(fieldItem, field) {
     renderForm();
   });
 
-  deleteBtn.addEventListener("click", () => {
-    if (confirm("Удалить это поле?")) {
-      const wasSelectOrRadio =
-        field.type === "select" || field.type === "radio";
+  deleteBtn.addEventListener('click', () => {
+    if (confirm('Удалить это поле?')) {
+      const wasSelectOrRadio = field.type === 'select' || field.type === 'radio';
 
-      currentConfig.fields = currentConfig.fields.filter(
-        (f) => f.id !== field.id
-      );
+      currentConfig.fields = currentConfig.fields.filter((f) => f.id !== field.id);
       fieldItem.remove();
 
       // Если удалили селект/радио, обновляем селекты полей
@@ -539,15 +464,10 @@ function setupFieldEventHandlers(fieldItem, field) {
     }
   });
 
-  moveUpBtn.addEventListener("click", () => {
-    const currentIndex = currentConfig.fields.findIndex(
-      (f) => f.id === field.id
-    );
+  moveUpBtn.addEventListener('click', () => {
+    const currentIndex = currentConfig.fields.findIndex((f) => f.id === field.id);
     if (currentIndex > 0) {
-      [
-        currentConfig.fields[currentIndex - 1],
-        currentConfig.fields[currentIndex],
-      ] = [
+      [currentConfig.fields[currentIndex - 1], currentConfig.fields[currentIndex]] = [
         currentConfig.fields[currentIndex],
         currentConfig.fields[currentIndex - 1],
       ];
@@ -558,15 +478,10 @@ function setupFieldEventHandlers(fieldItem, field) {
     }
   });
 
-  moveDownBtn.addEventListener("click", () => {
-    const currentIndex = currentConfig.fields.findIndex(
-      (f) => f.id === field.id
-    );
+  moveDownBtn.addEventListener('click', () => {
+    const currentIndex = currentConfig.fields.findIndex((f) => f.id === field.id);
     if (currentIndex < currentConfig.fields.length - 1) {
-      [
-        currentConfig.fields[currentIndex],
-        currentConfig.fields[currentIndex + 1],
-      ] = [
+      [currentConfig.fields[currentIndex], currentConfig.fields[currentIndex + 1]] = [
         currentConfig.fields[currentIndex + 1],
         currentConfig.fields[currentIndex],
       ];
@@ -577,24 +492,22 @@ function setupFieldEventHandlers(fieldItem, field) {
     }
   });
 
-  typeSelect.addEventListener("change", (e) => {
+  typeSelect.addEventListener('change', (e) => {
     const newType = e.target.value;
     const oldType = field.type;
     field.type = newType;
-    optionsContainer.style.display =
-      newType === "select" || newType === "radio" ? "block" : "none";
+    optionsContainer.style.display = newType === 'select' || newType === 'radio' ? 'block' : 'none';
     if (formulaContainer) {
-      formulaContainer.style.display =
-        newType === "computed" ? "block" : "none";
+      formulaContainer.style.display = newType === 'computed' ? 'block' : 'none';
     }
     if (customWebhookSplitLinesLabel) {
       customWebhookSplitLinesLabel.style.display =
-        newType === "textarea" || newType === "computed" ? "flex" : "none";
+        newType === 'textarea' || newType === 'computed' ? 'flex' : 'none';
     }
 
     // Если изменился тип на select/radio или с select/radio, обновляем селекты полей
-    const wasSelectOrRadio = oldType === "select" || oldType === "radio";
-    const isSelectOrRadio = newType === "select" || newType === "radio";
+    const wasSelectOrRadio = oldType === 'select' || oldType === 'radio';
+    const isSelectOrRadio = newType === 'select' || newType === 'radio';
     if (wasSelectOrRadio !== isSelectOrRadio) {
       rebuildConditionalFieldSelects();
     }
@@ -603,14 +516,14 @@ function setupFieldEventHandlers(fieldItem, field) {
     renderForm();
   });
 
-  labelInput.addEventListener("input", (e) => {
+  labelInput.addEventListener('input', (e) => {
     field.label = e.target.value;
-    fieldItem.querySelector(".field-title").textContent = `${
-      iconMap[field.icon] || "❓"
+    fieldItem.querySelector('.field-title').textContent = `${
+      iconMap[field.icon] || field.icon || '❓'
     } ${field.label}`;
 
     // Если это селект или радио, обновляем селекты полей (чтобы новое название отобразилось)
-    if (field.type === "select" || field.type === "radio") {
+    if (field.type === 'select' || field.type === 'radio') {
       rebuildConditionalFieldSelects();
     }
 
@@ -618,30 +531,60 @@ function setupFieldEventHandlers(fieldItem, field) {
     renderForm();
   });
 
-  placeholderInput.addEventListener("input", (e) => {
+  placeholderInput.addEventListener('input', (e) => {
     field.placeholder = e.target.value;
     updateConfigFromEditor();
     renderForm();
   });
 
-  iconSelect.addEventListener("change", (e) => {
-    field.icon = e.target.value;
-    fieldItem.querySelector(".field-title").textContent = `${
-      iconMap[field.icon] || "❓"
-    } ${field.label}`;
-    updateConfigFromEditor();
-    renderForm();
-  });
+  // Emoji picker button click handler
+  if (emojiPickerBtn && emojiPickerPopup) {
+    emojiPickerBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      // Close other emoji pickers
+      document.querySelectorAll('emoji-picker').forEach((popup) => {
+        if (popup !== emojiPickerPopup) {
+          popup.style.display = 'none';
+        }
+      });
+      // Toggle current picker
+      const isVisible = emojiPickerPopup.style.display === 'block';
+      emojiPickerPopup.style.display = isVisible ? 'none' : 'block';
+    });
 
-  requiredCheckbox.addEventListener("change", (e) => {
+    // Emoji picker selection handler
+    emojiPickerPopup.addEventListener('emoji-click', (e) => {
+      e.stopPropagation();
+      // Try different possible properties for emoji value
+      const selectedEmoji =
+        e.detail.unicode || e.detail.emoji?.unicode || e.detail.native || e.detail.emoji || '❓';
+      field.icon = selectedEmoji;
+      if (emojiDisplay) {
+        emojiDisplay.textContent = selectedEmoji;
+      }
+      fieldItem.querySelector('.field-title').textContent = `${selectedEmoji} ${field.label}`;
+      emojiPickerPopup.style.display = 'none';
+      updateConfigFromEditor();
+      renderForm();
+    });
+
+    // Close emoji picker when clicking outside
+    document.addEventListener('click', (e) => {
+      if (!emojiPickerBtn.contains(e.target) && !emojiPickerPopup.contains(e.target)) {
+        emojiPickerPopup.style.display = 'none';
+      }
+    });
+  }
+
+  requiredCheckbox.addEventListener('change', (e) => {
     field.required = e.target.checked;
     updateConfigFromEditor();
     renderForm();
   });
 
-  optionsInput.addEventListener("input", (e) => {
+  optionsInput.addEventListener('input', (e) => {
     field.options = e.target.value
-      .split(",")
+      .split(',')
       .map((opt) => opt.trim())
       .filter((opt) => opt);
 
@@ -649,69 +592,72 @@ function setupFieldEventHandlers(fieldItem, field) {
     renderForm();
   });
 
-  optionsInput.addEventListener("blur", () => {
+  optionsInput.addEventListener('blur', () => {
     rebuildConditionalSelects(field.id);
   });
 
   if (formulaInput) {
-    formulaInput.addEventListener("input", (e) => {
+    formulaInput.addEventListener('input', (e) => {
       field.formula = e.target.value;
       updateConfigFromEditor();
       renderForm();
     });
   }
 
-  conditionalSectionHeader.addEventListener("click", (e) => {
+  conditionalSectionHeader.addEventListener('click', (e) => {
     // Игнорируем клики по чекбоксу
-    if (e.target === conditionalEnabledCheckbox || e.target.closest('.conditional-checkbox-label-header')) {
+    if (
+      e.target === conditionalEnabledCheckbox ||
+      e.target.closest('.conditional-checkbox-label-header')
+    ) {
       return;
     }
 
-    const isCurrentlyOpen = conditionalConfig.style.display === "block";
+    const isCurrentlyOpen = conditionalConfig.style.display === 'block';
     const newState = !isCurrentlyOpen;
 
-    conditionalConfig.style.display = newState ? "block" : "none";
-    conditionalToggleIcon.classList.toggle("open", newState);
+    conditionalConfig.style.display = newState ? 'block' : 'none';
+    conditionalToggleIcon.classList.toggle('open', newState);
   });
 
-  conditionalEnabledCheckbox.addEventListener("change", (e) => {
+  conditionalEnabledCheckbox.addEventListener('change', (e) => {
     const isEnabled = e.target.checked;
 
     if (isEnabled) {
       field.conditional = {
         enabled: true,
-        field: conditionalFieldSelect.value || "",
-        value: field.conditional ? field.conditional.value || "" : "",
+        field: conditionalFieldSelect.value || '',
+        value: field.conditional ? field.conditional.value || '' : '',
       };
-      conditionalConfig.style.display = "block";
-      conditionalToggleIcon.classList.add("open");
+      conditionalConfig.style.display = 'block';
+      conditionalToggleIcon.classList.add('open');
       conditionalFieldSelect.disabled = false;
-      
+
       // Включаем все поля внутри conditional-value-container
       const valueInputs = conditionalValueContainer.querySelectorAll('input, select');
-      valueInputs.forEach(input => input.disabled = false);
+      valueInputs.forEach((input) => (input.disabled = false));
     } else {
       if (!field.conditional) {
         field.conditional = {};
       }
       field.conditional.enabled = false;
       conditionalFieldSelect.disabled = true;
-      
+
       // Отключаем все поля внутри conditional-value-container
       const valueInputs = conditionalValueContainer.querySelectorAll('input, select');
-      valueInputs.forEach(input => input.disabled = true);
+      valueInputs.forEach((input) => (input.disabled = true));
     }
 
     updateConfigFromEditor();
     renderForm();
   });
 
-  conditionalFieldSelect.addEventListener("change", (e) => {
+  conditionalFieldSelect.addEventListener('change', (e) => {
     if (!field.conditional) {
       field.conditional = { enabled: true };
     }
     field.conditional.field = e.target.value;
-    field.conditional.value = "";
+    field.conditional.value = '';
 
     if (e.target.value) {
       updateConditionalValueOptions(e.target.value);
@@ -723,30 +669,33 @@ function setupFieldEventHandlers(fieldItem, field) {
 
   // Обработчик для conditionalValueContainer теперь внутри updateConditionalValueOptions
 
-  customWebhookSectionHeader.addEventListener("click", (e) => {
+  customWebhookSectionHeader.addEventListener('click', (e) => {
     // Игнорируем клики по чекбоксу
-    if (e.target === customWebhookEnabledCheckbox || e.target.closest('.custom-webhook-checkbox-label-header')) {
+    if (
+      e.target === customWebhookEnabledCheckbox ||
+      e.target.closest('.custom-webhook-checkbox-label-header')
+    ) {
       return;
     }
 
-    const isCurrentlyOpen = customWebhookConfig.style.display === "block";
+    const isCurrentlyOpen = customWebhookConfig.style.display === 'block';
     const newState = !isCurrentlyOpen;
 
-    customWebhookConfig.style.display = newState ? "block" : "none";
-    customWebhookToggleIcon.classList.toggle("open", newState);
+    customWebhookConfig.style.display = newState ? 'block' : 'none';
+    customWebhookToggleIcon.classList.toggle('open', newState);
   });
 
-  customWebhookEnabledCheckbox.addEventListener("change", (e) => {
+  customWebhookEnabledCheckbox.addEventListener('change', (e) => {
     const isEnabled = e.target.checked;
 
     if (isEnabled) {
       field.customWebhook = {
         enabled: true,
-        url: customWebhookUrlInput.value || "",
+        url: customWebhookUrlInput.value || '',
         splitLines: field.customWebhook ? field.customWebhook.splitLines : false,
       };
-      customWebhookConfig.style.display = "block";
-      customWebhookToggleIcon.classList.add("open");
+      customWebhookConfig.style.display = 'block';
+      customWebhookToggleIcon.classList.add('open');
       customWebhookUrlInput.disabled = false;
       if (customWebhookSplitLinesCheckbox) {
         customWebhookSplitLinesCheckbox.disabled = false;
@@ -766,7 +715,7 @@ function setupFieldEventHandlers(fieldItem, field) {
     renderForm();
   });
 
-  customWebhookUrlInput.addEventListener("input", (e) => {
+  customWebhookUrlInput.addEventListener('input', (e) => {
     if (!field.customWebhook) {
       field.customWebhook = { enabled: true };
     }
@@ -776,7 +725,7 @@ function setupFieldEventHandlers(fieldItem, field) {
   });
 
   if (customWebhookSplitLinesCheckbox) {
-    customWebhookSplitLinesCheckbox.addEventListener("change", (e) => {
+    customWebhookSplitLinesCheckbox.addEventListener('change', (e) => {
       if (!field.customWebhook) {
         field.customWebhook = { enabled: true };
       }
@@ -787,7 +736,7 @@ function setupFieldEventHandlers(fieldItem, field) {
   }
 
   if (addVariableBtn) {
-    addVariableBtn.addEventListener("click", () => {
+    addVariableBtn.addEventListener('click', () => {
       showFieldVariablePopup(field, formulaInput);
     });
   }
@@ -796,31 +745,31 @@ function setupFieldEventHandlers(fieldItem, field) {
 // Функция для показа попапа выбора переменной
 function showFieldVariablePopup(field, formulaInput) {
   const availableFields = currentConfig.fields.filter(
-    (f) => f.id !== field.id && f.type !== "computed"
+    (f) => f.id !== field.id && f.type !== 'computed'
   );
 
   if (availableFields.length === 0) {
-    alert("Нет доступных полей для вставки. Создайте сначала другие поля.");
+    alert('Нет доступных полей для вставки. Создайте сначала другие поля.');
     return;
   }
 
-  const fieldSelect = document.createElement("select");
-  fieldSelect.className = "temp-field-select";
+  const fieldSelect = document.createElement('select');
+  fieldSelect.className = 'temp-field-select';
 
-  const defaultOption = document.createElement("option");
-  defaultOption.value = "";
-  defaultOption.textContent = "Выберите поле...";
+  const defaultOption = document.createElement('option');
+  defaultOption.value = '';
+  defaultOption.textContent = 'Выберите поле...';
   fieldSelect.appendChild(defaultOption);
 
   availableFields.forEach((f) => {
-    const option = document.createElement("option");
+    const option = document.createElement('option');
     option.value = f.id;
     option.textContent = f.label;
     fieldSelect.appendChild(option);
   });
 
-  const popup = document.createElement("div");
-  popup.className = "field-variable-popup";
+  const popup = document.createElement('div');
+  popup.className = 'field-variable-popup';
   popup.innerHTML = `
     <div class="popup-content">
       <label>Выберите поле для вставки:</label>
@@ -845,34 +794,32 @@ function showFieldVariablePopup(field, formulaInput) {
     </div>
   `;
 
-  popup.querySelector(".popup-select-container").appendChild(fieldSelect);
+  popup.querySelector('.popup-select-container').appendChild(fieldSelect);
   document.body.appendChild(popup);
 
-  const insertBtn = popup.querySelector(".insert-btn");
-  const cancelBtn = popup.querySelector(".cancel-btn");
-  const startIndexInput = popup.querySelector(".start-index-input");
-  const endIndexInput = popup.querySelector(".end-index-input");
+  const insertBtn = popup.querySelector('.insert-btn');
+  const cancelBtn = popup.querySelector('.cancel-btn');
+  const startIndexInput = popup.querySelector('.start-index-input');
+  const endIndexInput = popup.querySelector('.end-index-input');
 
-  insertBtn.addEventListener("click", () => {
+  insertBtn.addEventListener('click', () => {
     const selectedFieldId = fieldSelect.value;
     if (selectedFieldId) {
-      const selectedField = availableFields.find(
-        (f) => f.id === selectedFieldId
-      );
+      const selectedField = availableFields.find((f) => f.id === selectedFieldId);
       if (selectedField) {
         let placeholder = `{${selectedField.id}`;
 
         const start = startIndexInput.value;
         const end = endIndexInput.value;
 
-        if (start !== "") {
+        if (start !== '') {
           placeholder += `,${start}`;
-          if (end !== "") {
+          if (end !== '') {
             placeholder += `,${end}`;
           }
         }
 
-        placeholder += "}";
+        placeholder += '}';
 
         const cursorPos = formulaInput.selectionStart;
         const textBefore = formulaInput.value.substring(0, cursorPos);
@@ -880,8 +827,7 @@ function showFieldVariablePopup(field, formulaInput) {
 
         formulaInput.value = textBefore + placeholder + textAfter;
         formulaInput.focus();
-        formulaInput.selectionStart = formulaInput.selectionEnd =
-          cursorPos + placeholder.length;
+        formulaInput.selectionStart = formulaInput.selectionEnd = cursorPos + placeholder.length;
 
         field.formula = formulaInput.value;
         updateConfigFromEditor();
@@ -891,11 +837,11 @@ function showFieldVariablePopup(field, formulaInput) {
     popup.remove();
   });
 
-  cancelBtn.addEventListener("click", () => {
+  cancelBtn.addEventListener('click', () => {
     popup.remove();
   });
 
-  popup.addEventListener("click", (e) => {
+  popup.addEventListener('click', (e) => {
     if (e.target === popup) {
       popup.remove();
     }
@@ -904,7 +850,7 @@ function showFieldVariablePopup(field, formulaInput) {
 
 // Функция для перестроения списка полей в редакторе
 function rebuildFieldsList() {
-  fieldsList.innerHTML = "";
+  fieldsList.innerHTML = '';
   currentConfig.fields.forEach((field) => {
     addFieldToEditor(field);
   });
@@ -915,25 +861,17 @@ function rebuildConditionalFieldSelects() {
   // Обновляем селекты полей в условной видимости каждого поля
   currentConfig.fields.forEach((field) => {
     if (field.conditional && field.conditional.enabled) {
-      const fieldItem = fieldsList.querySelector(
-        `[data-field-id="${field.id}"]`
-      );
+      const fieldItem = fieldsList.querySelector(`[data-field-id="${field.id}"]`);
       if (fieldItem) {
-        const conditionalFieldSelect = fieldItem.querySelector(
-          ".conditional-field-select"
-        );
+        const conditionalFieldSelect = fieldItem.querySelector('.conditional-field-select');
         if (conditionalFieldSelect) {
           const currentValue = conditionalFieldSelect.value;
 
-          conditionalFieldSelect.innerHTML =
-            '<option value="">Выберите поле...</option>';
+          conditionalFieldSelect.innerHTML = '<option value="">Выберите поле...</option>';
 
           currentConfig.fields.forEach((f) => {
-            if (
-              f.id !== field.id &&
-              (f.type === "select" || f.type === "radio")
-            ) {
-              const option = document.createElement("option");
+            if (f.id !== field.id && (f.type === 'select' || f.type === 'radio')) {
+              const option = document.createElement('option');
               option.value = f.id;
               option.textContent = f.label;
               if (currentValue === f.id) {
@@ -954,15 +892,15 @@ function rebuildConditionalFieldSelects() {
         `[data-cond-msg-id="${condMsg.id}"]`
       );
       if (condMsgItem) {
-        const fieldSelect = condMsgItem.querySelector(".condmsg-field-select");
+        const fieldSelect = condMsgItem.querySelector('.condmsg-field-select');
         if (fieldSelect) {
           const currentValue = fieldSelect.value;
 
           fieldSelect.innerHTML = '<option value="">Выберите поле...</option>';
 
           currentConfig.fields.forEach((f) => {
-            if (f.type === "select" || f.type === "radio") {
-              const option = document.createElement("option");
+            if (f.type === 'select' || f.type === 'radio') {
+              const option = document.createElement('option');
               option.value = f.id;
               option.textContent = f.label;
               if (currentValue === f.id) {
@@ -985,25 +923,15 @@ function rebuildConditionalSelects(changedFieldId) {
       field.conditional.enabled &&
       field.conditional.field === changedFieldId
     ) {
-      const fieldItem = fieldsList.querySelector(
-        `[data-field-id="${field.id}"]`
-      );
+      const fieldItem = fieldsList.querySelector(`[data-field-id="${field.id}"]`);
       if (fieldItem) {
-        const conditionalValueContainer = fieldItem.querySelector(
-          ".conditional-value-container"
-        );
+        const conditionalValueContainer = fieldItem.querySelector('.conditional-value-container');
         if (conditionalValueContainer) {
-          const changedField = currentConfig.fields.find(
-            (f) => f.id === changedFieldId
-          );
-          if (
-            changedField &&
-            changedField.options &&
-            changedField.options.length > 0
-          ) {
+          const changedField = currentConfig.fields.find((f) => f.id === changedFieldId);
+          if (changedField && changedField.options && changedField.options.length > 0) {
             // Создаем контейнер с чекбоксами
-            const checkboxContainer = document.createElement("div");
-            checkboxContainer.className = "conditional-checkboxes";
+            const checkboxContainer = document.createElement('div');
+            checkboxContainer.className = 'conditional-checkboxes';
 
             // Получаем текущие выбранные значения
             let currentValues = [];
@@ -1019,18 +947,16 @@ function rebuildConditionalSelects(changedFieldId) {
             }
 
             changedField.options.forEach((opt) => {
-              const label = document.createElement("label");
-              label.className = "conditional-checkbox-label";
+              const label = document.createElement('label');
+              label.className = 'conditional-checkbox-label';
 
-              const checkbox = document.createElement("input");
-              checkbox.type = "checkbox";
+              const checkbox = document.createElement('input');
+              checkbox.type = 'checkbox';
               checkbox.value = opt;
               checkbox.checked = currentValues.includes(opt);
 
-              checkbox.addEventListener("change", () => {
-                const allCheckboxes = checkboxContainer.querySelectorAll(
-                  'input[type="checkbox"]'
-                );
+              checkbox.addEventListener('change', () => {
+                const allCheckboxes = checkboxContainer.querySelectorAll('input[type="checkbox"]');
                 const selectedValues = Array.from(allCheckboxes)
                   .filter((cb) => cb.checked)
                   .map((cb) => cb.value);
@@ -1041,11 +967,11 @@ function rebuildConditionalSelects(changedFieldId) {
               });
 
               label.appendChild(checkbox);
-              label.appendChild(document.createTextNode(" " + opt));
+              label.appendChild(document.createTextNode(' ' + opt));
               checkboxContainer.appendChild(label);
             });
 
-            conditionalValueContainer.innerHTML = "";
+            conditionalValueContainer.innerHTML = '';
             conditionalValueContainer.appendChild(checkboxContainer);
           }
         }
@@ -1059,21 +985,13 @@ function rebuildConditionalSelects(changedFieldId) {
         `[data-cond-msg-id="${condMsg.id}"]`
       );
       if (condMsgItem) {
-        const valueContainer = condMsgItem.querySelector(
-          ".condmsg-value-container"
-        );
+        const valueContainer = condMsgItem.querySelector('.condmsg-value-container');
         if (valueContainer) {
-          const changedField = currentConfig.fields.find(
-            (f) => f.id === changedFieldId
-          );
-          if (
-            changedField &&
-            changedField.options &&
-            changedField.options.length > 0
-          ) {
+          const changedField = currentConfig.fields.find((f) => f.id === changedFieldId);
+          if (changedField && changedField.options && changedField.options.length > 0) {
             // Создаем контейнер с чекбоксами
-            const checkboxContainer = document.createElement("div");
-            checkboxContainer.className = "conditional-checkboxes";
+            const checkboxContainer = document.createElement('div');
+            checkboxContainer.className = 'conditional-checkboxes';
 
             // Получаем текущие выбранные значения
             let currentValues = [];
@@ -1089,18 +1007,16 @@ function rebuildConditionalSelects(changedFieldId) {
             }
 
             changedField.options.forEach((opt) => {
-              const label = document.createElement("label");
-              label.className = "conditional-checkbox-label";
+              const label = document.createElement('label');
+              label.className = 'conditional-checkbox-label';
 
-              const checkbox = document.createElement("input");
-              checkbox.type = "checkbox";
+              const checkbox = document.createElement('input');
+              checkbox.type = 'checkbox';
               checkbox.value = opt;
               checkbox.checked = currentValues.includes(opt);
 
-              checkbox.addEventListener("change", () => {
-                const allCheckboxes = checkboxContainer.querySelectorAll(
-                  'input[type="checkbox"]'
-                );
+              checkbox.addEventListener('change', () => {
+                const allCheckboxes = checkboxContainer.querySelectorAll('input[type="checkbox"]');
                 const selectedValues = Array.from(allCheckboxes)
                   .filter((cb) => cb.checked)
                   .map((cb) => cb.value);
@@ -1110,11 +1026,11 @@ function rebuildConditionalSelects(changedFieldId) {
               });
 
               label.appendChild(checkbox);
-              label.appendChild(document.createTextNode(" " + opt));
+              label.appendChild(document.createTextNode(' ' + opt));
               checkboxContainer.appendChild(label);
             });
 
-            valueContainer.innerHTML = "";
+            valueContainer.innerHTML = '';
             valueContainer.appendChild(checkboxContainer);
           }
         }
@@ -1125,14 +1041,10 @@ function rebuildConditionalSelects(changedFieldId) {
 
 // Функция для обновления видимости расширенных настроек
 function updateAdvancedSettingsVisibility(showAdvanced) {
-  const conditionalContainers = document.querySelectorAll(
-    ".field-conditional-container"
-  );
-  const customWebhookContainers = document.querySelectorAll(
-    ".field-custom-webhook-container"
-  );
+  const conditionalContainers = document.querySelectorAll('.field-conditional-container');
+  const customWebhookContainers = document.querySelectorAll('.field-custom-webhook-container');
 
-  const displayValue = showAdvanced ? "block" : "none";
+  const displayValue = showAdvanced ? 'block' : 'none';
 
   conditionalContainers.forEach((container) => {
     container.style.display = displayValue;
