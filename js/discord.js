@@ -26,6 +26,11 @@ function createDiscordEmbed(formData) {
   };
 
   let questionIndex = 1;
+  // Для старых форм считаем параметры по умолчанию: номера включены, эмодзи выключены
+  const showQuestionNumbers =
+    currentConfig.sendQuestionNumbers !== undefined ? currentConfig.sendQuestionNumbers : true;
+  const showEmojis = currentConfig.sendEmojis || false;
+
   currentConfig.fields.forEach((field) => {
     // Пропускаем поля с кастомной отправкой
     if (
@@ -39,7 +44,25 @@ function createDiscordEmbed(formData) {
     const value = formData[field.id];
     if (value !== undefined && value !== '') {
       let displayValue = value;
-      let fieldName = `${questionIndex}) ${field.label}:`;
+
+      // Формируем название поля
+      let fieldName = '';
+
+      // Добавляем эмодзи если включено
+      if (showEmojis && field.icon) {
+        const emoji = getFieldIcon(field.icon);
+        // Если это не HTML-тег (Font Awesome), добавляем эмодзи
+        if (!emoji.startsWith('<i ')) {
+          fieldName += `${emoji} `;
+        }
+      }
+
+      // Добавляем номер вопроса если включено
+      if (showQuestionNumbers) {
+        fieldName += `${questionIndex}) `;
+      }
+
+      fieldName += `${field.label}:`;
 
       if (field.type === 'checkbox') {
         displayValue = value === 'on' ? '✅ Да' : '❌ Нет';
@@ -66,6 +89,11 @@ function createPlainTextMessage(formData) {
   let message = `**__📝 ${currentConfig.title}__**\n`;
 
   let questionIndex = 1;
+  // Для старых форм считаем параметры по умолчанию: номера включены, эмодзи выключены
+  const showQuestionNumbers =
+    currentConfig.sendQuestionNumbers !== undefined ? currentConfig.sendQuestionNumbers : true;
+  const showEmojis = currentConfig.sendEmojis || false;
+
   currentConfig.fields.forEach((field) => {
     // Пропускаем поля с кастомной отправкой
     if (
@@ -84,7 +112,26 @@ function createPlainTextMessage(formData) {
         displayValue = value === 'on' ? '✅ Да' : '❌ Нет';
       }
 
-      message += `**${questionIndex}) ${field.label}:**${
+      // Формируем название поля
+      let fieldLabel = '';
+
+      // Добавляем эмодзи если включено
+      if (showEmojis && field.icon) {
+        const emoji = getFieldIcon(field.icon);
+        // Если это не HTML-тег (Font Awesome), добавляем эмодзи
+        if (!emoji.startsWith('<i ')) {
+          fieldLabel += `${emoji} `;
+        }
+      }
+
+      // Добавляем номер вопроса если включено
+      if (showQuestionNumbers) {
+        fieldLabel += `${questionIndex}) `;
+      }
+
+      fieldLabel += `${field.label}:`;
+
+      message += `**${fieldLabel}**${
         ['textarea', 'computed'].includes(field.type) ? '\n' : ' '
       }${displayValue}\n`;
       questionIndex++;

@@ -12,6 +12,8 @@ function createEmptyConfig() {
     organization: 'LSPD',
     conditionalMessages: [],
     showAdvancedSettings: false,
+    sendQuestionNumbers: true,
+    sendEmojis: false,
     fields: [
       {
         id: generateId(),
@@ -51,6 +53,18 @@ function updateConfigFromEditor() {
   currentConfig.webhookAvatarUrl =
     webhookAvatarUrlInput.value || 'https://pngimg.com/uploads/discord/discord_PNG3.png';
   currentConfig.sendAsPlainText = sendAsPlainTextCheckbox ? sendAsPlainTextCheckbox.checked : false;
+
+  // Сохраняем настройки отправки номеров и эмодзи
+  const sendQuestionNumbersCheckbox = document.getElementById('sendQuestionNumbers');
+  const sendEmojisCheckbox = document.getElementById('sendEmojis');
+
+  if (sendQuestionNumbersCheckbox) {
+    currentConfig.sendQuestionNumbers = sendQuestionNumbersCheckbox.checked;
+  }
+
+  if (sendEmojisCheckbox) {
+    currentConfig.sendEmojis = sendEmojisCheckbox.checked;
+  }
 
   pageTitle.textContent = currentConfig.title;
   document.querySelector('h1').textContent = currentConfig.title;

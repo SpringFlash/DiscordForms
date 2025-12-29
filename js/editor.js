@@ -13,6 +13,21 @@ function initEditor() {
     sendAsPlainTextCheckbox.checked = currentConfig.sendAsPlainText || false;
   }
 
+  // Инициализация чекбоксов отправки номеров и эмодзи
+  const sendQuestionNumbersCheckbox = document.getElementById('sendQuestionNumbers');
+  const sendEmojisCheckbox = document.getElementById('sendEmojis');
+
+  if (sendQuestionNumbersCheckbox) {
+    // Для старых форм считаем параметр включенным по умолчанию
+    sendQuestionNumbersCheckbox.checked =
+      currentConfig.sendQuestionNumbers !== undefined ? currentConfig.sendQuestionNumbers : true;
+  }
+
+  if (sendEmojisCheckbox) {
+    // Для старых форм считаем параметр выключенным по умолчанию
+    sendEmojisCheckbox.checked = currentConfig.sendEmojis || false;
+  }
+
   if (!currentConfig.conditionalMessages) {
     currentConfig.conditionalMessages = [];
   }
@@ -44,6 +59,21 @@ function initEditor() {
 
   if (sendAsPlainTextCheckbox) {
     sendAsPlainTextCheckbox.addEventListener('change', updateConfigFromEditor);
+  }
+
+  // Обработчики для чекбоксов отправки номеров и эмодзи
+  if (sendQuestionNumbersCheckbox) {
+    sendQuestionNumbersCheckbox.addEventListener('change', (e) => {
+      currentConfig.sendQuestionNumbers = e.target.checked;
+      updateConfigFromEditor();
+    });
+  }
+
+  if (sendEmojisCheckbox) {
+    sendEmojisCheckbox.addEventListener('change', (e) => {
+      currentConfig.sendEmojis = e.target.checked;
+      updateConfigFromEditor();
+    });
   }
 
   if (organizationSelect) {

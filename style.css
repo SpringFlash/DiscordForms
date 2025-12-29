@@ -859,7 +859,7 @@ textarea:focus {
 }
 
 .checkbox-setting {
-  display: flex;
+  display: flex !important;
   align-items: center;
   gap: 0.75rem;
   cursor: pointer;
@@ -886,6 +886,7 @@ textarea:focus {
   color: var(--text-primary);
   font-weight: 500;
   user-select: none;
+  line-height: 20px;
 }
 
 .setting-group input:focus,
