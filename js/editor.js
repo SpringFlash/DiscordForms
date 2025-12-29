@@ -257,16 +257,13 @@ function addFieldToEditor(field) {
         <div class="conditional-config" style="display: ${
           field.conditional && field.conditional.enabled ? 'block' : 'none'
         };">
-          <div class="conditional-hint">Показывать это поле только если:</div>
-          <div class="conditional-row">
-            <select class="conditional-field-select" ${
-              field.conditional && field.conditional.enabled ? '' : 'disabled'
-            }>
-              <option value="">Выберите поле...</option>
-            </select>
-            <span>включает</span>
-            <div class="conditional-value-container"></div>
-          </div>
+          <div class="conditional-hint">Показывать это поле только если выполняются все условия:</div>
+          <div class="conditional-conditions-list"></div>
+          <button type="button" class="add-conditional-condition-btn" ${
+            field.conditional && field.conditional.enabled ? '' : 'disabled'
+          }>
+            <i class="fas fa-plus"></i> Добавить условие
+          </button>
         </div>
       </div>
       <div class="field-config-item field-custom-webhook-container" style="grid-column: 1 / -1; display: ${
@@ -332,8 +329,8 @@ function setupFieldEventHandlers(fieldItem, field) {
   const conditionalToggleIcon = fieldItem.querySelector('.conditional-toggle-icon');
   const conditionalConfig = fieldItem.querySelector('.conditional-config');
   const conditionalEnabledCheckbox = fieldItem.querySelector('.conditional-enabled-checkbox');
-  const conditionalFieldSelect = fieldItem.querySelector('.conditional-field-select');
-  const conditionalValueContainer = fieldItem.querySelector('.conditional-value-container');
+  const conditionalConditionsList = fieldItem.querySelector('.conditional-conditions-list');
+  const addConditionBtn = fieldItem.querySelector('.add-conditional-condition-btn');
   const customWebhookSectionHeader = fieldItem.querySelector('.custom-webhook-section-header');
   const customWebhookToggleIcon = fieldItem.querySelector('.custom-webhook-toggle-icon');
   const customWebhookConfig = fieldItem.querySelector('.custom-webhook-config');
@@ -344,43 +341,104 @@ function setupFieldEventHandlers(fieldItem, field) {
     '.custom-webhook-split-lines-checkbox'
   );
 
-  function populateConditionalFieldSelect() {
-    conditionalFieldSelect.innerHTML = '<option value="">Выберите поле...</option>';
+  // Инициализация структуры условий (миграция со старого формата)
+  if (field.conditional && field.conditional.enabled && !field.conditional.conditions) {
+    if (field.conditional.field) {
+      field.conditional.conditions = [{
+        field: field.conditional.field,
+        value: field.conditional.value || ''
+      }];
+    } else {
+      field.conditional.conditions = [];
+    }
+  }
 
-    currentConfig.fields.forEach((f) => {
-      if (f.id !== field.id && (f.type === 'select' || f.type === 'radio')) {
-        const option = document.createElement('option');
-        option.value = f.id;
-        option.textContent = f.label;
-        if (field.conditional && field.conditional.field === f.id) {
-          option.selected = true;
+  function renderConditionalConditions() {
+    if (!conditionalConditionsList) return;
+
+    conditionalConditionsList.innerHTML = '';
+
+    const isEnabled = field.conditional && field.conditional.enabled;
+    const conditions = (field.conditional && field.conditional.conditions) || [];
+
+    conditions.forEach((condition, index) => {
+      const conditionItem = document.createElement('div');
+      conditionItem.className = 'conditional-condition-item';
+      conditionItem.dataset.conditionIndex = index;
+
+      const conditionRow = document.createElement('div');
+      conditionRow.className = 'conditional-row';
+
+      const fieldSelect = document.createElement('select');
+      fieldSelect.className = 'conditional-field-select';
+      fieldSelect.disabled = !isEnabled;
+      fieldSelect.innerHTML = '<option value="">Выберите поле...</option>';
+
+      currentConfig.fields.forEach((f) => {
+        if (f.id !== field.id && (f.type === 'select' || f.type === 'radio')) {
+          const option = document.createElement('option');
+          option.value = f.id;
+          option.textContent = f.label;
+          if (condition.field === f.id) {
+            option.selected = true;
+          }
+          fieldSelect.appendChild(option);
         }
-        conditionalFieldSelect.appendChild(option);
+      });
+
+      const valueContainer = document.createElement('div');
+      valueContainer.className = 'conditional-value-container';
+
+      fieldSelect.addEventListener('change', (e) => {
+        condition.field = e.target.value;
+        condition.value = '';
+        updateConditionValueContainer(valueContainer, condition, isEnabled);
+        updateConfigFromEditor();
+        renderForm();
+      });
+
+      conditionRow.appendChild(fieldSelect);
+      conditionRow.appendChild(document.createTextNode(' включает '));
+      conditionRow.appendChild(valueContainer);
+
+      const deleteBtn = document.createElement('button');
+      deleteBtn.type = 'button';
+      deleteBtn.className = 'field-action-btn delete';
+      deleteBtn.title = 'Удалить условие';
+      deleteBtn.innerHTML = '<i class="fas fa-trash"></i>';
+      deleteBtn.disabled = !isEnabled;
+      deleteBtn.addEventListener('click', () => {
+        conditions.splice(index, 1);
+        renderConditionalConditions();
+        updateConfigFromEditor();
+        renderForm();
+      });
+
+      conditionItem.appendChild(conditionRow);
+      conditionItem.appendChild(deleteBtn);
+      conditionalConditionsList.appendChild(conditionItem);
+
+      if (condition.field) {
+        updateConditionValueContainer(valueContainer, condition, isEnabled);
       }
     });
   }
 
-  function updateConditionalValueOptions(selectedFieldId) {
-    const selectedField = currentConfig.fields.find((f) => f.id === selectedFieldId);
-
-    const container = fieldItem.querySelector('.conditional-value-container');
+  function updateConditionValueContainer(container, condition, isEnabled) {
     if (!container) return;
 
-    const isEnabled = field.conditional && field.conditional.enabled;
+    const selectedField = currentConfig.fields.find((f) => f.id === condition.field);
 
     if (!selectedField || !selectedField.options || selectedField.options.length === 0) {
       const input = document.createElement('input');
       input.type = 'text';
       input.className = 'conditional-value-input';
-      input.value = field.conditional ? field.conditional.value || '' : '';
+      input.value = condition.value || '';
       input.placeholder = 'Значение';
       input.disabled = !isEnabled;
 
       input.addEventListener('input', (e) => {
-        if (!field.conditional) {
-          field.conditional = { enabled: true };
-        }
-        field.conditional.value = e.target.value;
+        condition.value = e.target.value;
         updateConfigFromEditor();
         renderForm();
       });
@@ -390,20 +448,18 @@ function setupFieldEventHandlers(fieldItem, field) {
       return;
     }
 
-    // Создаем контейнер с чекбоксами для множественного выбора
     const checkboxContainer = document.createElement('div');
     checkboxContainer.className = 'conditional-checkboxes';
 
-    // Получаем текущие выбранные значения
     let currentValues = [];
-    if (field.conditional && field.conditional.value) {
+    if (condition.value) {
       try {
-        currentValues = JSON.parse(field.conditional.value);
+        currentValues = JSON.parse(condition.value);
         if (!Array.isArray(currentValues)) {
-          currentValues = [field.conditional.value];
+          currentValues = [condition.value];
         }
       } catch (e) {
-        currentValues = [field.conditional.value];
+        currentValues = [condition.value];
       }
     }
 
@@ -423,10 +479,7 @@ function setupFieldEventHandlers(fieldItem, field) {
           .filter((cb) => cb.checked)
           .map((cb) => cb.value);
 
-        if (!field.conditional) {
-          field.conditional = { enabled: true };
-        }
-        field.conditional.value = JSON.stringify(selectedValues);
+        condition.value = JSON.stringify(selectedValues);
         updateConfigFromEditor();
         renderForm();
       });
@@ -440,11 +493,7 @@ function setupFieldEventHandlers(fieldItem, field) {
     container.appendChild(checkboxContainer);
   }
 
-  populateConditionalFieldSelect();
-
-  if (field.conditional && field.conditional.field) {
-    updateConditionalValueOptions(field.conditional.field);
-  }
+  renderConditionalConditions();
 
   fieldHeader.addEventListener('click', (e) => {
     // Игнорируем клики по кнопкам и чекбоксу
@@ -654,50 +703,44 @@ function setupFieldEventHandlers(fieldItem, field) {
     const isEnabled = e.target.checked;
 
     if (isEnabled) {
-      field.conditional = {
-        enabled: true,
-        field: conditionalFieldSelect.value || '',
-        value: field.conditional ? field.conditional.value || '' : '',
-      };
+      if (!field.conditional) {
+        field.conditional = { enabled: true, conditions: [] };
+      } else {
+        field.conditional.enabled = true;
+        if (!field.conditional.conditions) {
+          field.conditional.conditions = [];
+        }
+      }
       conditionalConfig.style.display = 'block';
       conditionalToggleIcon.classList.add('open');
-      conditionalFieldSelect.disabled = false;
-
-      // Включаем все поля внутри conditional-value-container
-      const valueInputs = conditionalValueContainer.querySelectorAll('input, select');
-      valueInputs.forEach((input) => (input.disabled = false));
+      if (addConditionBtn) addConditionBtn.disabled = false;
     } else {
       if (!field.conditional) {
         field.conditional = {};
       }
       field.conditional.enabled = false;
-      conditionalFieldSelect.disabled = true;
-
-      // Отключаем все поля внутри conditional-value-container
-      const valueInputs = conditionalValueContainer.querySelectorAll('input, select');
-      valueInputs.forEach((input) => (input.disabled = true));
+      if (addConditionBtn) addConditionBtn.disabled = true;
     }
 
+    renderConditionalConditions();
     updateConfigFromEditor();
     renderForm();
   });
 
-  conditionalFieldSelect.addEventListener('change', (e) => {
-    if (!field.conditional) {
-      field.conditional = { enabled: true };
-    }
-    field.conditional.field = e.target.value;
-    field.conditional.value = '';
-
-    if (e.target.value) {
-      updateConditionalValueOptions(e.target.value);
-    }
-
-    updateConfigFromEditor();
-    renderForm();
-  });
-
-  // Обработчик для conditionalValueContainer теперь внутри updateConditionalValueOptions
+  if (addConditionBtn) {
+    addConditionBtn.addEventListener('click', () => {
+      if (!field.conditional) {
+        field.conditional = { enabled: true, conditions: [] };
+      }
+      if (!field.conditional.conditions) {
+        field.conditional.conditions = [];
+      }
+      field.conditional.conditions.push({ field: '', value: '' });
+      renderConditionalConditions();
+      updateConfigFromEditor();
+      renderForm();
+    });
+  }
 
   customWebhookSectionHeader.addEventListener('click', (e) => {
     // Игнорируем клики по чекбоксу
@@ -890,27 +933,33 @@ function rebuildFieldsList() {
 function rebuildConditionalFieldSelects() {
   // Обновляем селекты полей в условной видимости каждого поля
   currentConfig.fields.forEach((field) => {
-    if (field.conditional && field.conditional.enabled) {
+    if (field.conditional && field.conditional.enabled && field.conditional.conditions) {
       const fieldItem = fieldsList.querySelector(`[data-field-id="${field.id}"]`);
       if (fieldItem) {
-        const conditionalFieldSelect = fieldItem.querySelector('.conditional-field-select');
-        if (conditionalFieldSelect) {
-          const currentValue = conditionalFieldSelect.value;
+        const conditionItems = fieldItem.querySelectorAll('.conditional-condition-item');
+        conditionItems.forEach((item, index) => {
+          const condition = field.conditional.conditions[index];
+          if (condition) {
+            const fieldSelect = item.querySelector('.conditional-field-select');
+            if (fieldSelect) {
+              const currentValue = condition.field;
 
-          conditionalFieldSelect.innerHTML = '<option value="">Выберите поле...</option>';
+              fieldSelect.innerHTML = '<option value="">Выберите поле...</option>';
 
-          currentConfig.fields.forEach((f) => {
-            if (f.id !== field.id && (f.type === 'select' || f.type === 'radio')) {
-              const option = document.createElement('option');
-              option.value = f.id;
-              option.textContent = f.label;
-              if (currentValue === f.id) {
-                option.selected = true;
-              }
-              conditionalFieldSelect.appendChild(option);
+              currentConfig.fields.forEach((f) => {
+                if (f.id !== field.id && (f.type === 'select' || f.type === 'radio')) {
+                  const option = document.createElement('option');
+                  option.value = f.id;
+                  option.textContent = f.label;
+                  if (currentValue === f.id) {
+                    option.selected = true;
+                  }
+                  fieldSelect.appendChild(option);
+                }
+              });
             }
-          });
-        }
+          }
+        });
       }
     }
   });
@@ -951,59 +1000,74 @@ function rebuildConditionalSelects(changedFieldId) {
     if (
       field.conditional &&
       field.conditional.enabled &&
-      field.conditional.field === changedFieldId
+      field.conditional.conditions
     ) {
       const fieldItem = fieldsList.querySelector(`[data-field-id="${field.id}"]`);
       if (fieldItem) {
-        const conditionalValueContainer = fieldItem.querySelector('.conditional-value-container');
-        if (conditionalValueContainer) {
-          const changedField = currentConfig.fields.find((f) => f.id === changedFieldId);
-          if (changedField && changedField.options && changedField.options.length > 0) {
-            // Создаем контейнер с чекбоксами
-            const checkboxContainer = document.createElement('div');
-            checkboxContainer.className = 'conditional-checkboxes';
+        // Перерисовываем все условия, которые зависят от измененного поля
+        const conditionsToUpdate = field.conditional.conditions.filter(
+          (cond) => cond.field === changedFieldId
+        );
+        
+        if (conditionsToUpdate.length > 0) {
+          // Находим все элементы условий для этого поля
+          const conditionItems = fieldItem.querySelectorAll('.conditional-condition-item');
+          conditionItems.forEach((item, index) => {
+            const condition = field.conditional.conditions[index];
+            if (condition && condition.field === changedFieldId) {
+              const valueContainer = item.querySelector('.conditional-value-container');
+              if (valueContainer) {
+                const isEnabled = field.conditional.enabled;
+                const changedField = currentConfig.fields.find((f) => f.id === changedFieldId);
+                
+                if (changedField && changedField.options && changedField.options.length > 0) {
+                  const checkboxContainer = document.createElement('div');
+                  checkboxContainer.className = 'conditional-checkboxes';
 
-            // Получаем текущие выбранные значения
-            let currentValues = [];
-            if (field.conditional && field.conditional.value) {
-              try {
-                currentValues = JSON.parse(field.conditional.value);
-                if (!Array.isArray(currentValues)) {
-                  currentValues = [field.conditional.value];
+                  let currentValues = [];
+                  if (condition.value) {
+                    try {
+                      currentValues = JSON.parse(condition.value);
+                      if (!Array.isArray(currentValues)) {
+                        currentValues = [condition.value];
+                      }
+                    } catch (e) {
+                      currentValues = [condition.value];
+                    }
+                  }
+
+                  changedField.options.forEach((opt) => {
+                    const label = document.createElement('label');
+                    label.className = 'conditional-checkbox-label';
+
+                    const checkbox = document.createElement('input');
+                    checkbox.type = 'checkbox';
+                    checkbox.value = opt;
+                    checkbox.checked = currentValues.includes(opt);
+                    checkbox.disabled = !isEnabled;
+
+                    checkbox.addEventListener('change', () => {
+                      const allCheckboxes = checkboxContainer.querySelectorAll('input[type="checkbox"]');
+                      const selectedValues = Array.from(allCheckboxes)
+                        .filter((cb) => cb.checked)
+                        .map((cb) => cb.value);
+
+                      condition.value = JSON.stringify(selectedValues);
+                      updateConfigFromEditor();
+                      renderForm();
+                    });
+
+                    label.appendChild(checkbox);
+                    label.appendChild(document.createTextNode(' ' + opt));
+                    checkboxContainer.appendChild(label);
+                  });
+
+                  valueContainer.innerHTML = '';
+                  valueContainer.appendChild(checkboxContainer);
                 }
-              } catch (e) {
-                currentValues = [field.conditional.value];
               }
             }
-
-            changedField.options.forEach((opt) => {
-              const label = document.createElement('label');
-              label.className = 'conditional-checkbox-label';
-
-              const checkbox = document.createElement('input');
-              checkbox.type = 'checkbox';
-              checkbox.value = opt;
-              checkbox.checked = currentValues.includes(opt);
-
-              checkbox.addEventListener('change', () => {
-                const allCheckboxes = checkboxContainer.querySelectorAll('input[type="checkbox"]');
-                const selectedValues = Array.from(allCheckboxes)
-                  .filter((cb) => cb.checked)
-                  .map((cb) => cb.value);
-
-                field.conditional.value = JSON.stringify(selectedValues);
-                updateConfigFromEditor();
-                renderForm();
-              });
-
-              label.appendChild(checkbox);
-              label.appendChild(document.createTextNode(' ' + opt));
-              checkboxContainer.appendChild(label);
-            });
-
-            conditionalValueContainer.innerHTML = '';
-            conditionalValueContainer.appendChild(checkboxContainer);
-          }
+          });
         }
       }
     }

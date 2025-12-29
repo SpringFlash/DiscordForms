@@ -189,8 +189,16 @@ function renderForm() {
     fieldGroup.dataset.fieldId = field.id;
 
     if (field.conditional && field.conditional.enabled) {
-      fieldGroup.dataset.conditionalField = field.conditional.field;
-      fieldGroup.dataset.conditionalValue = field.conditional.value;
+      // Поддержка нового формата с массивом условий
+      if (field.conditional.conditions && Array.isArray(field.conditional.conditions)) {
+        fieldGroup.dataset.conditionalConditions = JSON.stringify(field.conditional.conditions);
+      } else {
+        // Миграция со старого формата
+        if (field.conditional.field) {
+          fieldGroup.dataset.conditionalField = field.conditional.field;
+          fieldGroup.dataset.conditionalValue = field.conditional.value || '';
+        }
+      }
       fieldGroup.classList.add('conditional-field');
       fieldGroup.style.display = 'none';
     }

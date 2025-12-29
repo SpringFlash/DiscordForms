@@ -1970,6 +1970,60 @@ emoji-picker {
   flex: 1;
 }
 
+/* Стили для списка условий */
+.conditional-conditions-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.conditional-condition-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  padding: 0.75rem;
+  background: var(--bg-secondary);
+  border-radius: 8px;
+  border: 1px solid var(--border-color);
+}
+
+.conditional-condition-item .conditional-row {
+  flex: 1;
+  margin: 0;
+}
+
+.add-conditional-condition-btn {
+  width: 100%;
+  padding: 0.75rem;
+  background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: var(--transition-fast);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.add-conditional-condition-btn:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-md);
+}
+
+.add-conditional-condition-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.add-conditional-condition-btn i {
+  font-size: 0.85rem;
+}
+
 .conditional-checkboxes {
   display: flex;
   flex-direction: column;
@@ -2019,6 +2073,14 @@ emoji-picker {
 
   .conditional-row span {
     text-align: center;
+  }
+
+  .conditional-condition-item {
+    flex-direction: column;
+  }
+
+  .conditional-condition-item .field-action-btn {
+    align-self: flex-end;
   }
 }
 

@@ -10,34 +10,74 @@ function initConditionalFields() {
 
   const updateConditionalVisibility = () => {
     conditionalFields.forEach((fieldGroup) => {
-      const dependsOnFieldId = fieldGroup.dataset.conditionalField;
-      const requiredValue = fieldGroup.dataset.conditionalValue;
+      const conditionsData = fieldGroup.dataset.conditionalConditions;
+      const oldField = fieldGroup.dataset.conditionalField;
+      const oldValue = fieldGroup.dataset.conditionalValue;
 
-      const dependsOnField = form.querySelector(`[name="${dependsOnFieldId}"]`);
+      let conditions = [];
 
-      if (!dependsOnField) return;
-
-      let currentValue = '';
-
-      if (dependsOnField.type === 'radio') {
-        const checkedRadio = form.querySelector(`[name="${dependsOnFieldId}"]:checked`);
-        currentValue = checkedRadio ? checkedRadio.value : '';
-      } else {
-        currentValue = dependsOnField.value;
-      }
-
-      // Поддержка массива значений для условия "включает"
-      let requiredValues = [];
-      try {
-        requiredValues = JSON.parse(requiredValue);
-        if (!Array.isArray(requiredValues)) {
-          requiredValues = [requiredValue];
+      // Проверяем новый формат
+      if (conditionsData) {
+        try {
+          conditions = JSON.parse(conditionsData);
+          if (!Array.isArray(conditions)) {
+            conditions = [];
+          }
+        } catch (e) {
+          conditions = [];
         }
-      } catch (e) {
-        requiredValues = [requiredValue];
       }
 
-      const isConditionMet = requiredValues.includes(currentValue);
+      // Если нет условий в новом формате, проверяем старый формат
+      if (conditions.length === 0 && oldField) {
+        conditions = [{ field: oldField, value: oldValue || '' }];
+      }
+
+      if (conditions.length === 0) return;
+
+      // Проверяем все условия (AND логика - все должны быть выполнены)
+      let allConditionsMet = true;
+
+      for (const condition of conditions) {
+        if (!condition.field) {
+          allConditionsMet = false;
+          break;
+        }
+
+        const dependsOnField = form.querySelector(`[name="${condition.field}"]`);
+        if (!dependsOnField) {
+          allConditionsMet = false;
+          break;
+        }
+
+        let currentValue = '';
+
+        if (dependsOnField.type === 'radio') {
+          const checkedRadio = form.querySelector(`[name="${condition.field}"]:checked`);
+          currentValue = checkedRadio ? checkedRadio.value : '';
+        } else {
+          currentValue = dependsOnField.value;
+        }
+
+        // Поддержка массива значений для условия "включает"
+        let requiredValues = [];
+        try {
+          requiredValues = JSON.parse(condition.value);
+          if (!Array.isArray(requiredValues)) {
+            requiredValues = [condition.value];
+          }
+        } catch (e) {
+          requiredValues = [condition.value];
+        }
+
+        const isConditionMet = requiredValues.includes(currentValue);
+        if (!isConditionMet) {
+          allConditionsMet = false;
+          break;
+        }
+      }
+
+      const isConditionMet = allConditionsMet;
 
       // Получаем все инпуты в группе (для radio может быть несколько)
       const inputs = fieldGroup.querySelectorAll('input, select, textarea');
@@ -81,9 +121,31 @@ function initConditionalFields() {
 
   const triggerFields = new Set();
   conditionalFields.forEach((fieldGroup) => {
-    const dependsOnFieldId = fieldGroup.dataset.conditionalField;
-    if (dependsOnFieldId) {
-      triggerFields.add(dependsOnFieldId);
+    const conditionsData = fieldGroup.dataset.conditionalConditions;
+
+    if (conditionsData) {
+      try {
+        const conditions = JSON.parse(conditionsData);
+        if (Array.isArray(conditions)) {
+          conditions.forEach((cond) => {
+            if (cond.field) {
+              triggerFields.add(cond.field);
+            }
+          });
+        }
+      } catch (e) {
+        // Миграция со старого формата
+        const oldField = fieldGroup.dataset.conditionalField;
+        if (oldField) {
+          triggerFields.add(oldField);
+        }
+      }
+    } else {
+      // Миграция со старого формата
+      const oldField = fieldGroup.dataset.conditionalField;
+      if (oldField) {
+        triggerFields.add(oldField);
+      }
     }
   });
 
