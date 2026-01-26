@@ -62,18 +62,8 @@ function updateOrganizationLogo(organization) {
 function updateFavicon(organization) {
   const faviconLink = document.getElementById('faviconLink');
   if (faviconLink) {
-    let faviconPath = 'images/favicon/favicon.ico'; // по умолчанию
-
-    // Устанавливаем favicon в зависимости от организации
-    if (organization === 'LSPD') {
-      faviconPath = 'images/favicon/lspd.ico';
-    } else if (organization === 'LSSD') {
-      faviconPath = 'images/favicon/lssd.ico';
-    } else if (organization === 'WN') {
-      faviconPath = 'images/favicon/wn.ico';
-    }
-
-    faviconLink.href = faviconPath;
+    const iconName = organization ? organization.toLowerCase() : 'favicon';
+    faviconLink.href = `images/favicon/${iconName}.ico`;
   }
 }
 
