@@ -348,11 +348,23 @@ function addFieldToEditor(field) {
           }>Вычисляемое поле</option>
         </select>
       </div>
-      <div class="field-config-item">
+      <div class="field-config-item field-placeholder-container" style="display: ${
+        field.type === "checkbox" ? "none" : "block"
+      };">
         <label>Placeholder</label>
         <input type="text" class="field-placeholder" value="${
           field.placeholder || ""
         }" />
+      </div>
+      <div class="field-config-item field-checkbox-text-container" style="display: ${
+        field.type === "checkbox" ? "block" : "none"
+      };">
+        <label class="checkbox-text-label">
+          <input type="checkbox" class="field-show-text-in-response" ${
+            field.showTextInResponse !== false ? "checked" : ""
+          } />
+          <span>Показывать текст в ответе</span>
+        </label>
       </div>
       <div class="field-config-item field-options" style="display: ${
         field.type === "select" || field.type === "radio" ? "block" : "none"
@@ -478,6 +490,9 @@ function setupFieldEventHandlers(fieldItem, field) {
   const formulaContainer = fieldItem.querySelector(".field-formula-container");
   const formulaInput = fieldItem.querySelector(".field-formula-input");
   const addVariableBtn = fieldItem.querySelector(".add-field-variable-btn");
+  const placeholderContainer = fieldItem.querySelector(".field-placeholder-container");
+  const checkboxTextContainer = fieldItem.querySelector(".field-checkbox-text-container");
+  const showTextInResponseCheckbox = fieldItem.querySelector(".field-show-text-in-response");
   const conditionalSectionHeader = fieldItem.querySelector(
     ".conditional-section-header"
   );
@@ -804,6 +819,12 @@ function setupFieldEventHandlers(fieldItem, field) {
       customWebhookSplitLinesLabel.style.display =
         newType === "textarea" || newType === "computed" ? "flex" : "none";
     }
+    if (placeholderContainer) {
+      placeholderContainer.style.display = newType === "checkbox" ? "none" : "block";
+    }
+    if (checkboxTextContainer) {
+      checkboxTextContainer.style.display = newType === "checkbox" ? "block" : "none";
+    }
 
     // Если изменился тип на select/radio или с select/radio, обновляем селекты полей
     const wasSelectOrRadio = oldType === "select" || oldType === "radio";
@@ -836,6 +857,13 @@ function setupFieldEventHandlers(fieldItem, field) {
     updateConfigFromEditor();
     renderForm();
   });
+
+  if (showTextInResponseCheckbox) {
+    showTextInResponseCheckbox.addEventListener("change", (e) => {
+      field.showTextInResponse = e.target.checked;
+      updateConfigFromEditor();
+    });
+  }
 
   // Emoji picker button click handler
   if (emojiPickerBtn && emojiPickerPopup) {

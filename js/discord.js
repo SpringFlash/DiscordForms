@@ -65,7 +65,11 @@ function createDiscordEmbed(formData) {
       fieldName += `${field.label}:`;
 
       if (field.type === 'checkbox') {
-        displayValue = value === 'on' ? '✅ Да' : '❌ Нет';
+        if (field.showTextInResponse !== false) {
+          displayValue = value === 'on' ? '✅ Да' : '❌ Нет';
+        } else {
+          displayValue = value === 'on' ? '✅' : '❌';
+        }
       }
 
       if (typeof displayValue === 'string' && displayValue.length > 1024) {
@@ -109,7 +113,11 @@ function createPlainTextMessage(formData) {
       let displayValue = value;
 
       if (field.type === 'checkbox') {
-        displayValue = value === 'on' ? '✅ Да' : '❌ Нет';
+        if (field.showTextInResponse !== false) {
+          displayValue = value === 'on' ? '✅ Да' : '❌ Нет';
+        } else {
+          displayValue = value === 'on' ? '✅' : '❌';
+        }
       }
 
       // Формируем название поля
