@@ -1,5 +1,14 @@
 // === ФУНКЦИИ РЕДАКТОРА ===
 
+// Update image field button visibility
+function updateImageFieldButtonVisibility() {
+  const addImageFieldBtn = document.getElementById('addImageFieldBtn');
+  const hasImageField = currentConfig.fields.some(f => f.type === 'image');
+  if (addImageFieldBtn) {
+    addImageFieldBtn.style.display = hasImageField ? 'none' : 'inline-flex';
+  }
+}
+
 // Функция для инициализации редактора
 function initEditor() {
   formTitleInput.value = currentConfig.title;
@@ -115,6 +124,28 @@ function initEditor() {
     updateConfigFromEditor();
     renderForm();
   });
+
+  // Image field button handler
+  const addImageFieldBtn = document.getElementById('addImageFieldBtn');
+
+  if (addImageFieldBtn) {
+    addImageFieldBtn.addEventListener('click', () => {
+      const newField = {
+        id: generateId(),
+        type: 'image',
+        label: 'Прикрепите скриншоты',
+        required: false,
+        maxFiles: 4,
+      };
+      currentConfig.fields.push(newField);
+      addFieldToEditor(newField);
+      updateImageFieldButtonVisibility();
+      updateConfigFromEditor();
+      renderForm();
+    });
+  }
+
+  updateImageFieldButtonVisibility();
 
   if (!currentConfig.conditionalMessages) {
     currentConfig.conditionalMessages = [];
@@ -529,6 +560,7 @@ function setupFieldEventHandlers(fieldItem, field) {
   deleteBtn.addEventListener('click', () => {
     if (confirm('Удалить это поле?')) {
       const wasSelectOrRadio = field.type === 'select' || field.type === 'radio';
+      const wasImageField = field.type === 'image';
 
       currentConfig.fields = currentConfig.fields.filter((f) => f.id !== field.id);
       fieldItem.remove();
@@ -536,6 +568,11 @@ function setupFieldEventHandlers(fieldItem, field) {
       // Если удалили селект/радио, обновляем селекты полей
       if (wasSelectOrRadio) {
         rebuildConditionalFieldSelects();
+      }
+
+      // Если удалили image field, показываем кнопку добавления
+      if (wasImageField) {
+        updateImageFieldButtonVisibility();
       }
 
       updateConfigFromEditor();
