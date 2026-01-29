@@ -1205,6 +1205,7 @@ function rebuildFieldsList() {
   currentConfig.fields.forEach((field) => {
     addFieldToEditor(field);
   });
+  updateImageFieldButtonVisibility();
 }
 
 // Функция для обновления селектов полей в условиях (когда меняется название или тип поля)
