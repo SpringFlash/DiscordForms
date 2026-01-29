@@ -28,6 +28,7 @@ function initEditor() {
     "sendQuestionNumbers"
   );
   const sendEmojisCheckbox = document.getElementById("sendEmojis");
+  const sendColonsCheckbox = document.getElementById("sendColons");
 
   if (sendQuestionNumbersCheckbox) {
     // Для старых форм считаем параметр включенным по умолчанию
@@ -40,6 +41,11 @@ function initEditor() {
   if (sendEmojisCheckbox) {
     // Для старых форм считаем параметр выключенным по умолчанию
     sendEmojisCheckbox.checked = currentConfig.sendEmojis || false;
+  }
+
+  if (sendColonsCheckbox) {
+    // Для старых форм считаем параметр включенным по умолчанию
+    sendColonsCheckbox.checked = currentConfig.sendColons !== false;
   }
 
   if (!currentConfig.conditionalMessages) {
@@ -91,6 +97,13 @@ function initEditor() {
   if (sendEmojisCheckbox) {
     sendEmojisCheckbox.addEventListener("change", (e) => {
       currentConfig.sendEmojis = e.target.checked;
+      updateConfigFromEditor();
+    });
+  }
+
+  if (sendColonsCheckbox) {
+    sendColonsCheckbox.addEventListener("change", (e) => {
+      currentConfig.sendColons = e.target.checked;
       updateConfigFromEditor();
     });
   }

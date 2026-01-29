@@ -66,6 +66,11 @@ function updateConfigFromEditor() {
     currentConfig.sendEmojis = sendEmojisCheckbox.checked;
   }
 
+  const sendColonsCheckbox = document.getElementById('sendColons');
+  if (sendColonsCheckbox) {
+    currentConfig.sendColons = sendColonsCheckbox.checked;
+  }
+
   pageTitle.textContent = currentConfig.title;
   document.querySelector('h1').textContent = currentConfig.title;
   document.querySelector('.header p').textContent = currentConfig.description;

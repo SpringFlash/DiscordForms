@@ -30,6 +30,7 @@ function createDiscordEmbed(formData) {
   const showQuestionNumbers =
     currentConfig.sendQuestionNumbers !== undefined ? currentConfig.sendQuestionNumbers : true;
   const showEmojis = currentConfig.sendEmojis || false;
+  const showColons = currentConfig.sendColons !== false;
 
   currentConfig.fields.forEach((field) => {
     // Пропускаем поля с кастомной отправкой
@@ -62,7 +63,7 @@ function createDiscordEmbed(formData) {
         fieldName += `${questionIndex}) `;
       }
 
-      fieldName += `${field.label}:`;
+      fieldName += `${field.label}${showColons ? ':' : ''}`;
 
       if (field.type === 'checkbox') {
         if (field.showTextInResponse !== false) {
@@ -97,6 +98,7 @@ function createPlainTextMessage(formData) {
   const showQuestionNumbers =
     currentConfig.sendQuestionNumbers !== undefined ? currentConfig.sendQuestionNumbers : true;
   const showEmojis = currentConfig.sendEmojis || false;
+  const showColons = currentConfig.sendColons !== false;
 
   currentConfig.fields.forEach((field) => {
     // Пропускаем поля с кастомной отправкой
@@ -137,7 +139,7 @@ function createPlainTextMessage(formData) {
         fieldLabel += `${questionIndex}) `;
       }
 
-      fieldLabel += `${field.label}:`;
+      fieldLabel += `${field.label}${showColons ? ':' : ''}`;
 
       message += `**${fieldLabel}**${
         ['textarea', 'computed'].includes(field.type) ? '\n' : ' '
