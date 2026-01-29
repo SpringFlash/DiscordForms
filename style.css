@@ -1041,6 +1041,7 @@ textarea:focus {
 .field-config-item {
   display: flex;
   flex-direction: column;
+  margin-top: auto;
 }
 
 .field-config-item label {
