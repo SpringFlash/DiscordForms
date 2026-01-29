@@ -472,6 +472,14 @@ function validateForm(formData) {
       return;
     }
 
+    // Validate image field
+    if (field.type === 'image') {
+      if (field.required && uploadedImages.length === 0) {
+        errors.push(`Поле "${field.label}" обязательно - прикрепите хотя бы одну картинку`);
+      }
+      return; // Skip other validations for image field
+    }
+
     if (field.required) {
       const value = formData[field.id];
       if (!value || (typeof value === 'string' && !value.trim())) {
