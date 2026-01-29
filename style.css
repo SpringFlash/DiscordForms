@@ -205,7 +205,8 @@ body {
 
 .form-wrapper.preview label,
 .form-wrapper.preview .radio-label,
-.form-wrapper.preview .checkbox-label {
+.form-wrapper.preview .checkbox-label,
+.form-wrapper.preview .checkboxes-item-label {
   pointer-events: none;
 }
 
@@ -482,6 +483,64 @@ select {
 }
 
 .checkbox-label input[type='checkbox']:checked + .checkbox-custom::after {
+  transform: translate(-50%, -50%) scale(1);
+}
+
+/* Checkboxes group (multiple selection) */
+.checkboxes-group {
+  margin-top: 0.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.checkboxes-item-label {
+  display: flex !important;
+  align-items: center;
+  cursor: pointer;
+  font-weight: 400;
+  gap: 0.5rem;
+  width: fit-content;
+}
+
+.checkboxes-item-label input[type='checkbox'] {
+  position: absolute;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.checkboxes-item-label .checkbox-custom {
+  width: 18px;
+  height: 18px;
+  display: block;
+  min-width: 18px;
+  min-height: 18px;
+  border: 2px solid var(--border-color);
+  border-radius: 4px;
+  position: relative;
+  transition: var(--transition-normal);
+  background: var(--bg-primary);
+  flex-shrink: 0;
+}
+
+.checkboxes-item-label input[type='checkbox']:checked + .checkbox-custom {
+  border-color: var(--primary-color);
+  background: var(--primary-color);
+}
+
+.checkboxes-item-label .checkbox-custom::after {
+  content: '✓';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) scale(0);
+  color: white;
+  font-size: 12px;
+  font-weight: bold;
+  transition: var(--transition-normal);
+}
+
+.checkboxes-item-label input[type='checkbox']:checked + .checkbox-custom::after {
   transform: translate(-50%, -50%) scale(1);
 }
 

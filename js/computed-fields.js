@@ -18,7 +18,17 @@ function calculateFormula(formula, formElement) {
 
       const fieldElement = formElement.querySelector(`[name="${fieldId}"]`);
       if (fieldElement) {
-        if (fieldElement.type === "checkbox") {
+        // Check field config to determine type
+        const fieldConfig = currentConfig.fields.find((f) => f.id === fieldId);
+
+        if (fieldConfig && fieldConfig.type === "checkboxes") {
+          // For checkboxes type, get all checked values
+          const checkedBoxes = formElement.querySelectorAll(
+            `[name="${fieldId}"]:checked`
+          );
+          const checkedValues = Array.from(checkedBoxes).map((cb) => cb.value);
+          value = checkedValues.join("\n");
+        } else if (fieldElement.type === "checkbox") {
           value = fieldElement.checked ? "Да" : "Нет";
         } else if (fieldElement.type === "radio") {
           const checkedRadio = formElement.querySelector(
@@ -93,7 +103,19 @@ function calculateFormula(formula, formElement) {
                       );
                       if (otherFieldElement) {
                         let otherValue = "";
-                        if (otherFieldElement.type === "checkbox") {
+                        const otherFieldConfig = currentConfig.fields.find(
+                          (f) => f.id === otherFieldId
+                        );
+
+                        if (otherFieldConfig && otherFieldConfig.type === "checkboxes") {
+                          const checkedBoxes = formElement.querySelectorAll(
+                            `[name="${otherFieldId}"]:checked`
+                          );
+                          const checkedValues = Array.from(checkedBoxes).map(
+                            (cb) => cb.value
+                          );
+                          otherValue = checkedValues.join("\n");
+                        } else if (otherFieldElement.type === "checkbox") {
                           otherValue = otherFieldElement.checked ? "Да" : "Нет";
                         } else if (otherFieldElement.type === "radio") {
                           const checkedRadio = formElement.querySelector(

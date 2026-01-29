@@ -52,9 +52,17 @@ function initConditionalFields() {
 
         let currentValue = '';
 
+        // Get field config to check if it's checkboxes type
+        const fieldConfig = currentConfig.fields.find((f) => f.id === condition.field);
+
         if (dependsOnField.type === 'radio') {
           const checkedRadio = form.querySelector(`[name="${condition.field}"]:checked`);
           currentValue = checkedRadio ? checkedRadio.value : '';
+        } else if (fieldConfig && fieldConfig.type === 'checkboxes') {
+          // For checkboxes, get all checked values
+          const checkedBoxes = form.querySelectorAll(`[name="${condition.field}"]:checked`);
+          const checkedValues = Array.from(checkedBoxes).map((cb) => cb.value);
+          currentValue = checkedValues; // Array of selected values
         } else {
           currentValue = dependsOnField.value;
         }
@@ -70,7 +78,13 @@ function initConditionalFields() {
           requiredValues = [condition.value];
         }
 
-        const isConditionMet = requiredValues.includes(currentValue);
+        let isConditionMet;
+        if (Array.isArray(currentValue)) {
+          // For checkboxes: check if any selected value is in required values
+          isConditionMet = currentValue.some((v) => requiredValues.includes(v));
+        } else {
+          isConditionMet = requiredValues.includes(currentValue);
+        }
         if (!isConditionMet) {
           allConditionsMet = false;
           break;
@@ -152,10 +166,12 @@ function initConditionalFields() {
   triggerFields.forEach((fieldId) => {
     const field = form.querySelector(`[name="${fieldId}"]`);
     if (field) {
-      if (field.type === 'radio') {
-        const allRadios = form.querySelectorAll(`[name="${fieldId}"]`);
-        allRadios.forEach((radio) => {
-          radio.addEventListener('change', updateConditionalVisibility);
+      const fieldConfig = currentConfig.fields.find((f) => f.id === fieldId);
+      if (field.type === 'radio' || (fieldConfig && fieldConfig.type === 'checkboxes')) {
+        // For radio and checkboxes, add listener to all inputs with the same name
+        const allInputs = form.querySelectorAll(`[name="${fieldId}"]`);
+        allInputs.forEach((input) => {
+          input.addEventListener('change', updateConditionalVisibility);
         });
       } else {
         field.addEventListener('change', updateConditionalVisibility);
@@ -207,7 +223,7 @@ function addConditionalMessageToEditor(condMsg) {
   function populateFieldSelect() {
     fieldSelect.innerHTML = '<option value="">Выберите поле...</option>';
     currentConfig.fields.forEach((f) => {
-      if (f.type === 'select' || f.type === 'radio') {
+      if (f.type === 'select' || f.type === 'radio' || f.type === 'checkboxes') {
         const option = document.createElement('option');
         option.value = f.id;
         option.textContent = f.label;

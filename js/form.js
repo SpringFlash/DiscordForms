@@ -250,6 +250,28 @@ function renderForm() {
         inputElement = radioGroup;
         break;
 
+      case 'checkboxes':
+        const checkboxesGroup = document.createElement('div');
+        checkboxesGroup.className = 'checkboxes-group';
+
+        if (field.options) {
+          field.options.forEach((option) => {
+            const checkboxItemLabel = document.createElement('label');
+            checkboxItemLabel.className = 'checkboxes-item-label';
+
+            checkboxItemLabel.innerHTML = `
+              <input type="checkbox" name="${field.id}" value="${option}" />
+              <span class="checkbox-custom"></span>
+              ${option}
+            `;
+
+            checkboxesGroup.appendChild(checkboxItemLabel);
+          });
+        }
+
+        inputElement = checkboxesGroup;
+        break;
+
       case 'checkbox':
         const checkboxLabel = document.createElement('label');
         checkboxLabel.className = 'checkbox-label';
@@ -544,7 +566,24 @@ function initFormHandlers() {
           continue; // Пропускаем скрытые вычисляемые поля
         }
       }
-      data[key] = value;
+
+      // Handle checkboxes type - collect multiple values
+      const fieldConfig = currentConfig.fields.find((f) => f.id === key);
+      if (fieldConfig && fieldConfig.type === 'checkboxes') {
+        if (!data[key]) {
+          data[key] = [];
+        }
+        data[key].push(value);
+      } else {
+        data[key] = value;
+      }
+    }
+
+    // Convert checkboxes arrays to newline-separated strings
+    for (const key in data) {
+      if (Array.isArray(data[key])) {
+        data[key] = data[key].join('\n');
+      }
     }
 
     const errors = validateForm(data);

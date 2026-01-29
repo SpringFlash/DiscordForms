@@ -353,6 +353,9 @@ function addFieldToEditor(field) {
           <option value="radio" ${
             field.type === "radio" ? "selected" : ""
           }>Радиокнопки</option>
+          <option value="checkboxes" ${
+            field.type === "checkboxes" ? "selected" : ""
+          }>Чекбоксы (множественный выбор)</option>
           <option value="checkbox" ${
             field.type === "checkbox" ? "selected" : ""
           }>Чекбокс</option>
@@ -380,7 +383,7 @@ function addFieldToEditor(field) {
         </label>
       </div>
       <div class="field-config-item field-options" style="display: ${
-        field.type === "select" || field.type === "radio" ? "block" : "none"
+        field.type === "select" || field.type === "radio" || field.type === "checkboxes" ? "block" : "none"
       };">
         <label>Варианты (через запятую)</label>
         <input type="text" class="field-options-input" value="${
@@ -583,7 +586,7 @@ function setupFieldEventHandlers(fieldItem, field) {
       fieldSelect.innerHTML = '<option value="">Выберите поле...</option>';
 
       currentConfig.fields.forEach((f) => {
-        if (f.id !== field.id && (f.type === "select" || f.type === "radio")) {
+        if (f.id !== field.id && (f.type === "select" || f.type === "radio" || f.type === "checkboxes")) {
           const option = document.createElement("option");
           option.value = f.id;
           option.textContent = f.label;
@@ -738,8 +741,8 @@ function setupFieldEventHandlers(fieldItem, field) {
 
     rebuildFieldsList();
 
-    // Если клонировали селект/радио, обновляем селекты полей
-    if (field.type === "select" || field.type === "radio") {
+    // Если клонировали селект/радио/чекбоксы, обновляем селекты полей
+    if (field.type === "select" || field.type === "radio" || field.type === "checkboxes") {
       rebuildConditionalFieldSelects();
     }
 
@@ -750,7 +753,7 @@ function setupFieldEventHandlers(fieldItem, field) {
   deleteBtn.addEventListener("click", () => {
     if (confirm("Удалить это поле?")) {
       const wasSelectOrRadio =
-        field.type === "select" || field.type === "radio";
+        field.type === "select" || field.type === "radio" || field.type === "checkboxes";
       const wasImageField = field.type === "image";
 
       currentConfig.fields = currentConfig.fields.filter(
@@ -823,7 +826,7 @@ function setupFieldEventHandlers(fieldItem, field) {
     const oldType = field.type;
     field.type = newType;
     optionsContainer.style.display =
-      newType === "select" || newType === "radio" ? "block" : "none";
+      newType === "select" || newType === "radio" || newType === "checkboxes" ? "block" : "none";
     if (formulaContainer) {
       formulaContainer.style.display =
         newType === "computed" ? "block" : "none";
@@ -839,9 +842,9 @@ function setupFieldEventHandlers(fieldItem, field) {
       checkboxTextContainer.style.display = newType === "checkbox" ? "block" : "none";
     }
 
-    // Если изменился тип на select/radio или с select/radio, обновляем селекты полей
-    const wasSelectOrRadio = oldType === "select" || oldType === "radio";
-    const isSelectOrRadio = newType === "select" || newType === "radio";
+    // Если изменился тип на select/radio/checkboxes или с select/radio/checkboxes, обновляем селекты полей
+    const wasSelectOrRadio = oldType === "select" || oldType === "radio" || oldType === "checkboxes";
+    const isSelectOrRadio = newType === "select" || newType === "radio" || newType === "checkboxes";
     if (wasSelectOrRadio !== isSelectOrRadio) {
       rebuildConditionalFieldSelects();
     }
@@ -856,8 +859,8 @@ function setupFieldEventHandlers(fieldItem, field) {
       iconMap[field.icon] || field.icon || "❓"
     } ${field.label}`;
 
-    // Если это селект или радио, обновляем селекты полей (чтобы новое название отобразилось)
-    if (field.type === "select" || field.type === "radio") {
+    // Если это селект или радио или чекбоксы, обновляем селекты полей (чтобы новое название отобразилось)
+    if (field.type === "select" || field.type === "radio" || field.type === "checkboxes") {
       rebuildConditionalFieldSelects();
     }
 
@@ -1142,7 +1145,7 @@ function setupImageFieldEventHandlers(fieldItem, field) {
       fieldSelect.innerHTML = '<option value="">Выберите поле...</option>';
 
       currentConfig.fields.forEach((f) => {
-        if (f.id !== field.id && (f.type === "select" || f.type === "radio")) {
+        if (f.id !== field.id && (f.type === "select" || f.type === "radio" || f.type === "checkboxes")) {
           const option = document.createElement("option");
           option.value = f.id;
           option.textContent = f.label;
@@ -1431,7 +1434,7 @@ function rebuildConditionalFieldSelects() {
               currentConfig.fields.forEach((f) => {
                 if (
                   f.id !== field.id &&
-                  (f.type === "select" || f.type === "radio")
+                  (f.type === "select" || f.type === "radio" || f.type === "checkboxes")
                 ) {
                   const option = document.createElement("option");
                   option.value = f.id;
@@ -1463,7 +1466,7 @@ function rebuildConditionalFieldSelects() {
           fieldSelect.innerHTML = '<option value="">Выберите поле...</option>';
 
           currentConfig.fields.forEach((f) => {
-            if (f.type === "select" || f.type === "radio") {
+            if (f.type === "select" || f.type === "radio" || f.type === "checkboxes") {
               const option = document.createElement("option");
               option.value = f.id;
               option.textContent = f.label;
