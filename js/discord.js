@@ -175,6 +175,44 @@ function getConditionalMessage(formData) {
   return matchedMessages.length > 0 ? matchedMessages.join('\n') : null;
 }
 
+// Create FormData payload with images
+function createFormDataPayload(payload, files) {
+  const formData = new FormData();
+  formData.append('payload_json', JSON.stringify(payload));
+
+  files.forEach((file, index) => {
+    formData.append(`files[${index}]`, file, `image${index}.png`);
+  });
+
+  return formData;
+}
+
+// Create multiple embeds for image gallery
+function createGalleryEmbeds(baseEmbed, fileCount) {
+  if (fileCount === 0) return [baseEmbed];
+
+  const galleryUrl = 'https://discord-form.gallery';
+
+  // First embed with all fields + first image
+  const mainEmbed = {
+    ...baseEmbed,
+    url: galleryUrl,
+    image: { url: 'attachment://image0.png' }
+  };
+
+  const embeds = [mainEmbed];
+
+  // Additional embeds for gallery effect (same url, different images)
+  for (let i = 1; i < fileCount; i++) {
+    embeds.push({
+      url: galleryUrl,
+      image: { url: `attachment://image${i}.png` }
+    });
+  }
+
+  return embeds;
+}
+
 // Функция для отправки данных в Discord
 async function sendToDiscord(formData) {
   if (!currentConfig.webhookUrl) {
@@ -182,10 +220,12 @@ async function sendToDiscord(formData) {
   }
 
   const customMessage = getConditionalMessage(formData);
+  const hasImages = uploadedImages && uploadedImages.length > 0;
+
   let payload;
+  let fetchOptions;
 
   if (currentConfig.sendAsPlainText) {
-    // Отправка как текстовое сообщение
     const plainTextContent = createPlainTextMessage(formData);
     const finalContent = customMessage
       ? `${customMessage}\n\n${plainTextContent}`
@@ -194,37 +234,60 @@ async function sendToDiscord(formData) {
     payload = {
       content: finalContent,
       username: currentConfig.webhookUsername || currentConfig.title,
-      avatar_url:
-        currentConfig.webhookAvatarUrl || 'https://pngimg.com/uploads/discord/discord_PNG3.png',
+      avatar_url: currentConfig.webhookAvatarUrl || 'https://pngimg.com/uploads/discord/discord_PNG3.png',
     };
+
+    if (hasImages) {
+      fetchOptions = {
+        method: 'POST',
+        body: createFormDataPayload(payload, uploadedImages),
+      };
+    } else {
+      fetchOptions = {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      };
+    }
   } else {
-    // Отправка как embed
     const embed = createDiscordEmbed(formData);
-    payload = {
-      content: customMessage,
-      embeds: [embed],
-      username: currentConfig.webhookUsername || currentConfig.title,
-      avatar_url:
-        currentConfig.webhookAvatarUrl || 'https://pngimg.com/uploads/discord/discord_PNG3.png',
-    };
+
+    if (hasImages) {
+      const embeds = createGalleryEmbeds(embed, uploadedImages.length);
+      payload = {
+        content: customMessage,
+        embeds: embeds,
+        username: currentConfig.webhookUsername || currentConfig.title,
+        avatar_url: currentConfig.webhookAvatarUrl || 'https://pngimg.com/uploads/discord/discord_PNG3.png',
+      };
+      fetchOptions = {
+        method: 'POST',
+        body: createFormDataPayload(payload, uploadedImages),
+      };
+    } else {
+      payload = {
+        content: customMessage,
+        embeds: [embed],
+        username: currentConfig.webhookUsername || currentConfig.title,
+        avatar_url: currentConfig.webhookAvatarUrl || 'https://pngimg.com/uploads/discord/discord_PNG3.png',
+      };
+      fetchOptions = {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      };
+    }
   }
 
   try {
-    // Отправка на основной webhook
-    const response = await fetch(currentConfig.webhookUrl, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(payload),
-    });
+    const response = await fetch(currentConfig.webhookUrl, fetchOptions);
 
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({}));
       throw new Error(`HTTP ${response.status}: ${errorData.message || 'Неизвестная ошибка'}`);
     }
 
-    // Обработка полей с кастомными настройками отправки
+    // Handle custom webhooks (existing code)
     const customWebhookFields = currentConfig.fields.filter(
       (field) => field.customWebhook && field.customWebhook.enabled
     );
@@ -233,10 +296,8 @@ async function sendToDiscord(formData) {
       const customWebhookPromises = [];
 
       customWebhookFields.forEach((field) => {
-        // Определяем webhook: кастомный если указан, иначе основной
         const webhookUrl = field.customWebhook.url || currentConfig.webhookUrl;
 
-        // Если включена опция splitLines для многострочных полей
         if (
           field.customWebhook.splitLines &&
           (field.type === 'textarea' || field.type === 'computed') &&
@@ -244,22 +305,17 @@ async function sendToDiscord(formData) {
         ) {
           const lines = formData[field.id].split('\n').filter((line) => line.trim() !== '');
 
-          // Отправляем каждую строку отдельным сообщением
           lines.forEach((line, index) => {
             const linePayload = {
               content: line,
               username: currentConfig.webhookUsername || currentConfig.title,
-              avatar_url:
-                currentConfig.webhookAvatarUrl ||
-                'https://pngimg.com/uploads/discord/discord_PNG3.png',
+              avatar_url: currentConfig.webhookAvatarUrl || 'https://pngimg.com/uploads/discord/discord_PNG3.png',
             };
 
             customWebhookPromises.push(
               fetch(webhookUrl, {
                 method: 'POST',
-                headers: {
-                  'Content-Type': 'application/json',
-                },
+                headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(linePayload),
               }).catch((error) => {
                 console.error(`Ошибка отправки строки ${index + 1} поля ${field.label}:`, error);
@@ -267,13 +323,10 @@ async function sendToDiscord(formData) {
             );
           });
         } else if (field.customWebhook.url) {
-          // Обычная отправка формы на кастомный webhook (только если URL указан)
           customWebhookPromises.push(
             fetch(webhookUrl, {
               method: 'POST',
-              headers: {
-                'Content-Type': 'application/json',
-              },
+              headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify(payload),
             }).catch((error) => {
               console.error(`Ошибка отправки на кастомный webhook поля ${field.label}:`, error);
