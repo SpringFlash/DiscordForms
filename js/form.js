@@ -338,6 +338,121 @@ function renderForm() {
 
   initComputedFields();
   initConditionalFields();
+  initImageUpload();
+}
+
+// Initialize image upload functionality
+function initImageUpload() {
+  const imageFieldGroups = document.querySelectorAll('.form-group[data-field-id]');
+
+  imageFieldGroups.forEach(fieldGroup => {
+    const field = currentConfig.fields.find(f => f.id === fieldGroup.dataset.fieldId);
+    if (!field || field.type !== 'image') return;
+
+    const uploadZone = fieldGroup.querySelector('.image-upload-zone');
+    const fileInput = fieldGroup.querySelector('.image-file-input');
+    const previewGrid = fieldGroup.querySelector('.image-preview-grid');
+    const previewCounter = fieldGroup.querySelector('.image-preview-counter');
+    const counterSpan = previewCounter?.querySelector('span');
+    const maxFiles = field.maxFiles || 4;
+
+    if (!uploadZone || !fileInput) return;
+
+    function updatePreview() {
+      previewGrid.innerHTML = '';
+
+      if (uploadedImages.length > 0) {
+        previewCounter.style.display = 'block';
+        counterSpan.textContent = uploadedImages.length;
+      } else {
+        previewCounter.style.display = 'none';
+      }
+
+      uploadedImages.forEach((file, index) => {
+        const item = document.createElement('div');
+        item.className = 'image-preview-item';
+
+        const img = document.createElement('img');
+        img.src = URL.createObjectURL(file);
+        img.onload = () => URL.revokeObjectURL(img.src);
+
+        const removeBtn = document.createElement('button');
+        removeBtn.type = 'button';
+        removeBtn.className = 'image-preview-remove';
+        removeBtn.innerHTML = '<i class="fas fa-times"></i>';
+        removeBtn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          uploadedImages.splice(index, 1);
+          updatePreview();
+        });
+
+        item.appendChild(img);
+        item.appendChild(removeBtn);
+        previewGrid.appendChild(item);
+      });
+    }
+
+    function addFiles(files) {
+      const imageFiles = Array.from(files).filter(f => f.type.startsWith('image/'));
+      const remainingSlots = maxFiles - uploadedImages.length;
+      const filesToAdd = imageFiles.slice(0, remainingSlots);
+
+      if (imageFiles.length > remainingSlots) {
+        showMessage(`Можно загрузить максимум ${maxFiles} картинок`, 'error');
+      }
+
+      uploadedImages.push(...filesToAdd);
+      updatePreview();
+    }
+
+    // Click to upload
+    uploadZone.addEventListener('click', (e) => {
+      if (e.target.closest('.image-preview-remove')) return;
+      fileInput.click();
+    });
+
+    fileInput.addEventListener('change', (e) => {
+      if (e.target.files.length > 0) {
+        addFiles(e.target.files);
+        fileInput.value = '';
+      }
+    });
+
+    // Drag and drop
+    uploadZone.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      uploadZone.classList.add('drag-over');
+    });
+
+    uploadZone.addEventListener('dragleave', (e) => {
+      e.preventDefault();
+      uploadZone.classList.remove('drag-over');
+    });
+
+    uploadZone.addEventListener('drop', (e) => {
+      e.preventDefault();
+      uploadZone.classList.remove('drag-over');
+      if (e.dataTransfer.files.length > 0) {
+        addFiles(e.dataTransfer.files);
+      }
+    });
+
+    // Paste from clipboard
+    document.addEventListener('paste', (e) => {
+      const items = e.clipboardData?.items;
+      if (!items) return;
+
+      const imageItems = Array.from(items).filter(item => item.type.startsWith('image/'));
+      if (imageItems.length > 0) {
+        e.preventDefault();
+        const files = imageItems.map(item => item.getAsFile()).filter(Boolean);
+        addFiles(files);
+      }
+    });
+
+    // Initial render
+    updatePreview();
+  });
 }
 
 // Функция валидации формы
@@ -438,6 +553,11 @@ function initFormHandlers() {
       if (result.success) {
         showMessage(result.message, 'success');
         contactForm.reset();
+        uploadedImages = [];
+        const previewGrids = document.querySelectorAll('.image-preview-grid');
+        previewGrids.forEach(grid => grid.innerHTML = '');
+        const previewCounters = document.querySelectorAll('.image-preview-counter');
+        previewCounters.forEach(counter => counter.style.display = 'none');
 
         if (submitBtn) {
           submitBtn.style.background = 'linear-gradient(135deg, #10b981, #059669)';
