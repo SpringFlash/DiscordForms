@@ -648,6 +648,9 @@ function setupFieldEventHandlers(fieldItem, field) {
   moveUpBtn.addEventListener('click', () => {
     const currentIndex = currentConfig.fields.findIndex((f) => f.id === field.id);
     if (currentIndex > 0) {
+      // Don't allow moving image field up (it should stay at end)
+      if (field.type === 'image') return;
+
       [currentConfig.fields[currentIndex - 1], currentConfig.fields[currentIndex]] = [
         currentConfig.fields[currentIndex],
         currentConfig.fields[currentIndex - 1],
@@ -662,6 +665,10 @@ function setupFieldEventHandlers(fieldItem, field) {
   moveDownBtn.addEventListener('click', () => {
     const currentIndex = currentConfig.fields.findIndex((f) => f.id === field.id);
     if (currentIndex < currentConfig.fields.length - 1) {
+      // Don't allow moving below image field (it should stay at end)
+      const nextField = currentConfig.fields[currentIndex + 1];
+      if (nextField.type === 'image') return;
+
       [currentConfig.fields[currentIndex], currentConfig.fields[currentIndex + 1]] = [
         currentConfig.fields[currentIndex + 1],
         currentConfig.fields[currentIndex],
