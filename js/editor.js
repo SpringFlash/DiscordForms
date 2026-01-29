@@ -176,6 +176,71 @@ function addFieldToEditor(field) {
   fieldItem.className = 'field-item';
   fieldItem.dataset.fieldId = field.id;
 
+  // Special rendering for image field
+  if (field.type === 'image') {
+    fieldItem.innerHTML = `
+      <div class="field-header">
+        <div class="field-header-left">
+          <span class="field-title">🖼️ ${field.label}</span>
+          <label class="field-required-inline">
+            <input type="checkbox" class="field-required" ${field.required ? 'checked' : ''} />
+            <span>обязательное</span>
+          </label>
+        </div>
+        <div class="field-actions">
+          <button class="field-action-btn delete" title="Удалить">
+            <i class="fas fa-trash"></i>
+          </button>
+        </div>
+      </div>
+      <div class="field-config">
+        <div class="field-config-item" style="grid-column: 1 / -1;">
+          <label>Название поля</label>
+          <input type="text" class="field-label" value="${field.label}" />
+        </div>
+        <div class="field-config-item">
+          <label>Максимум файлов</label>
+          <select class="field-max-files">
+            <option value="1" ${field.maxFiles === 1 ? 'selected' : ''}>1</option>
+            <option value="2" ${field.maxFiles === 2 ? 'selected' : ''}>2</option>
+            <option value="3" ${field.maxFiles === 3 ? 'selected' : ''}>3</option>
+            <option value="4" ${field.maxFiles === 4 ? 'selected' : ''}>4</option>
+          </select>
+        </div>
+        <div class="field-config-item field-conditional-container" style="grid-column: 1 / -1; display: ${
+          currentConfig.showAdvancedSettings ? 'block' : 'none'
+        };">
+          <div class="conditional-section-header">
+            <label class="conditional-checkbox-label-header">
+              <input type="checkbox" class="conditional-enabled-checkbox" ${
+                field.conditional && field.conditional.enabled ? 'checked' : ''
+              } />
+              <span>Условная видимость</span>
+            </label>
+            <i class="fas fa-chevron-down conditional-toggle-icon ${
+              field.conditional && field.conditional.enabled ? 'open' : ''
+            }"></i>
+          </div>
+          <div class="conditional-config" style="display: ${
+            field.conditional && field.conditional.enabled ? 'block' : 'none'
+          };">
+            <div class="conditional-hint">Показывать это поле только если выполняются все условия:</div>
+            <div class="conditional-conditions-list"></div>
+            <button type="button" class="add-conditional-condition-btn" ${
+              field.conditional && field.conditional.enabled ? '' : 'disabled'
+            }>
+              <i class="fas fa-plus"></i> Добавить условие
+            </button>
+          </div>
+        </div>
+      </div>
+    `;
+
+    setupImageFieldEventHandlers(fieldItem, field);
+    fieldsList.appendChild(fieldItem);
+    return;
+  }
+
   fieldItem.innerHTML = `
     <div class="field-header">
       <div class="field-header-left">
@@ -848,6 +913,175 @@ function setupFieldEventHandlers(fieldItem, field) {
   if (addVariableBtn) {
     addVariableBtn.addEventListener('click', () => {
       showFieldVariablePopup(field, formulaInput);
+    });
+  }
+}
+
+// Event handlers for image field card
+function setupImageFieldEventHandlers(fieldItem, field) {
+  const fieldHeader = fieldItem.querySelector('.field-header');
+  const deleteBtn = fieldItem.querySelector('.delete');
+  const labelInput = fieldItem.querySelector('.field-label');
+  const requiredCheckbox = fieldItem.querySelector('.field-required');
+  const maxFilesSelect = fieldItem.querySelector('.field-max-files');
+  const conditionalSectionHeader = fieldItem.querySelector('.conditional-section-header');
+  const conditionalToggleIcon = fieldItem.querySelector('.conditional-toggle-icon');
+  const conditionalConfig = fieldItem.querySelector('.conditional-config');
+  const conditionalEnabledCheckbox = fieldItem.querySelector('.conditional-enabled-checkbox');
+  const conditionalConditionsList = fieldItem.querySelector('.conditional-conditions-list');
+  const addConditionBtn = fieldItem.querySelector('.add-conditional-condition-btn');
+
+  // Initialize conditions structure
+  if (field.conditional && field.conditional.enabled && !field.conditional.conditions) {
+    field.conditional.conditions = [];
+  }
+
+  function renderConditionalConditions() {
+    if (!conditionalConditionsList) return;
+    conditionalConditionsList.innerHTML = '';
+
+    const isEnabled = field.conditional && field.conditional.enabled;
+    const conditions = (field.conditional && field.conditional.conditions) || [];
+
+    conditions.forEach((condition, index) => {
+      const conditionItem = document.createElement('div');
+      conditionItem.className = 'conditional-condition-item';
+
+      const conditionRow = document.createElement('div');
+      conditionRow.className = 'conditional-row';
+
+      const fieldSelect = document.createElement('select');
+      fieldSelect.className = 'conditional-field-select';
+      fieldSelect.disabled = !isEnabled;
+      fieldSelect.innerHTML = '<option value="">Выберите поле...</option>';
+
+      currentConfig.fields.forEach((f) => {
+        if (f.id !== field.id && (f.type === 'select' || f.type === 'radio')) {
+          const option = document.createElement('option');
+          option.value = f.id;
+          option.textContent = f.label;
+          if (condition.field === f.id) option.selected = true;
+          fieldSelect.appendChild(option);
+        }
+      });
+
+      const valueInput = document.createElement('input');
+      valueInput.type = 'text';
+      valueInput.className = 'conditional-value-input';
+      valueInput.value = condition.value || '';
+      valueInput.placeholder = 'Значение';
+      valueInput.disabled = !isEnabled;
+
+      fieldSelect.addEventListener('change', (e) => {
+        condition.field = e.target.value;
+        updateConfigFromEditor();
+        renderForm();
+      });
+
+      valueInput.addEventListener('input', (e) => {
+        condition.value = e.target.value;
+        updateConfigFromEditor();
+        renderForm();
+      });
+
+      const deleteCondBtn = document.createElement('button');
+      deleteCondBtn.type = 'button';
+      deleteCondBtn.className = 'field-action-btn delete';
+      deleteCondBtn.innerHTML = '<i class="fas fa-trash"></i>';
+      deleteCondBtn.disabled = !isEnabled;
+      deleteCondBtn.addEventListener('click', () => {
+        conditions.splice(index, 1);
+        renderConditionalConditions();
+        updateConfigFromEditor();
+        renderForm();
+      });
+
+      conditionRow.appendChild(fieldSelect);
+      conditionRow.appendChild(document.createTextNode(' = '));
+      conditionRow.appendChild(valueInput);
+      conditionItem.appendChild(conditionRow);
+      conditionItem.appendChild(deleteCondBtn);
+      conditionalConditionsList.appendChild(conditionItem);
+    });
+  }
+
+  renderConditionalConditions();
+
+  fieldHeader.addEventListener('click', (e) => {
+    if (e.target.closest('.field-actions') || e.target.closest('.field-required-inline')) return;
+    const config = fieldItem.querySelector('.field-config');
+    config.style.display = config.style.display === 'none' ? 'grid' : 'none';
+  });
+
+  deleteBtn.addEventListener('click', () => {
+    if (confirm('Удалить это поле?')) {
+      currentConfig.fields = currentConfig.fields.filter((f) => f.id !== field.id);
+      fieldItem.remove();
+      updateImageFieldButtonVisibility();
+      updateConfigFromEditor();
+      renderForm();
+    }
+  });
+
+  labelInput.addEventListener('input', (e) => {
+    field.label = e.target.value;
+    fieldItem.querySelector('.field-title').textContent = `🖼️ ${field.label}`;
+    updateConfigFromEditor();
+    renderForm();
+  });
+
+  requiredCheckbox.addEventListener('change', (e) => {
+    field.required = e.target.checked;
+    updateConfigFromEditor();
+    renderForm();
+  });
+
+  maxFilesSelect.addEventListener('change', (e) => {
+    field.maxFiles = parseInt(e.target.value, 10);
+    updateConfigFromEditor();
+    renderForm();
+  });
+
+  if (conditionalSectionHeader) {
+    conditionalSectionHeader.addEventListener('click', (e) => {
+      if (e.target === conditionalEnabledCheckbox || e.target.closest('.conditional-checkbox-label-header')) return;
+      const isCurrentlyOpen = conditionalConfig.style.display === 'block';
+      conditionalConfig.style.display = isCurrentlyOpen ? 'none' : 'block';
+      conditionalToggleIcon.classList.toggle('open', !isCurrentlyOpen);
+    });
+  }
+
+  if (conditionalEnabledCheckbox) {
+    conditionalEnabledCheckbox.addEventListener('change', (e) => {
+      const isEnabled = e.target.checked;
+      if (isEnabled) {
+        if (!field.conditional) field.conditional = { enabled: true, conditions: [] };
+        else {
+          field.conditional.enabled = true;
+          if (!field.conditional.conditions) field.conditional.conditions = [];
+        }
+        conditionalConfig.style.display = 'block';
+        conditionalToggleIcon.classList.add('open');
+        if (addConditionBtn) addConditionBtn.disabled = false;
+      } else {
+        if (!field.conditional) field.conditional = {};
+        field.conditional.enabled = false;
+        if (addConditionBtn) addConditionBtn.disabled = true;
+      }
+      renderConditionalConditions();
+      updateConfigFromEditor();
+      renderForm();
+    });
+  }
+
+  if (addConditionBtn) {
+    addConditionBtn.addEventListener('click', () => {
+      if (!field.conditional) field.conditional = { enabled: true, conditions: [] };
+      if (!field.conditional.conditions) field.conditional.conditions = [];
+      field.conditional.conditions.push({ field: '', value: '' });
+      renderConditionalConditions();
+      updateConfigFromEditor();
+      renderForm();
     });
   }
 }
