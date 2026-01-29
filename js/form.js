@@ -1,5 +1,8 @@
 // === ФУНКЦИИ РАБОТЫ С ФОРМОЙ ===
 
+// Store uploaded images for the form
+let uploadedImages = [];
+
 // Функция для получения иконки поля (поддержка emoji и Font Awesome)
 function getFieldIcon(icon) {
   if (!icon) return '';
@@ -279,6 +282,31 @@ function renderForm() {
           inputElement.dataset.formula = formula;
           inputElement.tabIndex = -1;
         }
+        break;
+
+      case 'image':
+        const uploadZone = document.createElement('div');
+        uploadZone.className = 'image-upload-zone';
+        uploadZone.innerHTML = `
+          <div class="image-upload-zone-icon"><i class="fas fa-cloud-upload-alt"></i></div>
+          <div class="image-upload-zone-text">Перетащите картинки сюда</div>
+          <div class="image-upload-btn">Выбрать файлы</div>
+          <div class="image-upload-zone-hint">Или вставьте из буфера (Ctrl+V)</div>
+          <input type="file" class="image-file-input" accept="image/*" multiple />
+        `;
+
+        const previewContainer = document.createElement('div');
+        previewContainer.className = 'image-preview-container';
+        previewContainer.innerHTML = `
+          <div class="image-preview-counter" style="display: none;">Загружено: <span>0</span> из ${field.maxFiles || 4}</div>
+          <div class="image-preview-grid"></div>
+        `;
+
+        fieldGroup.appendChild(label);
+        fieldGroup.appendChild(uploadZone);
+        fieldGroup.appendChild(previewContainer);
+        fieldGroup.dataset.maxFiles = field.maxFiles || 4;
+
         break;
 
       default:
