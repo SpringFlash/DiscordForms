@@ -5,7 +5,7 @@ let uploadedImages = [];
 
 // Функция для получения иконки поля (поддержка emoji и Font Awesome)
 function getFieldIcon(icon) {
-  if (!icon) return '';
+  if (!icon) return "";
 
   // Проверяем, является ли это emoji (содержит emoji символы)
   const emojiRegex =
@@ -15,7 +15,7 @@ function getFieldIcon(icon) {
   }
 
   // Проверяем, есть ли это в iconMap (для обратной совместимости)
-  if (typeof iconMap !== 'undefined' && iconMap[icon]) {
+  if (typeof iconMap !== "undefined" && iconMap[icon]) {
     return iconMap[icon];
   }
 
@@ -28,24 +28,24 @@ function toggleEditorMode(showEditor) {
   isEditorMode = showEditor;
 
   if (showEditor) {
-    editorPanel.classList.add('show');
+    editorPanel.classList.add("show");
 
     if (container) {
-      container.classList.add('editor-mode');
+      container.classList.add("editor-mode");
     }
 
     if (formPreview) {
-      formPreview.classList.add('preview');
+      formPreview.classList.add("preview");
     }
   } else {
-    editorPanel.classList.remove('show');
+    editorPanel.classList.remove("show");
 
     if (container) {
-      container.classList.remove('editor-mode');
+      container.classList.remove("editor-mode");
     }
 
     if (formPreview) {
-      formPreview.classList.remove('preview');
+      formPreview.classList.remove("preview");
     }
   }
 
@@ -54,7 +54,7 @@ function toggleEditorMode(showEditor) {
 
 // Функция для обновления логотипа организации
 function updateOrganizationLogo(organization) {
-  const logoImg = document.getElementById('orgLogoImg');
+  const logoImg = document.getElementById("orgLogoImg");
   if (logoImg) {
     logoImg.src = `images/${organization}.png`;
     logoImg.alt = `${organization} Logo`;
@@ -63,16 +63,16 @@ function updateOrganizationLogo(organization) {
 
 // Функция для обновления favicon в зависимости от организации
 function updateFavicon(organization) {
-  const faviconLink = document.getElementById('faviconLink');
+  const faviconLink = document.getElementById("faviconLink");
   if (faviconLink) {
-    const iconName = organization ? organization.toLowerCase() : 'favicon';
+    const iconName = organization ? organization.toLowerCase() : "favicon";
     faviconLink.href = `images/favicon/${iconName}.ico`;
   }
 }
 
 // Функция для восстановления базовой структуры формы
 function restoreFormStructure() {
-  const formWrapper = document.querySelector('.form-wrapper');
+  const formWrapper = document.querySelector(".form-wrapper");
 
   formWrapper.innerHTML = `
     <div id="organizationLogo" class="organization-logo">
@@ -110,10 +110,10 @@ function restoreFormStructure() {
 
 // Функция для показа welcome screen
 function showWelcomeScreen() {
-  const formWrapper = document.querySelector('.form-wrapper');
+  const formWrapper = document.querySelector(".form-wrapper");
 
-  document.title = 'Discord Forms - Создай свою форму';
-  document.getElementById('pageTitle').textContent = 'Discord Forms';
+  document.title = "Discord Forms - Создай свою форму";
+  document.getElementById("pageTitle").textContent = "Discord Forms";
 
   formWrapper.innerHTML = `
     <div class="welcome-screen">
@@ -150,9 +150,9 @@ function showWelcomeScreen() {
     </div>
   `;
 
-  const createFormBtn = document.getElementById('createFormBtn');
+  const createFormBtn = document.getElementById("createFormBtn");
   if (createFormBtn) {
-    createFormBtn.addEventListener('click', () => {
+    createFormBtn.addEventListener("click", () => {
       currentConfig = createEmptyConfig();
       restoreFormStructure();
       initEditor();
@@ -165,60 +165,65 @@ function showWelcomeScreen() {
 
 // Функция для рендеринга формы на основе конфига
 function renderForm() {
-  const formHeader = formWrapper.querySelector('.header h1');
-  const formDescription = formWrapper.querySelector('.header p');
-  const formFields = formWrapper.querySelector('.contact-form');
+  const formHeader = formWrapper.querySelector(".header h1");
+  const formDescription = formWrapper.querySelector(".header p");
+  const formFields = formWrapper.querySelector(".contact-form");
 
   formHeader.textContent = currentConfig.title;
   formDescription.textContent = currentConfig.description;
 
-  const submitBtn = formFields.querySelector('.submit-btn');
-  formFields.innerHTML = '';
+  const submitBtn = formFields.querySelector(".submit-btn");
+  formFields.innerHTML = "";
   formFields.appendChild(submitBtn);
 
   currentConfig.fields.forEach((field) => {
-    const fieldGroup = document.createElement('div');
-    fieldGroup.className = 'form-group';
+    const fieldGroup = document.createElement("div");
+    fieldGroup.className = "form-group";
     fieldGroup.dataset.fieldId = field.id;
 
     if (field.conditional && field.conditional.enabled) {
       // Поддержка нового формата с массивом условий
-      if (field.conditional.conditions && Array.isArray(field.conditional.conditions)) {
-        fieldGroup.dataset.conditionalConditions = JSON.stringify(field.conditional.conditions);
+      if (
+        field.conditional.conditions &&
+        Array.isArray(field.conditional.conditions)
+      ) {
+        fieldGroup.dataset.conditionalConditions = JSON.stringify(
+          field.conditional.conditions
+        );
       } else {
         // Миграция со старого формата
         if (field.conditional.field) {
           fieldGroup.dataset.conditionalField = field.conditional.field;
-          fieldGroup.dataset.conditionalValue = field.conditional.value || '';
+          fieldGroup.dataset.conditionalValue = field.conditional.value || "";
         }
       }
-      fieldGroup.classList.add('conditional-field');
-      fieldGroup.style.display = 'none';
+      fieldGroup.classList.add("conditional-field");
+      fieldGroup.style.display = "none";
     }
 
-    const label = document.createElement('label');
-    label.setAttribute('for', field.id);
+    const label = document.createElement("label");
+    label.setAttribute("for", field.id);
     const iconHtml = getFieldIcon(field.icon);
-    label.innerHTML = `${iconHtml} ${field.label}${field.required ? ' *' : ''}`;
+    label.innerHTML = `${iconHtml} ${field.label}${field.required ? " *" : ""}`;
 
     let inputElement;
 
     switch (field.type) {
-      case 'textarea':
-        inputElement = document.createElement('textarea');
+      case "textarea":
+        inputElement = document.createElement("textarea");
         inputElement.rows = 5;
         break;
 
-      case 'select':
-        inputElement = document.createElement('select');
+      case "select":
+        inputElement = document.createElement("select");
         if (field.options) {
-          const defaultOption = document.createElement('option');
-          defaultOption.value = '';
-          defaultOption.textContent = 'Выберите вариант';
+          const defaultOption = document.createElement("option");
+          defaultOption.value = "";
+          defaultOption.textContent = "Выберите вариант";
           inputElement.appendChild(defaultOption);
 
           field.options.forEach((option) => {
-            const optionElement = document.createElement('option');
+            const optionElement = document.createElement("option");
             optionElement.value = option;
             optionElement.textContent = option;
             inputElement.appendChild(optionElement);
@@ -226,18 +231,18 @@ function renderForm() {
         }
         break;
 
-      case 'radio':
-        const radioGroup = document.createElement('div');
-        radioGroup.className = 'radio-group';
+      case "radio":
+        const radioGroup = document.createElement("div");
+        radioGroup.className = "radio-group";
 
         if (field.options) {
           field.options.forEach((option, index) => {
-            const radioLabel = document.createElement('label');
-            radioLabel.className = 'radio-label';
+            const radioLabel = document.createElement("label");
+            radioLabel.className = "radio-label";
 
             radioLabel.innerHTML = `
               <input type="radio" name="${field.id}" value="${option}" ${
-              index === 0 && field.defaultValue === option ? 'checked' : ''
+              index === 0 && field.defaultValue === option ? "checked" : ""
             } />
               <span class="radio-custom"></span>
               ${option}
@@ -250,14 +255,14 @@ function renderForm() {
         inputElement = radioGroup;
         break;
 
-      case 'checkboxes':
-        const checkboxesGroup = document.createElement('div');
-        checkboxesGroup.className = 'checkboxes-group';
+      case "checkboxes":
+        const checkboxesGroup = document.createElement("div");
+        checkboxesGroup.className = "checkboxes-group";
 
         if (field.options) {
           field.options.forEach((option) => {
-            const checkboxItemLabel = document.createElement('label');
-            checkboxItemLabel.className = 'checkboxes-item-label';
+            const checkboxItemLabel = document.createElement("label");
+            checkboxItemLabel.className = "checkboxes-item-label";
 
             checkboxItemLabel.innerHTML = `
               <input type="checkbox" name="${field.id}" value="${option}" />
@@ -272,9 +277,9 @@ function renderForm() {
         inputElement = checkboxesGroup;
         break;
 
-      case 'checkbox':
-        const checkboxLabel = document.createElement('label');
-        checkboxLabel.className = 'checkbox-label';
+      case "checkbox":
+        const checkboxLabel = document.createElement("label");
+        checkboxLabel.className = "checkbox-label";
 
         checkboxLabel.innerHTML = `
           <input type="checkbox" id="${field.id}" name="${field.id}" />
@@ -285,30 +290,31 @@ function renderForm() {
         fieldGroup.appendChild(checkboxLabel);
         break;
 
-      case 'computed':
-        const formula = field.formula || '';
-        const hasMultilineOperations = formula.includes(',map,') || formula.includes(',lines,');
+      case "computed":
+        const formula = field.formula || "";
+        const hasMultilineOperations =
+          formula.includes(",map,") || formula.includes(",lines,");
 
         if (hasMultilineOperations) {
-          inputElement = document.createElement('textarea');
+          inputElement = document.createElement("textarea");
           inputElement.rows = 3;
           inputElement.readOnly = true;
-          inputElement.className = 'computed-field';
+          inputElement.className = "computed-field";
           inputElement.dataset.formula = formula;
           inputElement.tabIndex = -1;
         } else {
-          inputElement = document.createElement('input');
-          inputElement.type = 'text';
+          inputElement = document.createElement("input");
+          inputElement.type = "text";
           inputElement.readOnly = true;
-          inputElement.className = 'computed-field';
+          inputElement.className = "computed-field";
           inputElement.dataset.formula = formula;
           inputElement.tabIndex = -1;
         }
         break;
 
-      case 'image':
-        const uploadZone = document.createElement('div');
-        uploadZone.className = 'image-upload-zone';
+      case "image":
+        const uploadZone = document.createElement("div");
+        uploadZone.className = "image-upload-zone";
         uploadZone.innerHTML = `
           <div class="image-upload-zone-icon"><i class="fas fa-cloud-upload-alt"></i></div>
           <div class="image-upload-zone-text">Перетащите картинки сюда</div>
@@ -317,10 +323,12 @@ function renderForm() {
           <input type="file" class="image-file-input" accept="image/*" multiple />
         `;
 
-        const previewContainer = document.createElement('div');
-        previewContainer.className = 'image-preview-container';
+        const previewContainer = document.createElement("div");
+        previewContainer.className = "image-preview-container";
         previewContainer.innerHTML = `
-          <div class="image-preview-counter" style="display: none;">Загружено: <span>0</span> из ${field.maxFiles || 4}</div>
+          <div class="image-preview-counter" style="display: none;">Загружено: <span>0</span> из ${
+            field.maxFiles || 4
+          }</div>
           <div class="image-preview-grid"></div>
         `;
 
@@ -332,11 +340,11 @@ function renderForm() {
         break;
 
       default:
-        inputElement = document.createElement('input');
+        inputElement = document.createElement("input");
         inputElement.type = field.type;
     }
 
-    if (inputElement && inputElement.tagName !== 'DIV') {
+    if (inputElement && inputElement.tagName !== "DIV") {
       inputElement.id = field.id;
       inputElement.name = field.id;
       if (field.placeholder) inputElement.placeholder = field.placeholder;
@@ -345,12 +353,12 @@ function renderForm() {
       fieldGroup.appendChild(label);
       fieldGroup.appendChild(inputElement);
 
-      if (inputElement.type !== 'checkbox') {
-        const inputLine = document.createElement('div');
-        inputLine.className = 'input-line';
+      if (inputElement.type !== "checkbox") {
+        const inputLine = document.createElement("div");
+        inputLine.className = "input-line";
         fieldGroup.appendChild(inputLine);
       }
-    } else if (inputElement && inputElement.tagName === 'DIV') {
+    } else if (inputElement && inputElement.tagName === "DIV") {
       fieldGroup.appendChild(label);
       fieldGroup.appendChild(inputElement);
     }
@@ -365,44 +373,48 @@ function renderForm() {
 
 // Initialize image upload functionality
 function initImageUpload() {
-  const imageFieldGroups = document.querySelectorAll('.form-group[data-field-id]');
+  const imageFieldGroups = document.querySelectorAll(
+    ".form-group[data-field-id]"
+  );
 
-  imageFieldGroups.forEach(fieldGroup => {
-    const field = currentConfig.fields.find(f => f.id === fieldGroup.dataset.fieldId);
-    if (!field || field.type !== 'image') return;
+  imageFieldGroups.forEach((fieldGroup) => {
+    const field = currentConfig.fields.find(
+      (f) => f.id === fieldGroup.dataset.fieldId
+    );
+    if (!field || field.type !== "image") return;
 
-    const uploadZone = fieldGroup.querySelector('.image-upload-zone');
-    const fileInput = fieldGroup.querySelector('.image-file-input');
-    const previewGrid = fieldGroup.querySelector('.image-preview-grid');
-    const previewCounter = fieldGroup.querySelector('.image-preview-counter');
-    const counterSpan = previewCounter?.querySelector('span');
-    const maxFiles = field.maxFiles || 4;
+    const uploadZone = fieldGroup.querySelector(".image-upload-zone");
+    const fileInput = fieldGroup.querySelector(".image-file-input");
+    const previewGrid = fieldGroup.querySelector(".image-preview-grid");
+    const previewCounter = fieldGroup.querySelector(".image-preview-counter");
+    const counterSpan = previewCounter?.querySelector("span");
+    const maxFiles = field.maxFiles || 10;
 
     if (!uploadZone || !fileInput) return;
 
     function updatePreview() {
-      previewGrid.innerHTML = '';
+      previewGrid.innerHTML = "";
 
       if (uploadedImages.length > 0) {
-        previewCounter.style.display = 'block';
+        previewCounter.style.display = "block";
         counterSpan.textContent = uploadedImages.length;
       } else {
-        previewCounter.style.display = 'none';
+        previewCounter.style.display = "none";
       }
 
       uploadedImages.forEach((file, index) => {
-        const item = document.createElement('div');
-        item.className = 'image-preview-item';
+        const item = document.createElement("div");
+        item.className = "image-preview-item";
 
-        const img = document.createElement('img');
+        const img = document.createElement("img");
         img.src = URL.createObjectURL(file);
         img.onload = () => URL.revokeObjectURL(img.src);
 
-        const removeBtn = document.createElement('button');
-        removeBtn.type = 'button';
-        removeBtn.className = 'image-preview-remove';
+        const removeBtn = document.createElement("button");
+        removeBtn.type = "button";
+        removeBtn.className = "image-preview-remove";
         removeBtn.innerHTML = '<i class="fas fa-times"></i>';
-        removeBtn.addEventListener('click', (e) => {
+        removeBtn.addEventListener("click", (e) => {
           e.stopPropagation();
           uploadedImages.splice(index, 1);
           updatePreview();
@@ -415,12 +427,14 @@ function initImageUpload() {
     }
 
     function addFiles(files) {
-      const imageFiles = Array.from(files).filter(f => f.type.startsWith('image/'));
+      const imageFiles = Array.from(files).filter((f) =>
+        f.type.startsWith("image/")
+      );
       const remainingSlots = maxFiles - uploadedImages.length;
       const filesToAdd = imageFiles.slice(0, remainingSlots);
 
       if (imageFiles.length > remainingSlots) {
-        showMessage(`Можно загрузить максимум ${maxFiles} картинок`, 'error');
+        showMessage(`Можно загрузить максимум ${maxFiles} картинок`, "error");
       }
 
       uploadedImages.push(...filesToAdd);
@@ -428,46 +442,50 @@ function initImageUpload() {
     }
 
     // Click to upload
-    uploadZone.addEventListener('click', (e) => {
-      if (e.target.closest('.image-preview-remove')) return;
+    uploadZone.addEventListener("click", (e) => {
+      if (e.target.closest(".image-preview-remove")) return;
       fileInput.click();
     });
 
-    fileInput.addEventListener('change', (e) => {
+    fileInput.addEventListener("change", (e) => {
       if (e.target.files.length > 0) {
         addFiles(e.target.files);
-        fileInput.value = '';
+        fileInput.value = "";
       }
     });
 
     // Drag and drop
-    uploadZone.addEventListener('dragover', (e) => {
+    uploadZone.addEventListener("dragover", (e) => {
       e.preventDefault();
-      uploadZone.classList.add('drag-over');
+      uploadZone.classList.add("drag-over");
     });
 
-    uploadZone.addEventListener('dragleave', (e) => {
+    uploadZone.addEventListener("dragleave", (e) => {
       e.preventDefault();
-      uploadZone.classList.remove('drag-over');
+      uploadZone.classList.remove("drag-over");
     });
 
-    uploadZone.addEventListener('drop', (e) => {
+    uploadZone.addEventListener("drop", (e) => {
       e.preventDefault();
-      uploadZone.classList.remove('drag-over');
+      uploadZone.classList.remove("drag-over");
       if (e.dataTransfer.files.length > 0) {
         addFiles(e.dataTransfer.files);
       }
     });
 
     // Paste from clipboard
-    document.addEventListener('paste', (e) => {
+    document.addEventListener("paste", (e) => {
       const items = e.clipboardData?.items;
       if (!items) return;
 
-      const imageItems = Array.from(items).filter(item => item.type.startsWith('image/'));
+      const imageItems = Array.from(items).filter((item) =>
+        item.type.startsWith("image/")
+      );
       if (imageItems.length > 0) {
         e.preventDefault();
-        const files = imageItems.map(item => item.getAsFile()).filter(Boolean);
+        const files = imageItems
+          .map((item) => item.getAsFile())
+          .filter(Boolean);
         addFiles(files);
       }
     });
@@ -480,36 +498,38 @@ function initImageUpload() {
 // Функция валидации формы
 function validateForm(formData) {
   const errors = [];
-  const form = document.getElementById('contactForm');
+  const form = document.getElementById("contactForm");
 
   currentConfig.fields.forEach((field) => {
-    if (field.type === 'computed') {
+    if (field.type === "computed") {
       return;
     }
 
     const fieldGroup = form.querySelector(`[data-field-id="${field.id}"]`);
-    const isVisible = !fieldGroup || fieldGroup.style.display !== 'none';
+    const isVisible = !fieldGroup || fieldGroup.style.display !== "none";
 
     if (!isVisible) {
       return;
     }
 
     // Validate image field
-    if (field.type === 'image') {
+    if (field.type === "image") {
       if (field.required && uploadedImages.length === 0) {
-        errors.push(`Поле "${field.label}" обязательно - прикрепите хотя бы одну картинку`);
+        errors.push(
+          `Поле "${field.label}" обязательно - прикрепите хотя бы одну картинку`
+        );
       }
       return; // Skip other validations for image field
     }
 
     if (field.required) {
       const value = formData[field.id];
-      if (!value || (typeof value === 'string' && !value.trim())) {
+      if (!value || (typeof value === "string" && !value.trim())) {
         errors.push(`Поле "${field.label}" обязательно для заполнения`);
       }
     }
 
-    if (field.type === 'email' && formData[field.id]) {
+    if (field.type === "email" && formData[field.id]) {
       if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData[field.id])) {
         errors.push(`Введите корректный email адрес в поле "${field.label}"`);
       }
@@ -524,26 +544,26 @@ function initFormHandlers() {
   if (!contactForm) return;
 
   if (editFormBtn && formDropdown) {
-    editFormBtn.addEventListener('click', (e) => {
+    editFormBtn.addEventListener("click", (e) => {
       e.stopPropagation();
-      formDropdown.classList.toggle('show');
+      formDropdown.classList.toggle("show");
     });
 
-    document.addEventListener('click', () => {
-      if (formDropdown.classList.contains('show')) {
-        formDropdown.classList.remove('show');
+    document.addEventListener("click", () => {
+      if (formDropdown.classList.contains("show")) {
+        formDropdown.classList.remove("show");
       }
     });
 
     if (duplicateBtn) {
-      duplicateBtn.addEventListener('click', () => {
-        formDropdown.classList.remove('show');
+      duplicateBtn.addEventListener("click", () => {
+        formDropdown.classList.remove("show");
 
         if (!isEditorMode) {
           initEditor();
           if (webhookUrlInput) {
-            webhookUrlInput.value = '';
-            currentConfig.webhookUrl = '';
+            webhookUrlInput.value = "";
+            currentConfig.webhookUrl = "";
           }
         }
         toggleEditorMode(!isEditorMode);
@@ -551,7 +571,7 @@ function initFormHandlers() {
     }
   }
 
-  contactForm.addEventListener('submit', async (e) => {
+  contactForm.addEventListener("submit", async (e) => {
     e.preventDefault();
 
     const formData = new FormData(contactForm);
@@ -559,9 +579,13 @@ function initFormHandlers() {
 
     for (let [key, value] of formData.entries()) {
       // Проверяем видимость поля для вычисляемых полей
-      if (currentConfig.fields.find((f) => f.id === key && f.type === 'computed')) {
-        const fieldGroup = contactForm.querySelector(`[data-field-id="${key}"]`);
-        const isVisible = !fieldGroup || fieldGroup.style.display !== 'none';
+      if (
+        currentConfig.fields.find((f) => f.id === key && f.type === "computed")
+      ) {
+        const fieldGroup = contactForm.querySelector(
+          `[data-field-id="${key}"]`
+        );
+        const isVisible = !fieldGroup || fieldGroup.style.display !== "none";
         if (!isVisible) {
           continue; // Пропускаем скрытые вычисляемые поля
         }
@@ -569,7 +593,7 @@ function initFormHandlers() {
 
       // Handle checkboxes type - collect multiple values
       const fieldConfig = currentConfig.fields.find((f) => f.id === key);
-      if (fieldConfig && fieldConfig.type === 'checkboxes') {
+      if (fieldConfig && fieldConfig.type === "checkboxes") {
         if (!data[key]) {
           data[key] = [];
         }
@@ -582,13 +606,13 @@ function initFormHandlers() {
     // Convert checkboxes arrays to newline-separated strings
     for (const key in data) {
       if (Array.isArray(data[key])) {
-        data[key] = data[key].join('\n');
+        data[key] = data[key].join("\n");
       }
     }
 
     const errors = validateForm(data);
     if (errors.length > 0) {
-      showMessage(errors.join('. '), 'error');
+      showMessage(errors.join(". "), "error");
       return;
     }
 
@@ -598,26 +622,30 @@ function initFormHandlers() {
       const result = await sendToDiscord(data);
 
       if (result.success) {
-        showMessage(result.message, 'success');
+        showMessage(result.message, "success");
         contactForm.reset();
         uploadedImages = [];
-        const previewGrids = document.querySelectorAll('.image-preview-grid');
-        previewGrids.forEach(grid => grid.innerHTML = '');
-        const previewCounters = document.querySelectorAll('.image-preview-counter');
-        previewCounters.forEach(counter => counter.style.display = 'none');
+        const previewGrids = document.querySelectorAll(".image-preview-grid");
+        previewGrids.forEach((grid) => (grid.innerHTML = ""));
+        const previewCounters = document.querySelectorAll(
+          ".image-preview-counter"
+        );
+        previewCounters.forEach((counter) => (counter.style.display = "none"));
 
         if (submitBtn) {
-          submitBtn.style.background = 'linear-gradient(135deg, #10b981, #059669)';
+          submitBtn.style.background =
+            "linear-gradient(135deg, #10b981, #059669)";
           setTimeout(() => {
-            submitBtn.style.background = 'linear-gradient(135deg, #6366f1, #4f46e5)';
+            submitBtn.style.background =
+              "linear-gradient(135deg, #6366f1, #4f46e5)";
           }, 3000);
         }
       } else {
-        showMessage(result.message, 'error');
+        showMessage(result.message, "error");
       }
     } catch (error) {
-      console.error('Неожиданная ошибка:', error);
-      showMessage('Произошла неожиданная ошибка. Попробуйте еще раз.', 'error');
+      console.error("Неожиданная ошибка:", error);
+      showMessage("Произошла неожиданная ошибка. Попробуйте еще раз.", "error");
     } finally {
       setLoading(false);
     }

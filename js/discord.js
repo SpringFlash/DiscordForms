@@ -1,7 +1,7 @@
 // === ФУНКЦИИ РАБОТЫ С DISCORD ===
 
 // Функция для создания Discord embed
-function createDiscordEmbed(formData) {
+function createDiscordEmbed(formData, imagesLength) {
   const priorityColors = {
     Низкий: 0x10b981,
     Средний: 0xf59e0b,
@@ -19,16 +19,22 @@ function createDiscordEmbed(formData) {
     fields: [],
     timestamp: new Date().toISOString(),
     footer: {
-      text: `${currentConfig.webhookUsername || currentConfig.title}`,
+      text:
+        currentConfig.displayUsername !== false
+          ? `${currentConfig.webhookUsername || currentConfig.title}`
+          : "",
       icon_url:
-        currentConfig.webhookAvatarUrl || 'https://pngimg.com/uploads/discord/discord_PNG3.png',
+        currentConfig.webhookAvatarUrl ||
+        "https://pngimg.com/uploads/discord/discord_PNG3.png",
     },
   };
 
   let questionIndex = 1;
   // Для старых форм считаем параметры по умолчанию: номера включены, эмодзи выключены
   const showQuestionNumbers =
-    currentConfig.sendQuestionNumbers !== undefined ? currentConfig.sendQuestionNumbers : true;
+    currentConfig.sendQuestionNumbers !== undefined
+      ? currentConfig.sendQuestionNumbers
+      : true;
   const showEmojis = currentConfig.sendEmojis || false;
   const showColons = currentConfig.sendColons !== false;
 
@@ -43,17 +49,18 @@ function createDiscordEmbed(formData) {
     }
 
     const value = formData[field.id];
-    if (value !== undefined && value !== '') {
-      let displayValue = value;
+    const isImage = imagesLength && field.type === "image";
+    if (isImage || (value !== undefined && value !== "")) {
+      let displayValue = isImage ? " " : value;
 
       // Формируем название поля
-      let fieldName = '';
+      let fieldName = "";
 
       // Добавляем эмодзи если включено
       if (showEmojis && field.icon) {
         const emoji = getFieldIcon(field.icon);
         // Если это не HTML-тег (Font Awesome), добавляем эмодзи
-        if (!emoji.startsWith('<i ')) {
+        if (!emoji.startsWith("<i ")) {
           fieldName += `${emoji} `;
         }
       }
@@ -63,18 +70,33 @@ function createDiscordEmbed(formData) {
         fieldName += `${questionIndex}) `;
       }
 
-      fieldName += `${field.label}${showColons ? ':' : ''}`;
+      fieldName += `${field.label}${showColons ? ":" : ""}`;
+      if (isImage) {
+        let suffix = "й";
 
-      if (field.type === 'checkbox') {
+        if (imagesLength % 10 === 1 && imagesLength % 100 !== 11) {
+          suffix = "е";
+        } else if (
+          imagesLength % 10 >= 2 &&
+          imagesLength % 10 <= 4 &&
+          (imagesLength % 100 < 10 || imagesLength % 100 >= 20)
+        ) {
+          suffix = "я";
+        }
+
+        fieldName += ` (${imagesLength} изображени${suffix})`;
+      }
+
+      if (field.type === "checkbox") {
         if (field.showTextInResponse !== false) {
-          displayValue = value === 'on' ? '✅ Да' : '❌ Нет';
+          displayValue = value === "on" ? "✅ Да" : "❌ Нет";
         } else {
-          displayValue = value === 'on' ? '✅' : '❌';
+          displayValue = value === "on" ? "✅" : "❌";
         }
       }
 
-      if (typeof displayValue === 'string' && displayValue.length > 1024) {
-        displayValue = displayValue.substring(0, 1021) + '...';
+      if (typeof displayValue === "string" && displayValue.length > 1024) {
+        displayValue = displayValue.substring(0, 1021) + "...";
       }
 
       questionIndex++;
@@ -96,7 +118,9 @@ function createPlainTextMessage(formData) {
   let questionIndex = 1;
   // Для старых форм считаем параметры по умолчанию: номера включены, эмодзи выключены
   const showQuestionNumbers =
-    currentConfig.sendQuestionNumbers !== undefined ? currentConfig.sendQuestionNumbers : true;
+    currentConfig.sendQuestionNumbers !== undefined
+      ? currentConfig.sendQuestionNumbers
+      : true;
   const showEmojis = currentConfig.sendEmojis || false;
   const showColons = currentConfig.sendColons !== false;
 
@@ -111,25 +135,25 @@ function createPlainTextMessage(formData) {
     }
 
     const value = formData[field.id];
-    if (value !== undefined && value !== '') {
+    if (value !== undefined && value !== "") {
       let displayValue = value;
 
-      if (field.type === 'checkbox') {
+      if (field.type === "checkbox") {
         if (field.showTextInResponse !== false) {
-          displayValue = value === 'on' ? '✅ Да' : '❌ Нет';
+          displayValue = value === "on" ? "✅ Да" : "❌ Нет";
         } else {
-          displayValue = value === 'on' ? '✅' : '❌';
+          displayValue = value === "on" ? "✅" : "❌";
         }
       }
 
       // Формируем название поля
-      let fieldLabel = '';
+      let fieldLabel = "";
 
       // Добавляем эмодзи если включено
       if (showEmojis && field.icon) {
         const emoji = getFieldIcon(field.icon);
         // Если это не HTML-тег (Font Awesome), добавляем эмодзи
-        if (!emoji.startsWith('<i ')) {
+        if (!emoji.startsWith("<i ")) {
           fieldLabel += `${emoji} `;
         }
       }
@@ -139,10 +163,10 @@ function createPlainTextMessage(formData) {
         fieldLabel += `${questionIndex}) `;
       }
 
-      fieldLabel += `${field.label}${showColons ? ':' : ''}`;
+      fieldLabel += `${field.label}${showColons ? ":" : ""}`;
 
       message += `**${fieldLabel}**${
-        ['textarea', 'computed'].includes(field.type) ? '\n' : ' '
+        ["textarea", "computed"].includes(field.type) ? "\n" : " "
       }${displayValue}\n`;
       questionIndex++;
     }
@@ -153,7 +177,10 @@ function getConditionalMessage(formData) {
   const matchedMessages = [];
 
   // Собираем все условные сообщения, которые подходят по условию
-  if (currentConfig.conditionalMessages && currentConfig.conditionalMessages.length > 0) {
+  if (
+    currentConfig.conditionalMessages &&
+    currentConfig.conditionalMessages.length > 0
+  ) {
     for (const condMsg of currentConfig.conditionalMessages) {
       if (condMsg.field && condMsg.value && condMsg.message) {
         const fieldValue = formData[condMsg.field];
@@ -182,13 +209,13 @@ function getConditionalMessage(formData) {
   }
 
   // Если есть хотя бы одно сообщение, склеиваем их через двойной перенос строки
-  return matchedMessages.length > 0 ? matchedMessages.join('\n') : null;
+  return matchedMessages.length > 0 ? matchedMessages.join("\n") : null;
 }
 
 // Create FormData payload with images
 function createFormDataPayload(payload, files) {
   const formData = new FormData();
-  formData.append('payload_json', JSON.stringify(payload));
+  formData.append("payload_json", JSON.stringify(payload));
 
   files.forEach((file, index) => {
     formData.append(`files[${index}]`, file, `image${index}.png`);
@@ -201,13 +228,13 @@ function createFormDataPayload(payload, files) {
 function createGalleryEmbeds(baseEmbed, fileCount) {
   if (fileCount === 0) return [baseEmbed];
 
-  const galleryUrl = 'https://discord-form.gallery';
+  const galleryUrl = window.location.href;
 
   // First embed with all fields + first image
   const mainEmbed = {
     ...baseEmbed,
     url: galleryUrl,
-    image: { url: 'attachment://image0.png' }
+    image: { url: "attachment://image0.png" },
   };
 
   const embeds = [mainEmbed];
@@ -216,7 +243,7 @@ function createGalleryEmbeds(baseEmbed, fileCount) {
   for (let i = 1; i < fileCount; i++) {
     embeds.push({
       url: galleryUrl,
-      image: { url: `attachment://image${i}.png` }
+      image: { url: `attachment://image${i}.png` },
     });
   }
 
@@ -226,7 +253,7 @@ function createGalleryEmbeds(baseEmbed, fileCount) {
 // Функция для отправки данных в Discord
 async function sendToDiscord(formData) {
   if (!currentConfig.webhookUrl) {
-    return { success: false, message: 'Webhook URL не настроен' };
+    return { success: false, message: "Webhook URL не настроен" };
   }
 
   const customMessage = getConditionalMessage(formData);
@@ -244,23 +271,25 @@ async function sendToDiscord(formData) {
     payload = {
       content: finalContent,
       username: currentConfig.webhookUsername || currentConfig.title,
-      avatar_url: currentConfig.webhookAvatarUrl || 'https://pngimg.com/uploads/discord/discord_PNG3.png',
+      avatar_url:
+        currentConfig.webhookAvatarUrl ||
+        "https://pngimg.com/uploads/discord/discord_PNG3.png",
     };
 
     if (hasImages) {
       fetchOptions = {
-        method: 'POST',
+        method: "POST",
         body: createFormDataPayload(payload, uploadedImages),
       };
     } else {
       fetchOptions = {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       };
     }
   } else {
-    const embed = createDiscordEmbed(formData);
+    const embed = createDiscordEmbed(formData, uploadedImages.length);
 
     if (hasImages) {
       const embeds = createGalleryEmbeds(embed, uploadedImages.length);
@@ -268,10 +297,12 @@ async function sendToDiscord(formData) {
         content: customMessage,
         embeds: embeds,
         username: currentConfig.webhookUsername || currentConfig.title,
-        avatar_url: currentConfig.webhookAvatarUrl || 'https://pngimg.com/uploads/discord/discord_PNG3.png',
+        avatar_url:
+          currentConfig.webhookAvatarUrl ||
+          "https://pngimg.com/uploads/discord/discord_PNG3.png",
       };
       fetchOptions = {
-        method: 'POST',
+        method: "POST",
         body: createFormDataPayload(payload, uploadedImages),
       };
     } else {
@@ -279,11 +310,13 @@ async function sendToDiscord(formData) {
         content: customMessage,
         embeds: [embed],
         username: currentConfig.webhookUsername || currentConfig.title,
-        avatar_url: currentConfig.webhookAvatarUrl || 'https://pngimg.com/uploads/discord/discord_PNG3.png',
+        avatar_url:
+          currentConfig.webhookAvatarUrl ||
+          "https://pngimg.com/uploads/discord/discord_PNG3.png",
       };
       fetchOptions = {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       };
     }
@@ -294,7 +327,9 @@ async function sendToDiscord(formData) {
 
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({}));
-      throw new Error(`HTTP ${response.status}: ${errorData.message || 'Неизвестная ошибка'}`);
+      throw new Error(
+        `HTTP ${response.status}: ${errorData.message || "Неизвестная ошибка"}`
+      );
     }
 
     // Handle custom webhooks (existing code)
@@ -310,36 +345,46 @@ async function sendToDiscord(formData) {
 
         if (
           field.customWebhook.splitLines &&
-          (field.type === 'textarea' || field.type === 'computed') &&
+          (field.type === "textarea" || field.type === "computed") &&
           formData[field.id]
         ) {
-          const lines = formData[field.id].split('\n').filter((line) => line.trim() !== '');
+          const lines = formData[field.id]
+            .split("\n")
+            .filter((line) => line.trim() !== "");
 
           lines.forEach((line, index) => {
             const linePayload = {
               content: line,
               username: currentConfig.webhookUsername || currentConfig.title,
-              avatar_url: currentConfig.webhookAvatarUrl || 'https://pngimg.com/uploads/discord/discord_PNG3.png',
+              avatar_url:
+                currentConfig.webhookAvatarUrl ||
+                "https://pngimg.com/uploads/discord/discord_PNG3.png",
             };
 
             customWebhookPromises.push(
               fetch(webhookUrl, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(linePayload),
               }).catch((error) => {
-                console.error(`Ошибка отправки строки ${index + 1} поля ${field.label}:`, error);
+                console.error(
+                  `Ошибка отправки строки ${index + 1} поля ${field.label}:`,
+                  error
+                );
               })
             );
           });
         } else if (field.customWebhook.url) {
           customWebhookPromises.push(
             fetch(webhookUrl, {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
               body: JSON.stringify(payload),
             }).catch((error) => {
-              console.error(`Ошибка отправки на кастомный webhook поля ${field.label}:`, error);
+              console.error(
+                `Ошибка отправки на кастомный webhook поля ${field.label}:`,
+                error
+              );
             })
           );
         }
@@ -348,9 +393,9 @@ async function sendToDiscord(formData) {
       await Promise.allSettled(customWebhookPromises);
     }
 
-    return { success: true, message: 'Сообщение успешно отправлено! 🎉' };
+    return { success: true, message: "Сообщение успешно отправлено! 🎉" };
   } catch (error) {
-    console.error('Ошибка отправки в Discord:', error);
+    console.error("Ошибка отправки в Discord:", error);
     return {
       success: false,
       message: `Ошибка при отправке: ${error.message}. Попробуйте еще раз.`,

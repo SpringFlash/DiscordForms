@@ -23,6 +23,13 @@ function initEditor() {
     sendAsPlainTextCheckbox.checked = currentConfig.sendAsPlainText || false;
   }
 
+  if (displayUsernameCheckbox) {
+    displayUsernameCheckbox.checked =
+      currentConfig.displayUsername !== undefined
+        ? currentConfig.displayUsername
+        : true;
+  }
+
   // Инициализация чекбоксов отправки номеров и эмодзи
   const sendQuestionNumbersCheckbox = document.getElementById(
     "sendQuestionNumbers"
@@ -86,6 +93,10 @@ function initEditor() {
     sendAsPlainTextCheckbox.addEventListener("change", updateConfigFromEditor);
   }
 
+  if (displayUsernameCheckbox) {
+    displayUsernameCheckbox.addEventListener("change", updateConfigFromEditor);
+  }
+
   // Обработчики для чекбоксов отправки номеров и эмодзи
   if (sendQuestionNumbersCheckbox) {
     sendQuestionNumbersCheckbox.addEventListener("change", (e) => {
@@ -144,7 +155,9 @@ function initEditor() {
     };
 
     // Insert before image field if it exists (image field must stay at end)
-    const imageFieldIndex = currentConfig.fields.findIndex(f => f.type === 'image');
+    const imageFieldIndex = currentConfig.fields.findIndex(
+      (f) => f.type === "image"
+    );
     if (imageFieldIndex !== -1) {
       currentConfig.fields.splice(imageFieldIndex, 0, newField);
       rebuildFieldsList();
@@ -167,7 +180,7 @@ function initEditor() {
         type: "image",
         label: "Прикрепите скриншоты",
         required: false,
-        maxFiles: 4,
+        maxFiles: 10,
       };
       currentConfig.fields.push(newField);
       addFieldToEditor(newField);
@@ -247,6 +260,24 @@ function addFieldToEditor(field) {
             <option value="4" ${
               field.maxFiles === 4 ? "selected" : ""
             }>4</option>
+            <option value="5" ${
+              field.maxFiles === 5 ? "selected" : ""
+            }>5</option>
+            <option value="6" ${
+              field.maxFiles === 6 ? "selected" : ""
+            }>6</option>
+            <option value="7" ${
+              field.maxFiles === 7 ? "selected" : ""
+            }>7</option>
+            <option value="8" ${
+              field.maxFiles === 8 ? "selected" : ""
+            }>8</option>
+            <option value="9" ${
+              field.maxFiles === 9 ? "selected" : ""
+            }>9</option>
+            <option value="10" ${
+              field.maxFiles === 10 ? "selected" : ""
+            }>10</option>
           </select>
         </div>
         <div class="field-config-item field-conditional-container" style="grid-column: 1 / -1; display: ${
@@ -383,7 +414,11 @@ function addFieldToEditor(field) {
         </label>
       </div>
       <div class="field-config-item field-options" style="display: ${
-        field.type === "select" || field.type === "radio" || field.type === "checkboxes" ? "block" : "none"
+        field.type === "select" ||
+        field.type === "radio" ||
+        field.type === "checkboxes"
+          ? "block"
+          : "none"
       };">
         <label>Варианты (через запятую)</label>
         <input type="text" class="field-options-input" value="${
@@ -506,9 +541,15 @@ function setupFieldEventHandlers(fieldItem, field) {
   const formulaContainer = fieldItem.querySelector(".field-formula-container");
   const formulaInput = fieldItem.querySelector(".field-formula-input");
   const addVariableBtn = fieldItem.querySelector(".add-field-variable-btn");
-  const placeholderContainer = fieldItem.querySelector(".field-placeholder-container");
-  const checkboxTextContainer = fieldItem.querySelector(".field-checkbox-text-container");
-  const showTextInResponseCheckbox = fieldItem.querySelector(".field-show-text-in-response");
+  const placeholderContainer = fieldItem.querySelector(
+    ".field-placeholder-container"
+  );
+  const checkboxTextContainer = fieldItem.querySelector(
+    ".field-checkbox-text-container"
+  );
+  const showTextInResponseCheckbox = fieldItem.querySelector(
+    ".field-show-text-in-response"
+  );
   const conditionalSectionHeader = fieldItem.querySelector(
     ".conditional-section-header"
   );
@@ -586,7 +627,10 @@ function setupFieldEventHandlers(fieldItem, field) {
       fieldSelect.innerHTML = '<option value="">Выберите поле...</option>';
 
       currentConfig.fields.forEach((f) => {
-        if (f.id !== field.id && (f.type === "select" || f.type === "radio" || f.type === "checkboxes")) {
+        if (
+          f.id !== field.id &&
+          (f.type === "select" || f.type === "radio" || f.type === "checkboxes")
+        ) {
           const option = document.createElement("option");
           option.value = f.id;
           option.textContent = f.label;
@@ -742,7 +786,11 @@ function setupFieldEventHandlers(fieldItem, field) {
     rebuildFieldsList();
 
     // Если клонировали селект/радио/чекбоксы, обновляем селекты полей
-    if (field.type === "select" || field.type === "radio" || field.type === "checkboxes") {
+    if (
+      field.type === "select" ||
+      field.type === "radio" ||
+      field.type === "checkboxes"
+    ) {
       rebuildConditionalFieldSelects();
     }
 
@@ -753,7 +801,9 @@ function setupFieldEventHandlers(fieldItem, field) {
   deleteBtn.addEventListener("click", () => {
     if (confirm("Удалить это поле?")) {
       const wasSelectOrRadio =
-        field.type === "select" || field.type === "radio" || field.type === "checkboxes";
+        field.type === "select" ||
+        field.type === "radio" ||
+        field.type === "checkboxes";
       const wasImageField = field.type === "image";
 
       currentConfig.fields = currentConfig.fields.filter(
@@ -826,7 +876,9 @@ function setupFieldEventHandlers(fieldItem, field) {
     const oldType = field.type;
     field.type = newType;
     optionsContainer.style.display =
-      newType === "select" || newType === "radio" || newType === "checkboxes" ? "block" : "none";
+      newType === "select" || newType === "radio" || newType === "checkboxes"
+        ? "block"
+        : "none";
     if (formulaContainer) {
       formulaContainer.style.display =
         newType === "computed" ? "block" : "none";
@@ -836,15 +888,19 @@ function setupFieldEventHandlers(fieldItem, field) {
         newType === "textarea" || newType === "computed" ? "flex" : "none";
     }
     if (placeholderContainer) {
-      placeholderContainer.style.display = newType === "checkbox" ? "none" : "block";
+      placeholderContainer.style.display =
+        newType === "checkbox" ? "none" : "block";
     }
     if (checkboxTextContainer) {
-      checkboxTextContainer.style.display = newType === "checkbox" ? "block" : "none";
+      checkboxTextContainer.style.display =
+        newType === "checkbox" ? "block" : "none";
     }
 
     // Если изменился тип на select/radio/checkboxes или с select/radio/checkboxes, обновляем селекты полей
-    const wasSelectOrRadio = oldType === "select" || oldType === "radio" || oldType === "checkboxes";
-    const isSelectOrRadio = newType === "select" || newType === "radio" || newType === "checkboxes";
+    const wasSelectOrRadio =
+      oldType === "select" || oldType === "radio" || oldType === "checkboxes";
+    const isSelectOrRadio =
+      newType === "select" || newType === "radio" || newType === "checkboxes";
     if (wasSelectOrRadio !== isSelectOrRadio) {
       rebuildConditionalFieldSelects();
     }
@@ -860,7 +916,11 @@ function setupFieldEventHandlers(fieldItem, field) {
     } ${field.label}`;
 
     // Если это селект или радио или чекбоксы, обновляем селекты полей (чтобы новое название отобразилось)
-    if (field.type === "select" || field.type === "radio" || field.type === "checkboxes") {
+    if (
+      field.type === "select" ||
+      field.type === "radio" ||
+      field.type === "checkboxes"
+    ) {
       rebuildConditionalFieldSelects();
     }
 
@@ -1145,7 +1205,10 @@ function setupImageFieldEventHandlers(fieldItem, field) {
       fieldSelect.innerHTML = '<option value="">Выберите поле...</option>';
 
       currentConfig.fields.forEach((f) => {
-        if (f.id !== field.id && (f.type === "select" || f.type === "radio" || f.type === "checkboxes")) {
+        if (
+          f.id !== field.id &&
+          (f.type === "select" || f.type === "radio" || f.type === "checkboxes")
+        ) {
           const option = document.createElement("option");
           option.value = f.id;
           option.textContent = f.label;
@@ -1434,7 +1497,9 @@ function rebuildConditionalFieldSelects() {
               currentConfig.fields.forEach((f) => {
                 if (
                   f.id !== field.id &&
-                  (f.type === "select" || f.type === "radio" || f.type === "checkboxes")
+                  (f.type === "select" ||
+                    f.type === "radio" ||
+                    f.type === "checkboxes")
                 ) {
                   const option = document.createElement("option");
                   option.value = f.id;
@@ -1466,7 +1531,11 @@ function rebuildConditionalFieldSelects() {
           fieldSelect.innerHTML = '<option value="">Выберите поле...</option>';
 
           currentConfig.fields.forEach((f) => {
-            if (f.type === "select" || f.type === "radio" || f.type === "checkboxes") {
+            if (
+              f.type === "select" ||
+              f.type === "radio" ||
+              f.type === "checkboxes"
+            ) {
               const option = document.createElement("option");
               option.value = f.id;
               option.textContent = f.label;

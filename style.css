@@ -2576,3 +2576,12 @@ emoji-picker {
   font-size: 0.8rem;
   margin-top: 0.5rem;
 }
+
+.watermark {
+  background: transparent;
+  text-align: right;
+  padding: 5px;
+  margin: 0 10px;
+  opacity: 0.2;
+  font-weight: 500;
+}

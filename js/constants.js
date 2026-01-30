@@ -34,6 +34,7 @@ const webhookUrlInput = document.getElementById("webhookUrl");
 const webhookUsernameInput = document.getElementById("webhookUsername");
 const webhookAvatarUrlInput = document.getElementById("webhookAvatarUrl");
 const sendAsPlainTextCheckbox = document.getElementById("sendAsPlainText");
+const displayUsernameCheckbox = document.getElementById("displayUsername");
 const organizationSelect = document.getElementById("organizationSelect");
 const fieldsList = document.getElementById("fieldsList");
 const addFieldBtn = document.getElementById("addFieldBtn");
