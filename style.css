@@ -77,7 +77,6 @@ body {
   justify-content: center;
   padding: 2rem;
   position: relative;
-  max-width: 1400px;
   margin: 0 auto;
   gap: 2rem;
 }
@@ -2579,9 +2578,10 @@ emoji-picker {
 
 .watermark {
   background: transparent;
-  text-align: right;
-  padding: 5px;
-  margin: 0 10px;
+  width: fit-content;
   opacity: 0.2;
   font-weight: 500;
+  right: 30px;
+  bottom: 5px;
+  position: fixed;
 }
