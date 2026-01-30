@@ -228,7 +228,7 @@ function createFormDataPayload(payload, files) {
 function createGalleryEmbeds(baseEmbed, fileCount) {
   if (fileCount === 0) return [baseEmbed];
 
-  const galleryUrl = window.location.href;
+  const galleryUrl = "https://gta5rp.com/";
 
   // First embed with all fields + first image
   const mainEmbed = {
