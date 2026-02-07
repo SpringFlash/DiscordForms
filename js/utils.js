@@ -10,10 +10,38 @@ function showMessage(message, type = "success") {
   }, 5000);
 }
 
+// Strip default/empty values from config to reduce URL size
+function optimizeConfig(config) {
+  const optimized = { ...config };
+
+  if (!optimized.customMessage) delete optimized.customMessage;
+  if (!optimized.conditionalMessages?.length)
+    delete optimized.conditionalMessages;
+  if (optimized.showAdvancedSettings === false)
+    delete optimized.showAdvancedSettings;
+  if (optimized.sendEmojis === false) delete optimized.sendEmojis;
+
+  if (optimized.fields) {
+    optimized.fields = optimized.fields.map((field) => {
+      const f = { ...field };
+      if (!f.placeholder) delete f.placeholder;
+      if (!f.icon) delete f.icon;
+      if (!f.options?.length) delete f.options;
+      if (f.required === false) delete f.required;
+      if (f.customWebhook && !f.customWebhook.enabled) delete f.customWebhook;
+      if (f.conditional && !f.conditional.enabled) delete f.conditional;
+      return f;
+    });
+  }
+
+  return optimized;
+}
+
 // Функция для кодирования конфига в base64 с компрессией
 function encodeConfig(config) {
   try {
-    const json = JSON.stringify(config);
+    const optimized = optimizeConfig(config);
+    const json = JSON.stringify(optimized);
     // Используем LZ-String для сжатия (если доступна библиотека)
     if (typeof LZString !== "undefined") {
       return "v2:" + LZString.compressToEncodedURIComponent(json);
@@ -46,8 +74,19 @@ function decodeConfig(encodedConfig) {
   }
 }
 
-// Функция для получения параметров URL
+// Функция для получения параметров URL (hash first, query params fallback)
 function getUrlParams() {
+  // New format: hash fragment (#config=...&mode=...)
+  const hash = window.location.hash.substring(1);
+  if (hash) {
+    const hashParams = new URLSearchParams(hash);
+    const config = hashParams.get("config");
+    if (config) {
+      return { config, mode: hashParams.get("mode") };
+    }
+  }
+
+  // Old format fallback: query params (?config=...&mode=...)
   const params = new URLSearchParams(window.location.search);
   return {
     config: params.get("config"),
@@ -55,22 +94,29 @@ function getUrlParams() {
   };
 }
 
-// Функция для обновления URL без перезагрузки
+// Функция для обновления URL без перезагрузки (uses hash fragment)
 function updateUrl(config = null, mode = null) {
   const url = new URL(window.location);
 
+  // Clear old query params if migrating from old format
+  url.searchParams.delete("config");
+  url.searchParams.delete("mode");
+
+  const hashParams = new URLSearchParams(url.hash.substring(1));
+
   if (config) {
-    url.searchParams.set("config", encodeConfig(config));
+    hashParams.set("config", encodeConfig(config));
   }
 
   if (mode !== null) {
     if (mode) {
-      url.searchParams.set("mode", "editor");
+      hashParams.set("mode", "editor");
     } else {
-      url.searchParams.delete("mode");
+      hashParams.delete("mode");
     }
   }
 
+  url.hash = hashParams.toString();
   window.history.pushState({}, "", url);
 }
 

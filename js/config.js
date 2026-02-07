@@ -89,11 +89,13 @@ function updateConfigFromEditor() {
   updateUrl(currentConfig);
 }
 
-// Функция для генерации ссылки на форму
+// Функция для генерации ссылки на форму (uses hash fragment)
 function generateShareUrl() {
   const shareConfig = { ...currentConfig };
   const baseUrl = window.location.origin + window.location.pathname;
-  return `${baseUrl}?config=${encodeConfig(shareConfig)}`;
+  const hashParams = new URLSearchParams();
+  hashParams.set("config", encodeConfig(shareConfig));
+  return `${baseUrl}#${hashParams.toString()}`;
 }
 
 // Функция для генерации и копирования ссылки на форму

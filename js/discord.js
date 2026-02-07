@@ -1,7 +1,7 @@
 // === ФУНКЦИИ РАБОТЫ С DISCORD ===
 
-// Функция для создания Discord embed
-function createDiscordEmbed(formData, imagesLength) {
+// Функция для создания Discord embeds (splits fields into chunks of 25)
+function createDiscordEmbeds(formData, imagesLength) {
   const priorityColors = {
     Низкий: 0x10b981,
     Средний: 0xf59e0b,
@@ -13,24 +13,9 @@ function createDiscordEmbed(formData, imagesLength) {
     embedColor = priorityColors[formData.priority];
   }
 
-  const embed = {
-    title: `📝 ${currentConfig.title}`,
-    color: embedColor,
-    fields: [],
-    timestamp: new Date().toISOString(),
-    footer: {
-      text:
-        currentConfig.displayUsername !== false
-          ? `${currentConfig.webhookUsername || currentConfig.title}`
-          : "",
-      icon_url:
-        currentConfig.webhookAvatarUrl ||
-        "https://pngimg.com/uploads/discord/discord_PNG3.png",
-    },
-  };
-
+  // Build all fields first
+  const allFields = [];
   let questionIndex = 1;
-  // Для старых форм считаем параметры по умолчанию: номера включены, эмодзи выключены
   const showQuestionNumbers =
     currentConfig.sendQuestionNumbers !== undefined
       ? currentConfig.sendQuestionNumbers
@@ -39,7 +24,6 @@ function createDiscordEmbed(formData, imagesLength) {
   const showColons = currentConfig.sendColons !== false;
 
   currentConfig.fields.forEach((field) => {
-    // Пропускаем поля с кастомной отправкой
     if (
       field.customWebhook &&
       field.customWebhook.enabled &&
@@ -53,19 +37,15 @@ function createDiscordEmbed(formData, imagesLength) {
     if (isImage || (value !== undefined && value !== "")) {
       let displayValue = isImage ? " " : value;
 
-      // Формируем название поля
       let fieldName = "";
 
-      // Добавляем эмодзи если включено
       if (showEmojis && field.icon) {
         const emoji = getFieldIcon(field.icon);
-        // Если это не HTML-тег (Font Awesome), добавляем эмодзи
         if (!emoji.startsWith("<i ")) {
           fieldName += `${emoji} `;
         }
       }
 
-      // Добавляем номер вопроса если включено
       if (showQuestionNumbers) {
         fieldName += `${questionIndex}) `;
       }
@@ -100,7 +80,7 @@ function createDiscordEmbed(formData, imagesLength) {
       }
 
       questionIndex++;
-      embed.fields.push({
+      allFields.push({
         name: fieldName,
         value: displayValue,
         inline: false,
@@ -108,7 +88,40 @@ function createDiscordEmbed(formData, imagesLength) {
     }
   });
 
-  return embed;
+  // Split fields into chunks of 25 (Discord embed field limit)
+  const FIELD_LIMIT = 25;
+  const chunks = [];
+  for (let i = 0; i < allFields.length; i += FIELD_LIMIT) {
+    chunks.push(allFields.slice(i, i + FIELD_LIMIT));
+  }
+  if (chunks.length === 0) chunks.push([]);
+
+  const footer = {
+    text:
+      currentConfig.displayUsername !== false
+        ? `${currentConfig.webhookUsername || currentConfig.title}`
+        : "",
+    icon_url:
+      currentConfig.webhookAvatarUrl ||
+      "https://pngimg.com/uploads/discord/discord_PNG3.png",
+  };
+
+  return chunks.map((fields, i) => {
+    const isFirst = i === 0;
+    const isLast = i === chunks.length - 1;
+    const embed = { color: embedColor, fields };
+
+    if (isFirst) {
+      embed.title = `📝 ${currentConfig.title}`;
+    }
+
+    if (isLast) {
+      embed.timestamp = new Date().toISOString();
+      embed.footer = footer;
+    }
+
+    return embed;
+  });
 }
 
 // Функция для создания текстового сообщения
@@ -224,30 +237,27 @@ function createFormDataPayload(payload, files) {
   return formData;
 }
 
-// Create multiple embeds for image gallery
-function createGalleryEmbeds(baseEmbed, fileCount) {
-  if (fileCount === 0) return [baseEmbed];
+// Create multiple embeds for image gallery (attaches gallery to last embed)
+function createGalleryEmbeds(embeds, fileCount) {
+  if (fileCount === 0) return embeds;
 
   const galleryUrl = "https://gta5rp.com/";
+  const result = embeds.map((e) => ({ ...e }));
 
-  // First embed with all fields + first image
-  const mainEmbed = {
-    ...baseEmbed,
-    url: galleryUrl,
-    image: { url: "attachment://image0.png" },
-  };
-
-  const embeds = [mainEmbed];
+  // Attach first image to the last field embed
+  const lastEmbed = result[result.length - 1];
+  lastEmbed.url = galleryUrl;
+  lastEmbed.image = { url: "attachment://image0.png" };
 
   // Additional embeds for gallery effect (same url, different images)
   for (let i = 1; i < fileCount; i++) {
-    embeds.push({
+    result.push({
       url: galleryUrl,
       image: { url: `attachment://image${i}.png` },
     });
   }
 
-  return embeds;
+  return result;
 }
 
 // Функция для отправки данных в Discord
@@ -289,13 +299,13 @@ async function sendToDiscord(formData) {
       };
     }
   } else {
-    const embed = createDiscordEmbed(formData, uploadedImages.length);
+    const embeds = createDiscordEmbeds(formData, uploadedImages.length);
 
     if (hasImages) {
-      const embeds = createGalleryEmbeds(embed, uploadedImages.length);
+      const allEmbeds = createGalleryEmbeds(embeds, uploadedImages.length);
       payload = {
         content: customMessage,
-        embeds: embeds,
+        embeds: allEmbeds,
         username: currentConfig.webhookUsername || currentConfig.title,
         avatar_url:
           currentConfig.webhookAvatarUrl ||
@@ -308,7 +318,7 @@ async function sendToDiscord(formData) {
     } else {
       payload = {
         content: customMessage,
-        embeds: [embed],
+        embeds,
         username: currentConfig.webhookUsername || currentConfig.title,
         avatar_url:
           currentConfig.webhookAvatarUrl ||
