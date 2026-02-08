@@ -25,7 +25,7 @@
       :key="field.id"
       :field="field"
       v-model="formData[field.id]"
-      :is-visible="true"
+      :is-visible="visibilityMap[field.id] ?? true"
     />
     <button type="submit" class="submit-btn" :disabled="isLoading">
       <span class="btn-text">{{ isLoading ? 'Отправка...' : 'Отправить сообщение' }}</span>
@@ -41,6 +41,8 @@
 import { ref, reactive, computed, watch, onMounted, onUnmounted } from 'vue'
 import { useFormConfigStore } from '../../stores/formConfig'
 import { useUiStore } from '../../stores/ui'
+import { useConditionalFields } from '../../composables/useConditionalFields'
+import { useComputedFields } from '../../composables/useComputedFields'
 import FormField from './FormField.vue'
 
 withDefaults(
@@ -57,6 +59,20 @@ const uiStore = useUiStore()
 const config = computed(() => formConfigStore.config)
 
 const formData = reactive<Record<string, string>>({})
+
+const { visibilityMap } = useConditionalFields(config, formData)
+useComputedFields(config.value, formData)
+
+// Clear hidden field values
+watch(visibilityMap, (map, oldMap) => {
+  if (!oldMap) return
+  for (const fieldId of Object.keys(map)) {
+    if (!map[fieldId] && oldMap[fieldId]) {
+      formData[fieldId] = ''
+    }
+  }
+})
+
 const showDropdown = ref(false)
 const isLoading = ref(false)
 const responseText = ref('')
@@ -108,9 +124,9 @@ function onDuplicate(): void {
 }
 
 function onSubmit(): void {
-  // Validate required fields
+  // Validate required visible fields
   for (const field of config.value.fields) {
-    if (field.required && field.type !== 'image') {
+    if (field.required && field.type !== 'image' && (visibilityMap.value[field.id] ?? true)) {
       const value = formData[field.id]
       if (!value || !value.trim()) {
         showMessage(`Поле "${field.label}" обязательно для заполнения`, 'error')
