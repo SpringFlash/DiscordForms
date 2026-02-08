@@ -1,17 +1,21 @@
 <template>
   <div class="container" :class="{ 'editor-mode': uiStore.mode === 'editor' }">
     <EditorLayout v-if="uiStore.mode === 'editor'" />
-    <div
-      class="form-wrapper"
-      :class="{ preview: uiStore.mode === 'editor' }"
-      v-if="uiStore.mode === 'editor' || uiStore.mode === 'viewer'"
-      id="formPreview"
-    >
-      <FormView :preview="uiStore.mode === 'editor'" />
-    </div>
-    <div class="form-wrapper" v-if="uiStore.mode === 'welcome'" id="formPreview">
-      <WelcomeScreen @create="onCreateForm" />
-    </div>
+    <Transition name="form-enter" appear>
+      <div
+        class="form-wrapper"
+        :class="{ preview: uiStore.mode === 'editor' }"
+        v-if="uiStore.mode === 'editor' || uiStore.mode === 'viewer'"
+        id="formPreview"
+      >
+        <FormView :preview="uiStore.mode === 'editor'" />
+      </div>
+    </Transition>
+    <Transition name="form-enter" appear>
+      <div class="form-wrapper" v-if="uiStore.mode === 'welcome'" id="formPreview">
+        <WelcomeScreen @create="onCreateForm" />
+      </div>
+    </Transition>
     <div class="background-decoration">
       <div class="decoration-1"></div>
       <div class="decoration-2"></div>
@@ -37,10 +41,6 @@ function updateFavicon(org: string): void {
   if (link) {
     link.href = `${import.meta.env.BASE_URL}images/favicon/${org.toLowerCase()}.ico`
   }
-}
-
-export function getOrgLogoSrc(org: string): string {
-  return `${import.meta.env.BASE_URL}images/${org}.png`
 }
 
 function onCreateForm(): void {

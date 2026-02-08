@@ -2585,3 +2585,18 @@ emoji-picker {
   bottom: 5px;
   position: fixed;
 }
+
+/* Vue transition: form entrance animation */
+.form-enter-enter-active {
+  transition: all 0.8s ease-out;
+}
+
+.form-enter-enter-from {
+  opacity: 0;
+  transform: translateY(30px);
+}
+
+.form-enter-enter-to {
+  opacity: 1;
+  transform: translateY(0);
+}

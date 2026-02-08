@@ -1,17 +1,8 @@
 import LZString from 'lz-string'
 import type { FormConfig } from '../types'
 
-interface OptimizedField {
-  [key: string]: unknown
-}
-
-interface OptimizedConfig {
-  [key: string]: unknown
-  fields?: OptimizedField[]
-}
-
-export function optimizeConfig(config: FormConfig): OptimizedConfig {
-  const optimized: OptimizedConfig = { ...config }
+export function optimizeConfig(config: FormConfig): Record<string, unknown> {
+  const optimized: Record<string, unknown> = { ...config }
 
   if (!optimized.customMessage) delete optimized.customMessage
   if (
@@ -23,8 +14,8 @@ export function optimizeConfig(config: FormConfig): OptimizedConfig {
   if (optimized.sendEmojis === false) delete optimized.sendEmojis
 
   if (optimized.fields) {
-    optimized.fields = (config.fields).map((field) => {
-      const f: OptimizedField = { ...field }
+    optimized.fields = config.fields.map((field) => {
+      const f: Record<string, unknown> = { ...field }
       if (!f.placeholder) delete f.placeholder
       if (!f.icon) delete f.icon
       if (!f.options || !(f.options as string[]).length) delete f.options

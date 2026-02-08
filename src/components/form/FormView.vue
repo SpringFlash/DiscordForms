@@ -24,7 +24,8 @@
       v-for="field in config.fields"
       :key="field.id"
       :field="field"
-      v-model="formData[field.id]"
+      :model-value="formData[field.id] ?? ''"
+      @update:model-value="formData[field.id] = $event"
       :is-visible="visibilityMap[field.id] ?? true"
     />
     <button type="submit" class="submit-btn" :disabled="isLoading">

@@ -1,6 +1,6 @@
 <template>
   <div class="radio-group">
-    <label v-for="(option, index) in field.options" :key="option" class="radio-label">
+    <label v-for="option in field.options" :key="option" class="radio-label">
       <input
         type="radio"
         :name="field.id"

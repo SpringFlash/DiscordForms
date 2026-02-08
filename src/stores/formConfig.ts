@@ -1,6 +1,6 @@
 import { ref } from 'vue'
 import { defineStore } from 'pinia'
-import type { FormConfig, FormField, ConditionalMessage } from '../types'
+import type { FormConfig, FormField } from '../types'
 import { generateId } from '../utils'
 import { getUrlParams, decodeConfig, updateUrl, generateShareUrl } from '../services/config'
 
@@ -100,12 +100,12 @@ export const useFormConfigStore = defineStore('formConfig', () => {
     if (targetIndex < 0 || targetIndex >= fields.length) return
 
     // Don't allow moving image field up
-    if (fields[index].type === 'image' && direction === 'up') return
+    if (fields[index]!.type === 'image' && direction === 'up') return
     // Don't allow moving below image field
-    if (direction === 'down' && fields[targetIndex].type === 'image') return
+    if (direction === 'down' && fields[targetIndex]!.type === 'image') return
 
-    const temp = fields[index]
-    fields[index] = fields[targetIndex]
+    const temp = fields[index]!
+    fields[index] = fields[targetIndex]!
     fields[targetIndex] = temp
   }
 
@@ -114,9 +114,9 @@ export const useFormConfigStore = defineStore('formConfig', () => {
     const index = fields.findIndex((f) => f.id === fieldId)
     if (index === -1) return
 
-    const original = fields[index]
+    const original = fields[index]!
     const cloned: FormField = {
-      ...JSON.parse(JSON.stringify(original)) as FormField,
+      ...(JSON.parse(JSON.stringify(original)) as FormField),
       id: generateId(),
       label: original.label + ' (копия)',
     }

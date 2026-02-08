@@ -62,8 +62,8 @@ export function createDiscordEmbeds(
   imagesLength: number,
 ): DiscordEmbed[] {
   let embedColor = 0x6366f1
-  if (formData.priority && PRIORITY_COLORS[formData.priority]) {
-    embedColor = PRIORITY_COLORS[formData.priority]
+  if (formData.priority && PRIORITY_COLORS[formData.priority] !== undefined) {
+    embedColor = PRIORITY_COLORS[formData.priority]!
   }
 
   const allFields: DiscordEmbedField[] = []
@@ -89,7 +89,7 @@ export function createDiscordEmbeds(
       }
 
       if (field.type === 'checkbox') {
-        displayValue = formatCheckboxValue(field, value)
+        displayValue = formatCheckboxValue(field, value ?? '')
       }
 
       if (typeof displayValue === 'string' && displayValue.length > 1024) {
@@ -97,7 +97,7 @@ export function createDiscordEmbeds(
       }
 
       questionIndex++
-      allFields.push({ name: fieldName, value: displayValue, inline: false })
+      allFields.push({ name: fieldName, value: displayValue ?? '', inline: false })
     }
   })
 
@@ -174,7 +174,7 @@ export function getConditionalMessage(
         } catch {
           requiredValues = [condMsg.value]
         }
-        if (requiredValues.includes(fieldValue)) {
+        if (fieldValue !== undefined && requiredValues.includes(fieldValue)) {
           matchedMessages.push(condMsg.message)
         }
       }
@@ -208,7 +208,7 @@ export function createGalleryEmbeds(
 
   const galleryUrl = 'https://gta5rp.com/'
   const result = embeds.map((e) => ({ ...e }))
-  const lastEmbed = result[result.length - 1]
+  const lastEmbed = result[result.length - 1]!
   lastEmbed.url = galleryUrl
   lastEmbed.image = { url: 'attachment://image0.png' }
 
@@ -318,7 +318,7 @@ export async function sendToDiscord(
           (field.type === 'textarea' || field.type === 'computed') &&
           formData[field.id]
         ) {
-          const lines = formData[field.id]
+          const lines = (formData[field.id] ?? '')
             .split('\n')
             .filter((line) => line.trim() !== '')
 

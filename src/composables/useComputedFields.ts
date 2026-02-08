@@ -16,7 +16,7 @@ export function calculateFormula(
   for (const match of matches) {
     const content = match.slice(1, -1)
     const parts = content.split(',').map((p) => p.trim())
-    const fieldId = parts[0]
+    const fieldId = parts[0] ?? ''
     let value = ''
 
     const fieldConfig = fields.find((f) => f.id === fieldId)
@@ -46,7 +46,7 @@ export function calculateFormula(
           .filter((line) => line.trim())
           .length.toString()
       } else if (operation === 'line') {
-        const lineIndex = parseInt(parts[2])
+        const lineIndex = parseInt(parts[2] ?? '0')
         const lines = value.split('\n').filter((line) => line.trim())
         value =
           lineIndex < 0
@@ -54,13 +54,13 @@ export function calculateFormula(
             : lines[lineIndex] || ''
       } else if (operation === 'lines') {
         const lines = value.split('\n').filter((line) => line.trim())
-        const separator = parts.length > 2 ? parts[2] : ', '
+        const separator = parts.length > 2 ? (parts[2] ?? ', ') : ', '
         value = lines.join(separator)
       } else if (operation === 'map') {
         value = processMapOperation(parts, value, formData)
       } else {
-        const startIndex = parseInt(parts[1])
-        const endIndex = parts.length > 2 ? parseInt(parts[2]) : null
+        const startIndex = parseInt(parts[1] ?? '0')
+        const endIndex = parts.length > 2 ? parseInt(parts[2] ?? '0') : null
         if (value && !isNaN(startIndex)) {
           value =
             endIndex !== null && !isNaN(endIndex)
@@ -115,11 +115,12 @@ function processMapOperation(
         const lineContent = lineMatch.slice(1, -1)
         const lineParts = lineContent.split(',').map((p) => p.trim())
 
-        if (lineParts.length === 1 && lineParts[0] !== 'line') {
-          const otherValue = formData[lineParts[0]] || ''
+        const firstPart = lineParts[0] ?? ''
+        if (lineParts.length === 1 && firstPart !== 'line') {
+          const otherValue = formData[firstPart] || ''
           lineExpression = lineExpression.replace(lineMatch, otherValue)
         } else if (lineParts.length >= 2) {
-          const lineOp = lineParts[1]
+          const lineOp = lineParts[1] ?? ''
           let lineValue = line
 
           if (lineOp === 'length') {
@@ -133,7 +134,7 @@ function processMapOperation(
           } else if (!isNaN(parseInt(lineOp))) {
             const startIdx = parseInt(lineOp)
             const endIdx =
-              lineParts.length > 2 ? parseInt(lineParts[2]) : null
+              lineParts.length > 2 ? parseInt(lineParts[2] ?? '0') : null
             lineValue =
               endIdx !== null
                 ? line.substring(startIdx, endIdx)

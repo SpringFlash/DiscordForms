@@ -3,6 +3,7 @@
     <button type="button" class="emoji-picker-btn" @click.stop="showPicker = !showPicker">
       <span class="emoji-display">{{ displayValue }}</span>
     </button>
+    <!-- @vue-ignore -->
     <emoji-picker v-if="showPicker" class="emoji-picker-popup" @emoji-click="onEmojiClick"></emoji-picker>
   </div>
 </template>
