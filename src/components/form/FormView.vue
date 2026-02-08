@@ -43,6 +43,7 @@ import { useFormConfigStore } from '../../stores/formConfig'
 import { useUiStore } from '../../stores/ui'
 import { useConditionalFields } from '../../composables/useConditionalFields'
 import { useComputedFields } from '../../composables/useComputedFields'
+import { sendToDiscord } from '../../services/discord'
 import FormField from './FormField.vue'
 
 withDefaults(
@@ -123,19 +124,80 @@ function onDuplicate(): void {
   uiStore.setMode('editor')
 }
 
-function onSubmit(): void {
-  // Validate required visible fields
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+
+function validateForm(): string[] {
+  const errors: string[] = []
+
   for (const field of config.value.fields) {
-    if (field.required && field.type !== 'image' && (visibilityMap.value[field.id] ?? true)) {
-      const value = formData[field.id]
-      if (!value || !value.trim()) {
-        showMessage(`Поле "${field.label}" обязательно для заполнения`, 'error')
-        return
+    const isVisible = visibilityMap.value[field.id] ?? true
+    if (!isVisible) continue
+
+    // Skip validation for computed fields that are hidden
+    if (field.type === 'computed') continue
+
+    const value = formData[field.id]
+
+    // Required field validation
+    if (field.required) {
+      if (field.type === 'image') {
+        if (formConfigStore.uploadedImages.length === 0) {
+          errors.push(`Поле "${field.label}" обязательно для заполнения`)
+        }
+      } else if (!value || !value.trim()) {
+        errors.push(`Поле "${field.label}" обязательно для заполнения`)
       }
+    }
+
+    // Email format validation
+    if (field.type === 'email' && value && value.trim() && !EMAIL_REGEX.test(value.trim())) {
+      errors.push(`Поле "${field.label}" содержит некорректный email`)
     }
   }
 
-  showMessage('Форма успешно отправлена!', 'success')
+  return errors
+}
+
+async function onSubmit(): Promise<void> {
+  const errors = validateForm()
+  if (errors.length > 0) {
+    showMessage(errors.join('. '), 'error')
+    return
+  }
+
+  // Collect data: skip hidden fields and hidden computed fields
+  const submitData: Record<string, string> = {}
+  for (const field of config.value.fields) {
+    const isVisible = visibilityMap.value[field.id] ?? true
+    if (!isVisible) continue
+    if (field.type === 'image') continue
+
+    const value = formData[field.id]
+    if (value !== undefined) {
+      submitData[field.id] = value
+    }
+  }
+
+  isLoading.value = true
+  try {
+    const result = await sendToDiscord(config.value, submitData, formConfigStore.uploadedImages)
+    if (result.success) {
+      showMessage(result.message, 'success')
+      // Reset form data
+      for (const key of Object.keys(formData)) {
+        const field = config.value.fields.find((f) => f.id === key)
+        formData[key] = field?.defaultValue || ''
+      }
+      // Clear uploaded images
+      formConfigStore.uploadedImages = []
+    } else {
+      showMessage(result.message, 'error')
+    }
+  } catch {
+    showMessage('Произошла неожиданная ошибка. Попробуйте еще раз.', 'error')
+  } finally {
+    isLoading.value = false
+  }
 }
 
 function onDocumentClick(): void {
