@@ -98,52 +98,29 @@ body {
 /* Фоновая декорация */
 .background-decoration {
   position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
+  inset: 0;
   overflow: hidden;
   z-index: -1;
 }
 
-.decoration-1,
-.decoration-2,
-.decoration-3 {
+.decoration {
   position: absolute;
+  background: linear-gradient(
+    45deg,
+    var(--primary-light),
+    var(--primary-color)
+  );
   border-radius: 50%;
-  background: linear-gradient(45deg, var(--primary-light), var(--primary-color));
-  opacity: 0.1;
 }
 
-/* Тёмная тема для декоративных элементов */
-[data-theme='dark'] .decoration-1,
-[data-theme='dark'] .decoration-2,
-[data-theme='dark'] .decoration-3 {
-  opacity: 0.05;
-}
+.heart {
+  border-radius: 0;
+  background: none;
 
-.decoration-1 {
-  width: 300px;
-  height: 300px;
-  top: -150px;
-  right: -150px;
-  animation: float 6s ease-in-out infinite;
-}
-
-.decoration-2 {
-  width: 200px;
-  height: 200px;
-  bottom: -100px;
-  left: -100px;
-  animation: float 8s ease-in-out infinite reverse;
-}
-
-.decoration-3 {
-  width: 150px;
-  height: 150px;
-  top: 50%;
-  left: 10%;
-  animation: float 10s ease-in-out infinite;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 29'><path fill='white' d='M23.6,0c-3.4,0-6.4,2-7.6,5.1C14.8,2,11.8,0,8.4,0C3.8,0,0,3.8,0,8.4c0,9,16,20.6,16,20.6S32,17.4,32,8.4C32,3.8,28.2,0,23.6,0z'/></svg>");
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
 }
 
 @keyframes float {
@@ -153,6 +130,16 @@ body {
   }
   50% {
     transform: translateY(-20px) rotate(180deg);
+  }
+}
+
+@keyframes float-heart {
+  0%,
+  100% {
+    transform: rotate(-2.5deg) scale(1);
+  }
+  50% {
+    transform: rotate(2.5deg) scale(1.05);
   }
 }
 
@@ -1474,7 +1461,7 @@ emoji-picker {
   align-items: center;
   justify-content: center;
   text-align: center;
-  padding: 4rem 2rem;
+  padding: 4rem 2rem 0;
   min-height: 500px;
 }
 
