@@ -107,3 +107,4 @@ export function generateShareUrl(config: FormConfig): string {
   hashParams.set('config', encodeConfig(config))
   return `${baseUrl}#${hashParams.toString()}`
 }
+

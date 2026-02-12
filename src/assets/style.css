@@ -2600,3 +2600,58 @@ emoji-picker {
   opacity: 1;
   transform: translateY(0);
 }
+
+/* AI prompt hint button */
+.ai-prompt-hint-btn {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 2px solid var(--border-color);
+  background: var(--bg-primary);
+  color: var(--text-secondary);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+  transition: var(--transition-fast);
+  flex-shrink: 0;
+}
+
+.ai-prompt-hint-btn:hover {
+  border-color: var(--primary-color);
+  color: var(--primary-color);
+  background: rgba(99, 102, 241, 0.08);
+}
+
+/* AI prompt popup */
+.ai-prompt-popup {
+  max-width: 640px;
+  width: 90%;
+}
+
+.ai-prompt-popup h3 {
+  margin: 0 0 0.5rem 0;
+  color: var(--text-primary);
+  font-size: 1.2rem;
+}
+
+.ai-prompt-text {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 1rem;
+  font-size: 0.8rem;
+  line-height: 1.5;
+  color: var(--text-primary);
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  max-height: 400px;
+  overflow-y: auto;
+  margin: 1rem 0;
+  font-family: 'Courier New', monospace;
+}
+
+.popup-btn.copied {
+  background: linear-gradient(135deg, var(--success-color), #059669);
+}

@@ -1,5 +1,5 @@
 <template>
-  <div class="form-group" :data-field-id="field.id" v-show="isVisible">
+  <div class="form-group" :data-field-id="field.id" v-if="isVisible">
     <label v-if="field.type !== 'checkbox' && field.type !== 'image'" :for="field.id">
       <span v-html="iconHtml"></span>
       {{ field.label }}{{ field.required ? ' *' : '' }}

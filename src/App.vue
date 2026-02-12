@@ -16,6 +16,9 @@
         <WelcomeScreen @create="onCreateForm" />
       </div>
     </Transition>
+    <div class="form-wrapper loading-wrapper" v-if="uiStore.mode === 'loading'">
+      <i class="fas fa-spinner loading"></i>
+    </div>
     <div class="background-decoration">
       <div class="decoration-1"></div>
       <div class="decoration-2"></div>

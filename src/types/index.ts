@@ -69,7 +69,7 @@ export interface FormConfig {
   conditionalMessages: ConditionalMessage[]
 }
 
-export type AppMode = 'welcome' | 'editor' | 'viewer'
+export type AppMode = 'welcome' | 'editor' | 'viewer' | 'loading'
 
 export type Theme = 'light' | 'dark'
 

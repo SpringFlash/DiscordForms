@@ -103,12 +103,12 @@
           <span>Показывать текст в ответе</span>
         </label>
       </div>
-      <div class="field-config-item field-options" v-show="hasOptions">
+      <div class="field-config-item field-options" v-if="hasOptions">
         <label>Варианты (через запятую)</label>
         <input
           type="text"
           class="field-options-input"
-          :value="field.options.join(', ')"
+          :value="(field.options ?? []).join(', ')"
           @input="onOptionsInput"
         />
       </div>

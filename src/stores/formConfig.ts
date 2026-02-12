@@ -4,6 +4,13 @@ import type { FormConfig, FormField } from '../types'
 import { generateId } from '../utils'
 import { getUrlParams, decodeConfig, updateUrl, generateShareUrl } from '../services/config'
 
+function stripWebhooks(config: FormConfig): FormConfig {
+  const stripped = JSON.parse(JSON.stringify(config)) as FormConfig
+  stripped.webhookUrl = ''
+  stripped.fields = stripped.fields.map((f) => ({ ...f, customWebhook: null }))
+  return stripped
+}
+
 function createField(overrides: Partial<FormField> = {}): FormField {
   return {
     id: generateId(),
@@ -53,11 +60,13 @@ export const useFormConfigStore = defineStore('formConfig', () => {
 
   function loadFromUrl(): { loaded: boolean; isEditor: boolean } {
     const params = getUrlParams()
-    if (!params.config) {
-      return { loaded: false, isEditor: false }
+
+    let decoded: FormConfig | null = null
+
+    if (params.config) {
+      decoded = decodeConfig(params.config)
     }
 
-    const decoded = decodeConfig(params.config)
     if (!decoded) {
       return { loaded: false, isEditor: false }
     }
@@ -161,6 +170,38 @@ export const useFormConfigStore = defineStore('formConfig', () => {
     return config.value.fields.some((f) => f.type === 'image')
   }
 
+  function exportConfig(): void {
+    const stripped = stripWebhooks(config.value)
+    const json = JSON.stringify(stripped, null, 2)
+    const blob = new Blob([json], { type: 'application/json' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `${config.value.title || 'form'}.json`
+    a.click()
+    URL.revokeObjectURL(url)
+  }
+
+  function importConfig(file: File): Promise<boolean> {
+    return new Promise((resolve) => {
+      const reader = new FileReader()
+      reader.onload = () => {
+        try {
+          const imported = JSON.parse(reader.result as string) as FormConfig
+          imported.webhookUrl = ''
+          imported.fields = (imported.fields ?? []).map((f) => ({ ...createField(), ...f, customWebhook: null }))
+          config.value = imported
+          updateUrl(config.value, null)
+          resolve(true)
+        } catch {
+          resolve(false)
+        }
+      }
+      reader.onerror = () => resolve(false)
+      reader.readAsText(file)
+    })
+  }
+
   return {
     config,
     uploadedImages,
@@ -177,5 +218,7 @@ export const useFormConfigStore = defineStore('formConfig', () => {
     getShareUrl,
     resetConfig,
     hasImageField,
+    exportConfig,
+    importConfig,
   }
 })
