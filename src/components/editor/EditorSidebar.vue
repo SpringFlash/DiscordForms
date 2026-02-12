@@ -47,26 +47,28 @@
         >
       </div>
     </div>
-    <div v-if="showAiPrompt" class="field-variable-popup" @click.self="showAiPrompt = false">
-      <div class="popup-content ai-prompt-popup">
-        <h3>Промпт для ИИ</h3>
-        <p class="section-hint">
-          Скопируйте промпт, вставьте в чат с ИИ вместе с примером отчёта — получите готовый JSON для импорта.
-        </p>
-        <pre class="ai-prompt-text">{{ aiPrompt }}</pre>
-        <div class="popup-buttons">
-          <button class="popup-btn cancel-btn" @click="showAiPrompt = false">Закрыть</button>
-          <button
-            class="popup-btn insert-btn"
-            :class="{ copied: isPromptCopied }"
-            @click="onCopyPrompt"
-          >
-            <i :class="isPromptCopied ? 'fas fa-check' : 'fas fa-copy'"></i>
-            {{ isPromptCopied ? 'Скопировано!' : 'Скопировать' }}
-          </button>
+    <Teleport to="body">
+      <div v-if="showAiPrompt" class="field-variable-popup" @click.self="showAiPrompt = false">
+        <div class="popup-content ai-prompt-popup">
+          <h3>Промпт для ИИ</h3>
+          <p class="section-hint">
+            Скопируйте промпт, вставьте в чат с ИИ вместе с примером отчёта — получите готовый JSON для импорта.
+          </p>
+          <pre class="ai-prompt-text">{{ aiPrompt }}</pre>
+          <div class="popup-buttons">
+            <button class="popup-btn cancel-btn" @click="showAiPrompt = false">Закрыть</button>
+            <button
+              class="popup-btn insert-btn"
+              :class="{ copied: isPromptCopied }"
+              @click="onCopyPrompt"
+            >
+              <i :class="isPromptCopied ? 'fas fa-check' : 'fas fa-copy'"></i>
+              {{ isPromptCopied ? 'Скопировано!' : 'Скопировать' }}
+            </button>
+          </div>
         </div>
       </div>
-    </div>
+    </Teleport>
     <div class="editor-section">
       <h3>Ссылка на форму</h3>
       <div class="url-buttons-group">
