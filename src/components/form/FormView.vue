@@ -84,7 +84,7 @@ const responseVisible = ref(false)
 let hideTimeout: ReturnType<typeof setTimeout> | undefined
 
 const orgLogoSrc = computed(() => {
-  return `${import.meta.env.BASE_URL}images/${config.value.organization}.png`
+  return `${import.meta.env.BASE_URL}images/${config.value.organization || 'LSPD'}.png`
 })
 
 function initFormData(): void {
