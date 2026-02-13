@@ -59,8 +59,13 @@ function onPopState(): void {
   window.location.reload()
 }
 
-const circles = ref([])
-const bgRef = ref(null)
+const circles = ref<{
+  id: number
+  isHeart: boolean
+  style: {}
+}[]>([])
+
+const bgRef = ref<HTMLDivElement | null>(null)
 
 const isValentine = () => {
   const now = new Date()
@@ -118,11 +123,6 @@ const generateCircles = () => {
       },
     })
   }
-}
-
-const regenerate = async () => {
-  await nextTick()      // ждём пока новый контент отрисуется
-  generateCircles()
 }
 
 onMounted(() => {
