@@ -77,8 +77,8 @@ function formulaToHtml(formula: string): string {
   if (!formula) return ''
   return formula.replace(/\{([^}]+)\}/g, (match, inner: string) => {
     const parts = inner.split(',')
-    const fieldId = parts[0]
-    const label = fieldLabelMap.value.get(fieldId) || fieldId
+    const fieldId = parts[0] ?? inner
+    const label = fieldLabelMap.value.get(fieldId) ?? fieldId
     const hasParams = parts.length > 1
     const paramsText = hasParams ? ` [${parts.slice(1).join(',')}]` : ''
     return `<span class="formula-badge" data-var="${escapeHtml(match)}" contenteditable="false">${escapeHtml(label)}${hasParams ? `<span class="badge-params">${escapeHtml(paramsText)}</span>` : ''}</span>`
