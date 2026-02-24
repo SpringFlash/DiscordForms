@@ -9,6 +9,10 @@
       @keydown="onEditorKeydown"
       @paste="onEditorPaste"
       @click="onEditorClick"
+      @dragstart="onDragStart"
+      @dragover="onDragOver"
+      @drop="onDrop"
+      @dragend="onDragEnd"
     ></div>
     <div class="formula-hint">
       Используйте панель ниже для вставки переменных.
@@ -82,7 +86,7 @@ function formulaToHtml(formula: string): string {
     const label = fieldLabelMap.value.get(fieldId) ?? fieldId
     const hasParams = parts.length > 1
     const paramsText = hasParams ? ` [${parts.slice(1).join(',')}]` : ''
-    return `<span class="formula-badge" data-var="${escapeHtml(match)}" contenteditable="false">${escapeHtml(label)}${hasParams ? `<span class="badge-params">${escapeHtml(paramsText)}</span>` : ''}<span class="formula-badge-delete">\u00d7</span></span>`
+    return `<span class="formula-badge" data-var="${escapeHtml(match)}" contenteditable="false" draggable="true">${escapeHtml(label)}${hasParams ? `<span class="badge-params">${escapeHtml(paramsText)}</span>` : ''}<span class="formula-badge-delete">\u00d7</span></span>`
   })
 }
 
@@ -130,6 +134,55 @@ function onEditorClick(e: MouseEvent) {
   }
 }
 
+let draggedBadge: HTMLElement | null = null
+
+function onDragStart(e: DragEvent) {
+  const target = (e.target as HTMLElement).closest('.formula-badge') as HTMLElement | null
+  if (!target) {
+    e.preventDefault()
+    return
+  }
+  draggedBadge = target
+  target.classList.add('formula-badge-dragging')
+  e.dataTransfer?.setData('text/plain', target.dataset.var || '')
+  if (e.dataTransfer) e.dataTransfer.effectAllowed = 'move'
+}
+
+function onDragOver(e: DragEvent) {
+  if (!draggedBadge) return
+  e.preventDefault()
+  if (e.dataTransfer) e.dataTransfer.dropEffect = 'move'
+}
+
+function onDrop(e: DragEvent) {
+  e.preventDefault()
+  const editor = formulaEditorRef.value
+  if (!draggedBadge || !editor) return
+
+  const range = document.caretRangeFromPoint(e.clientX, e.clientY)
+  if (!range || !editor.contains(range.startContainer)) {
+    cleanupDrag()
+    return
+  }
+
+  draggedBadge.remove()
+  range.insertNode(draggedBadge)
+
+  cleanupDrag()
+  onEditorInput()
+}
+
+function onDragEnd() {
+  cleanupDrag()
+}
+
+function cleanupDrag() {
+  if (draggedBadge) {
+    draggedBadge.classList.remove('formula-badge-dragging')
+    draggedBadge = null
+  }
+}
+
 function onEditorPaste(e: ClipboardEvent) {
   e.preventDefault()
   const text = e.clipboardData?.getData('text/plain') || ''
@@ -148,7 +201,7 @@ function createBadgeHtml(fieldId: string, params?: { start: number; end: number 
     varStr = `{${fieldId}}`
   }
 
-  return `<span class="formula-badge" data-var="${escapeHtml(varStr)}" contenteditable="false">${escapeHtml(label)}${paramsHtml}<span class="formula-badge-delete">\u00d7</span></span>`
+  return `<span class="formula-badge" data-var="${escapeHtml(varStr)}" contenteditable="false" draggable="true">${escapeHtml(label)}${paramsHtml}<span class="formula-badge-delete">\u00d7</span></span>`
 }
 
 function insertVariable() {

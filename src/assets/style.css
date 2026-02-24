@@ -1652,9 +1652,17 @@ emoji-picker {
   font-weight: 500;
   line-height: 1.4;
   vertical-align: baseline;
-  cursor: default;
+  cursor: grab;
   user-select: none;
   margin: 0 1px;
+}
+
+.formula-badge:active {
+  cursor: grabbing;
+}
+
+.formula-badge-dragging {
+  opacity: 0.4;
 }
 
 .formula-badge-delete {
