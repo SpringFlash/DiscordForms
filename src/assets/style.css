@@ -1653,8 +1653,21 @@ emoji-picker {
   line-height: 1.4;
   vertical-align: baseline;
   cursor: default;
-  user-select: all;
+  user-select: none;
   margin: 0 1px;
+}
+
+.formula-badge-delete {
+  margin-left: 0.2rem;
+  cursor: pointer;
+  opacity: 0.6;
+  font-size: 0.9rem;
+  line-height: 1;
+  transition: opacity 0.15s;
+}
+
+.formula-badge-delete:hover {
+  opacity: 1;
 }
 
 .badge-params {

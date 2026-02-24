@@ -8,6 +8,7 @@
       @input="onEditorInput"
       @keydown="onEditorKeydown"
       @paste="onEditorPaste"
+      @click="onEditorClick"
     ></div>
     <div class="formula-hint">
       Используйте панель ниже для вставки переменных.
@@ -81,7 +82,7 @@ function formulaToHtml(formula: string): string {
     const label = fieldLabelMap.value.get(fieldId) ?? fieldId
     const hasParams = parts.length > 1
     const paramsText = hasParams ? ` [${parts.slice(1).join(',')}]` : ''
-    return `<span class="formula-badge" data-var="${escapeHtml(match)}" contenteditable="false">${escapeHtml(label)}${hasParams ? `<span class="badge-params">${escapeHtml(paramsText)}</span>` : ''}</span>`
+    return `<span class="formula-badge" data-var="${escapeHtml(match)}" contenteditable="false">${escapeHtml(label)}${hasParams ? `<span class="badge-params">${escapeHtml(paramsText)}</span>` : ''}<span class="formula-badge-delete">\u00d7</span></span>`
   })
 }
 
@@ -118,6 +119,17 @@ function onEditorKeydown(e: KeyboardEvent) {
   }
 }
 
+function onEditorClick(e: MouseEvent) {
+  const target = e.target as HTMLElement
+  if (target.classList.contains('formula-badge-delete')) {
+    const badge = target.closest('.formula-badge')
+    if (badge) {
+      badge.remove()
+      onEditorInput()
+    }
+  }
+}
+
 function onEditorPaste(e: ClipboardEvent) {
   e.preventDefault()
   const text = e.clipboardData?.getData('text/plain') || ''
@@ -136,7 +148,7 @@ function createBadgeHtml(fieldId: string, params?: { start: number; end: number 
     varStr = `{${fieldId}}`
   }
 
-  return `<span class="formula-badge" data-var="${escapeHtml(varStr)}" contenteditable="false">${escapeHtml(label)}${paramsHtml}</span>`
+  return `<span class="formula-badge" data-var="${escapeHtml(varStr)}" contenteditable="false">${escapeHtml(label)}${paramsHtml}<span class="formula-badge-delete">\u00d7</span></span>`
 }
 
 function insertVariable() {
