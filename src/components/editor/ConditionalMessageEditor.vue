@@ -27,16 +27,16 @@
           >
             <label
               v-for="opt in fieldOptions"
-              :key="opt"
+              :key="opt.label"
               class="conditional-checkbox-label"
             >
               <input
                 type="checkbox"
-                :value="opt"
-                :checked="conditionValues.includes(opt)"
-                @change="onValueToggle(opt, $event)"
+                :value="opt.value || opt.label"
+                :checked="conditionValues.includes(opt.value || opt.label)"
+                @change="onValueToggle(opt.value || opt.label, $event)"
               />
-              {{ opt }}
+              {{ opt.label }}
             </label>
           </div>
           <input
