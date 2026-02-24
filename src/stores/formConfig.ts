@@ -1,6 +1,6 @@
 import { ref } from 'vue'
 import { defineStore } from 'pinia'
-import type { FormConfig, FormField } from '../types'
+import type { FormConfig, FormField, FieldOption } from '../types'
 import { generateId } from '../utils'
 import { getUrlParams, decodeConfig, updateUrl, generateShareUrl } from '../services/config'
 
@@ -189,7 +189,15 @@ export const useFormConfigStore = defineStore('formConfig', () => {
         try {
           const imported = JSON.parse(reader.result as string) as FormConfig
           imported.webhookUrl = ''
-          imported.fields = (imported.fields ?? []).map((f) => ({ ...createField(), ...f, customWebhook: null }))
+          imported.fields = (imported.fields ?? []).map((f) => {
+            const field = { ...createField(), ...f, customWebhook: null }
+            if (Array.isArray(field.options)) {
+              field.options = field.options.map((o: unknown) =>
+                typeof o === 'string' ? { label: o, value: '' } : (o as FieldOption),
+              )
+            }
+            return field
+          })
           config.value = imported
           updateUrl(config.value, null)
           resolve(true)

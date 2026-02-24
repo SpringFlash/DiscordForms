@@ -9,6 +9,11 @@ export type FieldType =
   | 'computed'
   | 'image'
 
+export interface FieldOption {
+  label: string
+  value: string
+}
+
 export interface ConditionalCondition {
   field: string
   value: string
@@ -35,7 +40,7 @@ export interface FormField {
   placeholder: string
   required: boolean
   icon: string
-  options: string[]
+  options: FieldOption[]
   formula: string
   showTextInResponse: boolean
   defaultValue: string

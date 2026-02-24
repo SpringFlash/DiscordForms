@@ -1,5 +1,11 @@
 import LZString from 'lz-string'
-import type { FormConfig } from '../types'
+import type { FormConfig, FieldOption } from '../types'
+
+function migrateOptions(options: unknown[]): FieldOption[] {
+  return options.map((o) =>
+    typeof o === 'string' ? { label: o, value: '' } : (o as FieldOption),
+  )
+}
 
 export function optimizeConfig(config: FormConfig): Record<string, unknown> {
   const optimized: Record<string, unknown> = { ...config }
@@ -18,7 +24,7 @@ export function optimizeConfig(config: FormConfig): Record<string, unknown> {
       const f: Record<string, unknown> = { ...field }
       if (!f.placeholder) delete f.placeholder
       if (!f.icon) delete f.icon
-      if (!f.options || !(f.options as string[]).length) delete f.options
+      if (!f.options || !(f.options as FieldOption[]).length) delete f.options
       if (f.required === false) delete f.required
       if (
         f.customWebhook &&
@@ -48,15 +54,26 @@ export function encodeConfig(config: FormConfig): string {
   }
 }
 
+function migrateConfig(config: FormConfig): FormConfig {
+  for (const field of config.fields ?? []) {
+    if (Array.isArray(field.options)) {
+      field.options = migrateOptions(field.options as unknown[])
+    }
+  }
+  return config
+}
+
 export function decodeConfig(encodedConfig: string): FormConfig | null {
   try {
+    let config: FormConfig | null = null
     if (encodedConfig.startsWith('v2:')) {
       const compressed = encodedConfig.substring(3)
       const json = LZString.decompressFromEncodedURIComponent(compressed)
-      if (json) return JSON.parse(json) as FormConfig
-      return null
+      if (json) config = JSON.parse(json) as FormConfig
+    } else {
+      config = JSON.parse(decodeURIComponent(atob(encodedConfig))) as FormConfig
     }
-    return JSON.parse(decodeURIComponent(atob(encodedConfig))) as FormConfig
+    return config ? migrateConfig(config) : null
   } catch (e) {
     console.error('Config decoding error:', e)
     return null

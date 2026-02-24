@@ -45,17 +45,17 @@
               >
                 <label
                   v-for="opt in getFieldOptions(condition.field)"
-                  :key="opt"
+                  :key="opt.label"
                   class="conditional-checkbox-label"
                 >
                   <input
                     type="checkbox"
-                    :value="opt"
-                    :checked="getConditionValues(condition).includes(opt)"
-                    @change="onConditionValueToggle(condition, opt, $event)"
+                    :value="opt.value || opt.label"
+                    :checked="getConditionValues(condition).includes(opt.value || opt.label)"
+                    @change="onConditionValueToggle(condition, opt.value || opt.label, $event)"
                     :disabled="!isEnabled"
                   />
-                  {{ opt }}
+                  {{ opt.label }}
                 </label>
               </div>
               <input
@@ -93,7 +93,7 @@
 
 <script setup lang="ts">
 import { ref, computed } from 'vue'
-import type { FormField, ConditionalCondition } from '../../types'
+import type { FormField, FieldOption, ConditionalCondition } from '../../types'
 import { useFormConfigStore } from '../../stores/formConfig'
 
 const props = defineProps<{
@@ -115,7 +115,7 @@ const availableFields = computed(() => {
   )
 })
 
-function getFieldOptions(fieldId: string): string[] {
+function getFieldOptions(fieldId: string): FieldOption[] {
   const f = store.config.fields.find((field) => field.id === fieldId)
   return f?.options ?? []
 }

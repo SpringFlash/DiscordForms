@@ -7,7 +7,7 @@
     @change="emit('update:modelValue', ($event.target as HTMLSelectElement).value)"
   >
     <option value="">Выберите вариант</option>
-    <option v-for="option in field.options" :key="option" :value="option">{{ option }}</option>
+    <option v-for="option in field.options" :key="option.label" :value="option.value || option.label">{{ option.label }}</option>
   </select>
   <div class="input-line"></div>
 </template>

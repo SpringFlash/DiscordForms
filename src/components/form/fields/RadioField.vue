@@ -1,15 +1,15 @@
 <template>
   <div class="radio-group">
-    <label v-for="option in field.options" :key="option" class="radio-label">
+    <label v-for="option in field.options" :key="option.label" class="radio-label">
       <input
         type="radio"
         :name="field.id"
-        :value="option"
-        :checked="modelValue === option"
-        @change="emit('update:modelValue', option)"
+        :value="option.value || option.label"
+        :checked="modelValue === (option.value || option.label)"
+        @change="emit('update:modelValue', option.value || option.label)"
       />
       <span class="radio-custom"></span>
-      {{ option }}
+      {{ option.label }}
     </label>
   </div>
 </template>

@@ -1,15 +1,15 @@
 <template>
   <div class="checkboxes-group">
-    <label v-for="option in field.options" :key="option" class="checkboxes-item-label">
+    <label v-for="option in field.options" :key="option.label" class="checkboxes-item-label">
       <input
         type="checkbox"
         :name="field.id"
-        :value="option"
-        :checked="selectedValues.includes(option)"
-        @change="onToggle(option, ($event.target as HTMLInputElement).checked)"
+        :value="option.value || option.label"
+        :checked="selectedValues.includes(option.value || option.label)"
+        @change="onToggle(option.value || option.label, ($event.target as HTMLInputElement).checked)"
       />
       <span class="checkbox-custom"></span>
-      {{ option }}
+      {{ option.label }}
     </label>
   </div>
 </template>

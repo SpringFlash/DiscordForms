@@ -103,15 +103,7 @@
           <span>Показывать текст в ответе</span>
         </label>
       </div>
-      <div class="field-config-item field-options" v-if="hasOptions">
-        <label>Варианты (через запятую)</label>
-        <input
-          type="text"
-          class="field-options-input"
-          :value="(field.options ?? []).join(', ')"
-          @input="onOptionsInput"
-        />
-      </div>
+      <OptionsEditor v-if="hasOptions" :field="field" />
       <ComputedFieldEditor v-if="field.type === 'computed'" :field="field" />
       <ConditionalEditor v-show="config.showAdvancedSettings" :field="field" />
       <CustomWebhookEditor v-show="config.showAdvancedSettings" :field="field" />
@@ -128,6 +120,7 @@ import EmojiPicker from '../common/EmojiPicker.vue'
 import ComputedFieldEditor from './ComputedFieldEditor.vue'
 import ConditionalEditor from './ConditionalEditor.vue'
 import CustomWebhookEditor from './CustomWebhookEditor.vue'
+import OptionsEditor from './OptionsEditor.vue'
 
 const props = defineProps<{
   field: FormField
@@ -154,12 +147,6 @@ function onHeaderClick(e: MouseEvent) {
   )
     return
   expanded.value = !expanded.value
-}
-
-function onOptionsInput(e: Event) {
-  const value = (e.target as HTMLInputElement).value
-  props.field.options = value.split(',').map((s) => s.trim())
-  store.updateConfig()
 }
 
 function onDelete() {
