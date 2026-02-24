@@ -1621,50 +1621,46 @@ emoji-picker {
 /* === СТИЛИ ДЛЯ ВЫЧИСЛЯЕМЫХ ПОЛЕЙ === */
 
 /* Редактор формул */
-.formula-editor {
-  display: flex;
-  gap: 0.5rem;
-  align-items: center;
-}
-
-.field-formula-input {
-  flex: 1;
-  padding: 0.75rem;
-  border: 2px solid var(--border-color);
-  border-radius: 8px;
+.formula-editor-rich {
+  padding: 0.5rem;
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
   font-size: 0.9rem;
-  font-family: 'Courier New', monospace;
   background: var(--bg-secondary);
+  min-height: 2rem;
+  line-height: 2;
+  cursor: text;
+  white-space: pre-wrap;
+  word-wrap: break-word;
 }
 
-.field-formula-input:focus {
+.formula-editor-rich:focus {
   outline: none;
   border-color: var(--primary-color);
   box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
 }
 
-.add-field-variable-btn {
+.formula-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.15rem;
   background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
   color: white;
-  border: none;
-  padding: 0.75rem 1rem;
-  border-radius: 8px;
-  cursor: pointer;
+  padding: 0.1rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.8rem;
   font-weight: 500;
-  transition: var(--transition-fast);
-  white-space: nowrap;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
+  line-height: 1.4;
+  vertical-align: baseline;
+  cursor: default;
+  user-select: all;
+  margin: 0 1px;
 }
 
-.add-field-variable-btn:hover {
-  transform: translateY(-1px);
-  box-shadow: var(--shadow-md);
-}
-
-.add-field-variable-btn i {
-  font-size: 0.9rem;
+.badge-params {
+  font-size: 0.7rem;
+  opacity: 0.75;
+  font-family: 'Courier New', monospace;
 }
 
 .formula-hint {
@@ -1672,6 +1668,94 @@ emoji-picker {
   font-size: 0.8rem;
   color: var(--text-secondary);
   font-style: italic;
+}
+
+.formula-variable-panel {
+  margin-top: 0.5rem;
+}
+
+.add-variable-btn {
+  background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+  color: white;
+  border: none;
+  padding: 0.5rem 0.75rem;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.8rem;
+  font-weight: 500;
+  transition: var(--transition-fast);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.add-variable-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-md);
+}
+
+.add-variable-btn i {
+  font-size: 0.75rem;
+}
+
+.variable-selector {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  flex-wrap: wrap;
+  margin-top: 0.5rem;
+  padding: 0.5rem;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+}
+
+.variable-field-select {
+  flex: 1;
+  min-width: 120px;
+  padding: 0.4rem;
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  font-size: 0.85rem;
+}
+
+.variable-substring-inputs {
+  display: flex;
+  gap: 0.25rem;
+}
+
+.variable-start-input,
+.variable-end-input {
+  width: 70px;
+  padding: 0.4rem;
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  font-size: 0.85rem;
+}
+
+.insert-variable-btn {
+  background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+  color: white;
+  border: none;
+  padding: 0.4rem 0.75rem;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.8rem;
+  font-weight: 500;
+  transition: var(--transition-fast);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+.insert-variable-btn:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-md);
+}
+
+.insert-variable-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 
 /* Вычисляемое поле в форме */
