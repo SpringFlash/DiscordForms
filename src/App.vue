@@ -43,7 +43,7 @@ import WelcomeScreen from './components/common/WelcomeScreen.vue'
 const formConfigStore = useFormConfigStore()
 const uiStore = useUiStore()
 
-function updateFavicon(org: string): void {
+function updateFavicon(org = 'lspd'): void {
   const link = document.getElementById('faviconLink') as HTMLLinkElement | null
   if (link) {
     link.href = `${import.meta.env.BASE_URL}images/favicon/${org.toLowerCase()}.ico`

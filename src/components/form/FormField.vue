@@ -1,7 +1,7 @@
 <template>
   <div class="form-group" :data-field-id="field.id" v-if="isVisible">
-    <label v-if="field.type !== 'checkbox' && field.type !== 'image'" :for="field.id">
-      <span v-html="iconHtml"></span>
+    <label v-if="field.type !== 'checkbox'" :for="field.id">
+      <span v-html="field.type === 'image' ? '🖼️' : iconHtml"></span>
       {{ field.label }}{{ field.required ? ' *' : '' }}
     </label>
     <component :is="fieldComponent" :field="field" v-model="localValue" />
