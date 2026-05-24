@@ -48,6 +48,7 @@
 import { ref } from 'vue'
 import type { FormField } from '../../types'
 import { useFormConfigStore } from '../../stores/formConfig'
+import { useConfirm } from '../../composables/useConfirm'
 import ConditionalEditor from './ConditionalEditor.vue'
 
 const props = defineProps<{
@@ -55,6 +56,7 @@ const props = defineProps<{
 }>()
 
 const store = useFormConfigStore()
+const { confirm } = useConfirm()
 const expanded = ref(true)
 
 function onHeaderClick(e: MouseEvent) {
@@ -63,8 +65,9 @@ function onHeaderClick(e: MouseEvent) {
   expanded.value = !expanded.value
 }
 
-function onDelete() {
-  if (confirm('Удалить это поле?')) {
+async function onDelete() {
+  const ok = await confirm({ title: 'Удалить поле?', message: 'Действие нельзя отменить.' })
+  if (ok) {
     store.removeField(props.field.id)
     store.updateConfig()
   }

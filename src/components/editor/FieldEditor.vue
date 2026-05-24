@@ -1,8 +1,38 @@
 <template>
-  <div class="field-item" :data-field-id="field.id">
+  <div
+    class="field-item"
+    :class="{ 'is-dragging': isDragging, 'is-over': isOver }"
+    :data-field-id="field.id"
+    @dragover.prevent="onDragOver"
+    @dragenter.prevent="onDragEnter"
+    @dragleave="onDragLeave"
+    @drop.prevent="onDrop"
+  >
     <div class="field-header" @click="onHeaderClick">
       <div class="field-header-left">
-        <span class="field-title">{{ displayIcon }} {{ field.label }}</span>
+        <span
+          class="field-drag-handle"
+          draggable="true"
+          title="Перетащите для изменения порядка"
+          @dragstart="onDragStart"
+          @dragend="onDragEnd"
+          @click.stop
+        >⠿</span>
+        <span
+          v-if="!editing"
+          class="field-title"
+          @click.stop="startEdit"
+        >{{ displayIcon }} {{ field.label }}</span>
+        <input
+          v-else
+          ref="titleInput"
+          class="field-title-input"
+          v-model="localLabel"
+          @blur="saveLabel"
+          @keydown.enter.prevent="saveLabel"
+          @keydown.esc.prevent="cancelLabel"
+          @click.stop
+        />
         <label class="field-required-inline" @click.stop>
           <input
             type="checkbox"
@@ -13,35 +43,22 @@
           <span>обязательное</span>
         </label>
       </div>
-      <div class="field-actions" @click.stop>
+      <div class="field-actions" @click.stop style="position: relative;">
         <button
-          class="field-action-btn move-up"
-          title="Переместить вверх"
-          @click="store.moveField(field.id, 'up'); store.updateConfig()"
-        >
-          <i class="fas fa-arrow-up"></i>
-        </button>
-        <button
-          class="field-action-btn move-down"
-          title="Переместить вниз"
-          @click="store.moveField(field.id, 'down'); store.updateConfig()"
-        >
-          <i class="fas fa-arrow-down"></i>
-        </button>
-        <button
-          class="field-action-btn clone"
-          title="Клонировать"
-          @click="store.cloneField(field.id); store.updateConfig()"
-        >
-          <i class="fas fa-clone"></i>
-        </button>
-        <button
-          class="field-action-btn delete"
-          title="Удалить"
-          @click="onDelete"
-        >
-          <i class="fas fa-trash"></i>
-        </button>
+          class="field-overflow-btn"
+          title="Действия"
+          @click.stop="overflowOpen = !overflowOpen"
+        >⋯</button>
+        <div v-if="overflowOpen" class="field-overflow-menu">
+          <button
+            class="field-overflow-item"
+            @click.stop="onClone"
+          >📋 Клонировать</button>
+          <button
+            class="field-overflow-item field-overflow-item--danger"
+            @click.stop="onDelete"
+          >🗑️ Удалить</button>
+        </div>
       </div>
     </div>
     <div class="field-config" v-show="expanded">
@@ -112,9 +129,10 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed, nextTick, onMounted, onUnmounted } from 'vue'
 import type { FormField } from '../../types'
 import { useFormConfigStore } from '../../stores/formConfig'
+import { useToast } from '../../composables/useToast'
 import { iconMap } from '../../utils'
 import EmojiPicker from '../common/EmojiPicker.vue'
 import ComputedFieldEditor from './ComputedFieldEditor.vue'
@@ -128,11 +146,21 @@ const props = defineProps<{
 
 const store = useFormConfigStore()
 const config = store.config
+const toast = useToast()
 
 const expanded = ref(true)
+const overflowOpen = ref(false)
+
+const editing = ref(false)
+const localLabel = ref(props.field.label)
+const titleInput = ref<HTMLInputElement | null>(null)
+
+const isDragging = ref(false)
+const isOver = ref(false)
+let dragLeaveTimer: ReturnType<typeof setTimeout> | null = null
 
 const displayIcon = computed(() => {
-  return iconMap[props.field.icon] || props.field.icon || '\u2753'
+  return iconMap[props.field.icon] || props.field.icon || '❓'
 })
 
 const hasOptions = computed(() => {
@@ -143,16 +171,130 @@ function onHeaderClick(e: MouseEvent) {
   const target = e.target as HTMLElement
   if (
     target.closest('.field-actions') ||
-    target.closest('.field-required-inline')
+    target.closest('.field-required-inline') ||
+    target.closest('.field-drag-handle') ||
+    target.closest('.field-title-input')
   )
     return
   expanded.value = !expanded.value
 }
 
-function onDelete() {
-  if (confirm('Удалить это поле?')) {
-    store.removeField(props.field.id)
+function startEdit() {
+  localLabel.value = props.field.label
+  editing.value = true
+  nextTick(() => {
+    titleInput.value?.focus()
+    titleInput.value?.select()
+  })
+}
+
+function saveLabel() {
+  const trimmed = localLabel.value.trim()
+  if (trimmed) {
+    props.field.label = trimmed
     store.updateConfig()
+  } else {
+    localLabel.value = props.field.label
+  }
+  editing.value = false
+}
+
+function cancelLabel() {
+  localLabel.value = props.field.label
+  editing.value = false
+}
+
+function onClone() {
+  overflowOpen.value = false
+  store.cloneField(props.field.id)
+  store.updateConfig()
+}
+
+function onDelete() {
+  overflowOpen.value = false
+  const index = config.fields.findIndex((f) => f.id === props.field.id)
+  const removed = JSON.parse(JSON.stringify(props.field)) as FormField
+  store.removeField(props.field.id)
+  store.updateConfig()
+  toast.show({
+    type: 'warning',
+    title: 'Поле удалено',
+    description: removed.label,
+    duration: 5000,
+    action: {
+      label: 'Отменить',
+      onClick: () => {
+        store.restoreField(removed, index)
+        store.updateConfig()
+      },
+    },
+  })
+}
+
+function onDragStart(e: DragEvent) {
+  if (!e.dataTransfer) return
+  e.dataTransfer.setData('text/plain', props.field.id)
+  e.dataTransfer.effectAllowed = 'move'
+  isDragging.value = true
+}
+
+function onDragEnd() {
+  isDragging.value = false
+}
+
+function onDragOver(e: DragEvent) {
+  if (!e.dataTransfer) return
+  e.dataTransfer.dropEffect = 'move'
+  if (dragLeaveTimer !== null) {
+    clearTimeout(dragLeaveTimer)
+    dragLeaveTimer = null
+  }
+  isOver.value = true
+}
+
+function onDragEnter(e: DragEvent) {
+  e.preventDefault()
+  if (dragLeaveTimer !== null) {
+    clearTimeout(dragLeaveTimer)
+    dragLeaveTimer = null
+  }
+  isOver.value = true
+}
+
+function onDragLeave() {
+  dragLeaveTimer = setTimeout(() => {
+    isOver.value = false
+    dragLeaveTimer = null
+  }, 50)
+}
+
+function onDrop(e: DragEvent) {
+  isOver.value = false
+  if (!e.dataTransfer) return
+  const fromId = e.dataTransfer.getData('text/plain')
+  if (!fromId || fromId === props.field.id) return
+  const fields = config.fields
+  const fromIndex = fields.findIndex((f) => f.id === fromId)
+  const toIndex = fields.findIndex((f) => f.id === props.field.id)
+  if (fromIndex === -1 || toIndex === -1) return
+  store.reorderFields(fromIndex, toIndex)
+  store.updateConfig()
+}
+
+function onOutsideClick(e: MouseEvent) {
+  if (!overflowOpen.value) return
+  const target = e.target as HTMLElement
+  if (!target.closest('.field-actions')) {
+    overflowOpen.value = false
   }
 }
+
+onMounted(() => {
+  document.addEventListener('click', onOutsideClick)
+})
+
+onUnmounted(() => {
+  document.removeEventListener('click', onOutsideClick)
+  if (dragLeaveTimer !== null) clearTimeout(dragLeaveTimer)
+})
 </script>

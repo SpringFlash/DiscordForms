@@ -1,4 +1,14 @@
 <template>
+  <div v-if="!preview" class="form-menu">
+    <button class="edit-form-btn" title="Меню формы" @click.stop="showDropdown = !showDropdown">
+      <i class="fas fa-ellipsis-v"></i>
+    </button>
+    <div v-if="showDropdown" class="form-dropdown show">
+      <button class="dropdown-item" @click="onDuplicate">
+        <i class="fas fa-copy"></i> Дублировать и настроить
+      </button>
+    </div>
+  </div>
   <div class="organization-logo">
     <img :src="orgLogoSrc" :alt="config.organization + ' Logo'" />
   </div>
@@ -6,16 +16,6 @@
   <div class="header">
     <div class="header-top">
       <h1>{{ config.title }}</h1>
-      <div v-if="!preview" class="form-menu">
-        <button class="edit-form-btn" title="Меню формы" @click.stop="showDropdown = !showDropdown">
-          <i class="fas fa-ellipsis-v"></i>
-        </button>
-        <div v-if="showDropdown" class="form-dropdown show">
-          <button class="dropdown-item" @click="onDuplicate">
-            <i class="fas fa-copy"></i> Дублировать и настроить
-          </button>
-        </div>
-      </div>
     </div>
     <p>{{ config.description }}</p>
   </div>
@@ -39,11 +39,13 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, computed, watch, onMounted, onUnmounted } from 'vue'
+import { ref, reactive, computed, watch, provide, onMounted, onUnmounted } from 'vue'
 import { useFormConfigStore } from '../../stores/formConfig'
 import { useUiStore } from '../../stores/ui'
 import { useConditionalFields } from '../../composables/useConditionalFields'
 import { useComputedFields } from '../../composables/useComputedFields'
+import { useFormValidation, VALIDATION_KEY } from '../../composables/useFormValidation'
+import { useToast } from '../../composables/useToast'
 import { sendToDiscord } from '../../services/discord'
 import FormField from './FormField.vue'
 
@@ -64,6 +66,16 @@ const formData = reactive<Record<string, string>>({})
 
 const { visibilityMap } = useConditionalFields(config, formData)
 useComputedFields(config.value, formData)
+
+const imagesCount = computed(() => formConfigStore.uploadedImages.length)
+const { errors, validateField, clearError, validateAll } = useFormValidation(
+  computed(() => config.value.fields),
+  formData,
+  visibilityMap,
+  imagesCount,
+)
+
+provide(VALIDATION_KEY, { errors, validateField, clearError })
 
 // Clear hidden field values
 watch(visibilityMap, (map, oldMap) => {
@@ -125,44 +137,13 @@ function onDuplicate(): void {
   uiStore.setMode('editor')
 }
 
-const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-
-function validateForm(): string[] {
-  const errors: string[] = []
-
-  for (const field of config.value.fields) {
-    const isVisible = visibilityMap.value[field.id] ?? true
-    if (!isVisible) continue
-
-    // Skip validation for computed fields that are hidden
-    if (field.type === 'computed') continue
-
-    const value = formData[field.id]
-
-    // Required field validation
-    if (field.required) {
-      if (field.type === 'image') {
-        if (formConfigStore.uploadedImages.length === 0) {
-          errors.push(`Поле "${field.label}" обязательно для заполнения`)
-        }
-      } else if (!value || !value.trim()) {
-        errors.push(`Поле "${field.label}" обязательно для заполнения`)
-      }
-    }
-
-    // Email format validation
-    if (field.type === 'email' && value && value.trim() && !EMAIL_REGEX.test(value.trim())) {
-      errors.push(`Поле "${field.label}" содержит некорректный email`)
-    }
-  }
-
-  return errors
-}
+const toast = useToast()
 
 async function onSubmit(): Promise<void> {
-  const errors = validateForm()
-  if (errors.length > 0) {
-    showMessage(errors.join('. '), 'error')
+  const valid = validateAll()
+  if (!valid) {
+    const errorCount = Object.keys(errors.value).length
+    toast.error('Заполните форму корректно', `Найдено ${errorCount} ошибок`)
     return
   }
 

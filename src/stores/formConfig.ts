@@ -1,8 +1,11 @@
 import { ref } from 'vue'
+
+type SaveStatus = 'idle' | 'saving' | 'saved'
 import { defineStore } from 'pinia'
-import type { FormConfig, FormField, FieldOption } from '../types'
+import type { FormConfig, FormField, FieldOption, FieldType } from '../types'
 import { generateId } from '../utils'
 import { getUrlParams, decodeConfig, updateUrl, generateShareUrl } from '../services/config'
+import { saveToHistory } from '../utils/formHistory'
 
 function stripWebhooks(config: FormConfig): FormConfig {
   const stripped = JSON.parse(JSON.stringify(config)) as FormConfig
@@ -57,6 +60,9 @@ function createEmptyConfig(): FormConfig {
 export const useFormConfigStore = defineStore('formConfig', () => {
   const config = ref<FormConfig>(createEmptyConfig())
   const uploadedImages = ref<File[]>([])
+  const saveStatus = ref<SaveStatus>('idle')
+  let saveTimer: ReturnType<typeof setTimeout> | null = null
+  let savedTimer: ReturnType<typeof setTimeout> | null = null
 
   function loadFromUrl(): { loaded: boolean; isEditor: boolean } {
     const params = getUrlParams()
@@ -77,11 +83,14 @@ export const useFormConfigStore = defineStore('formConfig', () => {
     }
 
     config.value = decoded
+    if (!isEditor) {
+      saveToHistory(decoded, window.location.href)
+    }
     return { loaded: true, isEditor }
   }
 
-  function addField(): void {
-    const field = createField()
+  function addField(type?: FieldType): void {
+    const field = createField(type ? { type } : {})
     const imageIndex = config.value.fields.findIndex((f) => f.type === 'image')
     if (imageIndex !== -1) {
       config.value.fields.splice(imageIndex, 0, field)
@@ -98,6 +107,22 @@ export const useFormConfigStore = defineStore('formConfig', () => {
 
   function removeField(fieldId: string): void {
     config.value.fields = config.value.fields.filter((f) => f.id !== fieldId)
+  }
+
+  function restoreField(field: FormField, index: number): void {
+    config.value.fields.splice(index, 0, field)
+  }
+
+  function reorderFields(fromIndex: number, toIndex: number): void {
+    const fields = config.value.fields
+    if (fromIndex === toIndex) return
+    if (fields[fromIndex]?.type === 'image' || fields[toIndex]?.type === 'image') return
+    const imageIndex = fields.findIndex((f) => f.type === 'image')
+    if (imageIndex !== -1) {
+      if (fromIndex >= imageIndex || toIndex >= imageIndex) return
+    }
+    const [item] = fields.splice(fromIndex, 1)
+    fields.splice(toIndex, 0, item!)
   }
 
   function moveField(fieldId: string, direction: 'up' | 'down'): void {
@@ -156,10 +181,30 @@ export const useFormConfigStore = defineStore('formConfig', () => {
 
   function updateConfig(): void {
     updateUrl(config.value, null)
+    saveStatus.value = 'saving'
+    if (savedTimer !== null) {
+      clearTimeout(savedTimer)
+      savedTimer = null
+    }
+    if (saveTimer !== null) {
+      clearTimeout(saveTimer)
+    }
+    saveTimer = setTimeout(() => {
+      saveStatus.value = 'saved'
+      savedTimer = setTimeout(() => {
+        saveStatus.value = 'idle'
+        savedTimer = null
+      }, 1500)
+      saveTimer = null
+    }, 400)
   }
 
   function getShareUrl(): string {
     return generateShareUrl(config.value)
+  }
+
+  function applyTemplate(template: FormConfig): void {
+    config.value = JSON.parse(JSON.stringify(template)) as FormConfig
   }
 
   function resetConfig(): void {
@@ -213,10 +258,13 @@ export const useFormConfigStore = defineStore('formConfig', () => {
   return {
     config,
     uploadedImages,
+    saveStatus,
     loadFromUrl,
     addField,
     addImageField,
     removeField,
+    restoreField,
+    reorderFields,
     moveField,
     cloneField,
     updateField,
@@ -224,6 +272,7 @@ export const useFormConfigStore = defineStore('formConfig', () => {
     removeConditionalMessage,
     updateConfig,
     getShareUrl,
+    applyTemplate,
     resetConfig,
     hasImageField,
     exportConfig,

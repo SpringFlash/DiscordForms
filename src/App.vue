@@ -4,11 +4,10 @@
     <Transition name="form-enter" appear>
       <div
         class="form-wrapper"
-        :class="{ preview: uiStore.mode === 'editor' }"
-        v-if="uiStore.mode === 'editor' || uiStore.mode === 'viewer'"
+        v-if="uiStore.mode === 'viewer'"
         id="formPreview"
       >
-        <FormView :preview="uiStore.mode === 'editor'" />
+        <FormView :preview="false" />
       </div>
     </Transition>
     <Transition name="form-enter" appear>
@@ -19,29 +18,36 @@
     <div class="form-wrapper loading-wrapper" v-if="uiStore.mode === 'loading'">
       <i class="fas fa-spinner loading"></i>
     </div>
-    <div ref="bgRef" class="background-decoration">
-      <div
-        v-for="circle in circles"
-        :key="circle.id"
-        class="decoration"
-        :class="{ heart: circle.isHeart }"
-        :style="circle.style"
-      />
-    </div>
   </div>
-  <p class="watermark">&copy; SpringFlash (Geralt Spring)</p>
+  <div class="watermark">
+    <span class="watermark__dot"></span>
+    <span class="watermark__label">Crafted by</span>
+    <span class="watermark__name">SpringFlash</span>
+    <span class="watermark__divider"></span>
+    <span class="watermark__alias">Geralt Spring</span>
+  </div>
+  <ToastContainer />
+  <SaveIndicator />
+  <ConfirmModal />
+  <CommandPalette />
 </template>
 
 <script setup lang="ts">
-import { onMounted, onUnmounted, watch, ref, nextTick } from 'vue'
+import { onMounted, onUnmounted, watch } from 'vue'
 import { useFormConfigStore } from './stores/formConfig'
 import { useUiStore } from './stores/ui'
+import { useCommandPalette } from './composables/useCommandPalette'
 import EditorLayout from './components/editor/EditorLayout.vue'
 import FormView from './components/form/FormView.vue'
 import WelcomeScreen from './components/common/WelcomeScreen.vue'
+import ToastContainer from './components/common/ToastContainer.vue'
+import ConfirmModal from './components/common/ConfirmModal.vue'
+import SaveIndicator from './components/common/SaveIndicator.vue'
+import CommandPalette from './components/common/CommandPalette.vue'
 
 const formConfigStore = useFormConfigStore()
 const uiStore = useUiStore()
+const commandPalette = useCommandPalette()
 
 function updateFavicon(org = 'lspd'): void {
   const link = document.getElementById('faviconLink') as HTMLLinkElement | null
@@ -59,69 +65,12 @@ function onPopState(): void {
   window.location.reload()
 }
 
-const circles = ref<{
-  id: number
-  isHeart: boolean
-  style: {}
-}[]>([])
-
-const bgRef = ref<HTMLDivElement | null>(null)
-
-const isValentine = () => {
-  const now = new Date()
-  return now.getDate() === 14 && now.getMonth() === 1
-}
-
-const generateCircles = () => {
-  if (!bgRef.value) return
-
-  const containerHeight = bgRef.value.offsetHeight
-  const viewportWidth = window.innerWidth
-
-  const density = 550
-  const calculatedRows = Math.floor(containerHeight / density)
-  const rows = Math.max(6, calculatedRows)
-
-  const step = containerHeight / rows
-  const valentine = isValentine()
-
-  circles.value = []
-
-  for (let i = 0; i < rows; i++) {
-    const isLeft = i % 2 === 0
-
-    const colMin = isLeft ? 5 : 70
-    const colMax = isLeft ? 30 : 95
-    const colWidth = colMax - colMin
-
-    const size = 140 + Math.random() * 80
-
-    const left =
-      colMin +
-      Math.random() *
-        (colWidth - (size / viewportWidth) * 100)
-
-    const baseTop = i * step
-    const jitterY = step * 0.15 * (Math.random() - 0.5)
-
-    const animationName = valentine ? 'float-heart' : 'float'
-    const duration = valentine
-      ? 2 + Math.random() * 2
-      : 8 + Math.random() * 6
-    const delay = Math.random() * 3
-
-    circles.value.push({
-      id: i,
-      isHeart: valentine,
-      style: {
-        width: `${size}px`,
-        height: `${size}px`,
-        top: `${baseTop + jitterY}px`,
-        left: `${left}%`,
-        opacity: valentine ? 0.06 : 0.05,
-        animation: `${animationName} ${duration}s ease-in-out ${delay}s infinite`,
-      },
-    })
+function onGlobalKeydown(e: KeyboardEvent): void {
+  if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
+    if (uiStore.mode === 'editor') {
+      e.preventDefault()
+      commandPalette.open()
+    }
   }
 }
 
@@ -141,11 +90,12 @@ onMounted(() => {
   updateFavicon(formConfigStore.config.organization)
 
   window.addEventListener('popstate', onPopState)
-  generateCircles()
+  window.addEventListener('keydown', onGlobalKeydown)
 })
 
 onUnmounted(() => {
   window.removeEventListener('popstate', onPopState)
+  window.removeEventListener('keydown', onGlobalKeydown)
 })
 
 watch(
@@ -161,15 +111,4 @@ watch(
     updateFavicon(org)
   },
 )
-
-watch(
-  () => uiStore.mode,
-  async () => {
-    await nextTick()
-    requestAnimationFrame(() => {
-      generateCircles()
-    })
-  }
-)
-
 </script>

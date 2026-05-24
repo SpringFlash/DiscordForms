@@ -1,29 +1,42 @@
 <template>
-  <div class="editor-header">
-    <h2><i class="fas fa-cog"></i> Настройка формы</h2>
-  </div>
-  <div class="editor-content">
+  <nav class="sidebar-tabs" role="tablist">
+    <button
+      class="sidebar-tab"
+      :class="{ 'is-active': activeTab === 'settings' }"
+      role="tab"
+      type="button"
+      :aria-selected="activeTab === 'settings'"
+      @click="activeTab = 'settings'"
+    >
+      <span class="sidebar-tab__icon">⚙</span>
+      <span>Настройки</span>
+    </button>
+    <button
+      class="sidebar-tab"
+      :class="{ 'is-active': activeTab === 'fields' }"
+      role="tab"
+      type="button"
+      :aria-selected="activeTab === 'fields'"
+      @click="activeTab = 'fields'"
+    >
+      <span class="sidebar-tab__icon">🧩</span>
+      <span>Поля</span>
+    </button>
+    <button
+      class="sidebar-tab"
+      :class="{ 'is-active': activeTab === 'logic' }"
+      role="tab"
+      type="button"
+      :aria-selected="activeTab === 'logic'"
+      @click="activeTab = 'logic'"
+    >
+      <span class="sidebar-tab__icon">⚡</span>
+      <span>Логика</span>
+    </button>
+  </nav>
+
+  <div class="editor-content" v-show="activeTab === 'settings'">
     <FormSettings />
-    <div class="editor-section">
-      <h3>Условные сообщения</h3>
-      <p class="section-hint">
-        Отправляйте разные сообщения в Discord в зависимости от выбранных значений
-      </p>
-      <div class="conditional-messages-list">
-        <ConditionalMessageEditor
-          v-for="condMsg in config.conditionalMessages"
-          :key="condMsg.id"
-          :cond-msg="condMsg"
-        />
-      </div>
-      <button
-        class="add-field-btn"
-        @click="store.addConditionalMessage(); store.updateConfig()"
-      >
-        <i class="fas fa-plus"></i> Добавить условное сообщение
-      </button>
-    </div>
-    <FieldList />
     <div class="editor-section">
       <div class="section-header-with-toggle">
         <h3>Импорт / Экспорт</h3>
@@ -47,28 +60,6 @@
         >
       </div>
     </div>
-    <Teleport to="body">
-      <div v-if="showAiPrompt" class="field-variable-popup" @click.self="showAiPrompt = false">
-        <div class="popup-content ai-prompt-popup">
-          <h3>Промпт для ИИ</h3>
-          <p class="section-hint">
-            Скопируйте промпт, вставьте в чат с ИИ вместе с примером отчёта — получите готовый JSON для импорта.
-          </p>
-          <pre class="ai-prompt-text">{{ aiPrompt }}</pre>
-          <div class="popup-buttons">
-            <button class="popup-btn cancel-btn" @click="showAiPrompt = false">Закрыть</button>
-            <button
-              class="popup-btn insert-btn"
-              :class="{ copied: isPromptCopied }"
-              @click="onCopyPrompt"
-            >
-              <i :class="isPromptCopied ? 'fas fa-check' : 'fas fa-copy'"></i>
-              {{ isPromptCopied ? 'Скопировано!' : 'Скопировать' }}
-            </button>
-          </div>
-        </div>
-      </div>
-    </Teleport>
     <div class="editor-section">
       <h3>Ссылка на форму</h3>
       <div class="url-buttons-group">
@@ -83,21 +74,123 @@
       </div>
     </div>
   </div>
+
+  <div class="editor-content" v-show="activeTab === 'fields'">
+    <FieldList />
+  </div>
+
+  <div class="editor-content" v-show="activeTab === 'logic'">
+    <div class="editor-section">
+      <h3>Условные сообщения</h3>
+      <p class="section-hint">
+        Отправляйте разные сообщения в Discord в зависимости от выбранных значений
+      </p>
+      <div class="conditional-messages-list">
+        <ConditionalMessageEditor
+          v-for="condMsg in config.conditionalMessages"
+          :key="condMsg.id"
+          :cond-msg="condMsg"
+        />
+      </div>
+      <button
+        class="add-field-btn"
+        @click="store.addConditionalMessage(); store.updateConfig()"
+      >
+        <i class="fas fa-plus"></i> Добавить условное сообщение
+      </button>
+    </div>
+  </div>
+
+  <Teleport to="body">
+    <div v-if="showAiPrompt" class="field-variable-popup" @click.self="showAiPrompt = false">
+      <div
+        class="popup-content ai-prompt-popup"
+        tabindex="-1"
+        ref="aiPromptCard"
+        @keydown.esc="showAiPrompt = false"
+      >
+        <div class="ai-prompt-header">
+          <h3>Сгенерировать форму через ИИ</h3>
+          <button class="ai-prompt-close-btn" @click="showAiPrompt = false">
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+
+        <div class="ai-steps">
+          <div class="ai-step-card">
+            <div class="ai-step-badge">1</div>
+            <div class="ai-step-body">
+              <div class="ai-step-title">Скопируй промпт</div>
+              <button
+                class="popup-btn insert-btn ai-step-btn"
+                :class="{ copied: isPromptCopied }"
+                @click="onCopyPrompt"
+              >
+                <i :class="isPromptCopied ? 'fas fa-check' : 'fas fa-copy'"></i>
+                {{ isPromptCopied ? '✓ Скопировано!' : '📋 Скопировать промпт' }}
+              </button>
+            </div>
+          </div>
+
+          <div class="ai-step-card">
+            <div class="ai-step-badge">2</div>
+            <div class="ai-step-body">
+              <div class="ai-step-title">Вставь в ChatGPT или Claude вместе с примером отчёта</div>
+            </div>
+          </div>
+
+          <div class="ai-step-card">
+            <div class="ai-step-badge">3</div>
+            <div class="ai-step-body">
+              <div class="ai-step-title">Импортируй полученный JSON</div>
+              <button
+                class="popup-btn cancel-btn ai-step-btn"
+                @click="onImportFromAi"
+              >
+                📤 Импорт JSON
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div class="ai-prompt-collapse">
+          <button class="ai-prompt-toggle" @click="showPromptText = !showPromptText">
+            {{ showPromptText ? '▾ Скрыть текст промпта' : '▸ Посмотреть текст промпта' }}
+          </button>
+          <pre v-if="showPromptText" class="ai-prompt-text">{{ aiPrompt }}</pre>
+        </div>
+      </div>
+    </div>
+  </Teleport>
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, watch, nextTick } from 'vue'
 import { useFormConfigStore } from '../../stores/formConfig'
+import { useToast } from '../../composables/useToast'
 import { copyToClipboard } from '../../utils'
+import { saveToHistory } from '../../utils/formHistory'
 import FormSettings from './FormSettings.vue'
 import ConditionalMessageEditor from './ConditionalMessageEditor.vue'
 import FieldList from './FieldList.vue'
+import { useEditorTab } from '../../composables/useEditorTab'
 
 const store = useFormConfigStore()
 const config = store.config
+const { success: toastSuccess, error: toastError, warning: toastWarning } = useToast()
 const fileInput = ref<HTMLInputElement | null>(null)
+const aiPromptCard = ref<HTMLDivElement | null>(null)
 const showAiPrompt = ref(false)
+const { activeTab } = useEditorTab()
+
+watch(showAiPrompt, async (val) => {
+  if (val) {
+    await nextTick()
+    aiPromptCard.value?.focus()
+  }
+})
 const isPromptCopied = ref(false)
+const showPromptText = ref(false)
 
 const isCopied = ref(false)
 let copiedTimeout: ReturnType<typeof setTimeout> | undefined
@@ -166,10 +259,11 @@ function showCopied(): void {
 }
 
 async function onCopyPrompt(): Promise<void> {
-  const success = await copyToClipboard(aiPrompt)
-  if (success) {
+  const ok = await copyToClipboard(aiPrompt)
+  if (ok) {
     isPromptCopied.value = true
     setTimeout(() => { isPromptCopied.value = false }, 2000)
+    toastSuccess('Промпт скопирован')
   }
 }
 
@@ -181,26 +275,35 @@ function onImportClick(): void {
   fileInput.value?.click()
 }
 
+function onImportFromAi(): void {
+  showAiPrompt.value = false
+  fileInput.value?.click()
+}
+
 async function onImportFile(event: Event): Promise<void> {
   const input = event.target as HTMLInputElement
   const file = input.files?.[0]
   if (!file) return
 
-  const success = await store.importConfig(file)
-  if (!success) {
-    alert('Не удалось импортировать файл. Проверьте формат JSON.')
+  const ok = await store.importConfig(file)
+  if (!ok) {
+    toastError('Не удалось импортировать файл', 'Проверьте формат JSON.')
   }
   input.value = ''
 }
 
 async function onCopyLink(): Promise<void> {
   if (!config.webhookUrl) {
-    alert('Укажите Webhook URL перед генерацией ссылки')
+    toastWarning('Webhook URL не указан', 'Заполните его в настройках формы.')
     return
   }
 
   const url = store.getShareUrl()
-  const success = await copyToClipboard(url)
-  if (success) showCopied()
+  const ok = await copyToClipboard(url)
+  if (ok) {
+    showCopied()
+    toastSuccess('Ссылка скопирована')
+    saveToHistory(config, url)
+  }
 }
 </script>

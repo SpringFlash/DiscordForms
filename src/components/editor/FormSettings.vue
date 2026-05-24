@@ -26,6 +26,7 @@
         v-model="config.webhookUrl"
         @input="store.updateConfig()"
         placeholder="https://discord.com/api/webhooks/..."
+        data-webhook-url-input
       />
     </div>
     <div class="setting-group">
@@ -68,16 +69,29 @@
     </div>
     <div class="setting-group">
       <label>Организация</label>
-      <select v-model="config.organization" @change="store.updateConfig()">
-        <option value="LSPD">LSPD</option>
-        <option value="LSSD">LSSD</option>
-        <option value="WN">WN</option>
-        <option value="EMS">EMS</option>
-      </select>
-    </div>
-    <div class="setting-group">
-      <label>Тема оформления</label>
-      <ThemeToggle />
+      <div class="org-picker-grid" role="radiogroup">
+        <div
+          v-for="org in organizations"
+          :key="org.code"
+          class="org-picker-card"
+          :class="{ 'org-picker-card--active': config.organization === org.code }"
+          role="radio"
+          :aria-checked="config.organization === org.code"
+          tabindex="0"
+          @click="selectOrg(org.code)"
+          @keydown.enter="selectOrg(org.code)"
+          @keydown.space.prevent="selectOrg(org.code)"
+        >
+          <img
+            class="org-picker-img"
+            :src="`${baseUrl}images/${org.code}.png`"
+            :alt="org.name"
+            loading="lazy"
+          />
+          <div class="org-picker-label">{{ org.code }}</div>
+          <div class="org-picker-check">✓</div>
+        </div>
+      </div>
     </div>
     <div class="setting-group">
       <label>Кастомное сообщение</label>
@@ -93,8 +107,20 @@
 
 <script setup lang="ts">
 import { useFormConfigStore } from '../../stores/formConfig'
-import ThemeToggle from '../common/ThemeToggle.vue'
 
 const store = useFormConfigStore()
 const config = store.config
+const baseUrl = import.meta.env.BASE_URL
+
+const organizations = [
+  { code: 'LSPD', name: 'LSPD' },
+  { code: 'LSSD', name: 'LSSD' },
+  { code: 'WN', name: 'WN' },
+  { code: 'EMS', name: 'EMS' },
+]
+
+function selectOrg(code: string): void {
+  config.organization = code
+  store.updateConfig()
+}
 </script>
