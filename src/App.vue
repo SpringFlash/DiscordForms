@@ -30,7 +30,6 @@
   <SaveIndicator />
   <ConfirmModal />
   <CommandPalette />
-  <PromoBanner />
 </template>
 
 <script setup lang="ts">
@@ -45,7 +44,6 @@ import ToastContainer from './components/common/ToastContainer.vue'
 import ConfirmModal from './components/common/ConfirmModal.vue'
 import SaveIndicator from './components/common/SaveIndicator.vue'
 import CommandPalette from './components/common/CommandPalette.vue'
-import PromoBanner from './components/common/PromoBanner.vue'
 
 const formConfigStore = useFormConfigStore()
 const uiStore = useUiStore()
