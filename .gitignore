@@ -24,3 +24,7 @@ dist-ssr
 *.sw?
 .lazyweb/
 GTA5RP Wiki*
+
+# Worktrees and agent scratch
+.worktrees/
+.superpowers/
