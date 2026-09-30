@@ -1,5 +1,5 @@
 <template>
-  <div class="legends" aria-hidden="true">
+  <div class="legends" :class="{ 'legends--tucked': isAtPageBottom }" aria-hidden="true">
     <figure
       v-for="legend in legends"
       :key="legend.image"
@@ -18,6 +18,8 @@
 </template>
 
 <script setup lang="ts">
+import { ref, onMounted, onUnmounted } from 'vue'
+
 interface Legend {
   firstName: string
   lastName: string
@@ -29,6 +31,30 @@ const legends: Legend[] = [
   { firstName: 'DMITRIY', lastName: 'WHITER', image: 'dmitriy.webp', side: 'left' },
   { firstName: 'DANIEL', lastName: 'ZYUGO', image: 'daniel.webp', side: 'right' },
 ]
+
+const PAGE_BOTTOM_THRESHOLD_PX = 40
+
+const isAtPageBottom = ref(false)
+
+function updatePageBottom(): void {
+  const scrolledTo = window.scrollY + window.innerHeight
+  isAtPageBottom.value = scrolledTo >= document.documentElement.scrollHeight - PAGE_BOTTOM_THRESHOLD_PX
+}
+
+const resizeObserver = new ResizeObserver(updatePageBottom)
+
+onMounted(() => {
+  updatePageBottom()
+  window.addEventListener('scroll', updatePageBottom, { passive: true })
+  window.addEventListener('resize', updatePageBottom)
+  resizeObserver.observe(document.body)
+})
+
+onUnmounted(() => {
+  window.removeEventListener('scroll', updatePageBottom)
+  window.removeEventListener('resize', updatePageBottom)
+  resizeObserver.disconnect()
+})
 
 function imageSrc(file: string): string {
   return `${import.meta.env.BASE_URL}images/legends/${file}`
@@ -146,7 +172,77 @@ function imageSrc(file: string): string {
 
 @media (max-width: 1100px) {
   .legends {
+    z-index: 2;
+  }
+
+  .legends__haze {
     display: none;
+  }
+
+  .legend {
+    --tilt: 22deg;
+    --peek-offset: 46%;
+    width: clamp(150px, 38vw, 260px);
+    height: auto;
+    bottom: 0;
+    opacity: 0.95;
+    filter: drop-shadow(0 0 24px rgba(0, 0, 0, 0.7));
+    mask-image: none;
+    transform: translateY(var(--peek-offset)) rotate(var(--tilt));
+    transition: transform 0.45s cubic-bezier(0.34, 1.3, 0.64, 1);
+  }
+
+  .legend--left {
+    bottom: -2vh;
+    left: -22vw;
+    transform-origin: bottom left;
+  }
+
+  .legend--right {
+    --tilt: -22deg;
+    right: -21vw;
+    transform-origin: bottom right;
+  }
+
+  .legends--tucked .legend {
+    --peek-offset: 110%;
+    transition-timing-function: cubic-bezier(0.55, 0, 0.75, 0.3);
+  }
+
+  .legend__name {
+    position: absolute;
+    top: 4%;
+    z-index: 0;
+    margin: 0;
+    writing-mode: vertical-rl;
+    transform: rotate(203deg);
+    opacity: 0.85;
+  }
+
+  .legend--left .legend__name {
+    left: 6%;
+  }
+
+  .legend--right .legend__name {
+    right: 13%;
+    transform: rotate(-16deg);
+  }
+
+  .legend__first {
+    display: none;
+  }
+
+  .legend__last {
+    font-size: clamp(2rem, 9.5vw, 3.5rem);
+    letter-spacing: 0.04em;
+  }
+
+  .legend__image {
+    position: relative;
+    z-index: 1;
+    flex: none;
+    width: 100%;
+    height: auto;
   }
 }
 </style>
