@@ -95,6 +95,7 @@ body {
   position: relative;
   margin: 0 auto;
   gap: 2rem;
+  z-index: 1;
 }
 
 .container.editor-mode {

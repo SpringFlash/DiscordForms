@@ -1,4 +1,5 @@
 <template>
+  <LspdLegends v-if="uiStore.mode !== 'editor'" />
   <div class="container" :class="{ 'editor-mode': uiStore.mode === 'editor' }">
     <EditorLayout v-if="uiStore.mode === 'editor'" />
     <Transition name="form-enter" appear>
@@ -44,6 +45,7 @@ import ToastContainer from './components/common/ToastContainer.vue'
 import ConfirmModal from './components/common/ConfirmModal.vue'
 import SaveIndicator from './components/common/SaveIndicator.vue'
 import CommandPalette from './components/common/CommandPalette.vue'
+import LspdLegends from './components/common/LspdLegends.vue'
 
 const formConfigStore = useFormConfigStore()
 const uiStore = useUiStore()
