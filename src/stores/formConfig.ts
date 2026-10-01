@@ -80,10 +80,6 @@ export const useFormConfigStore = defineStore('formConfig', () => {
     }
 
     const isEditor = params.mode === 'editor'
-    if (isEditor) {
-      decoded.webhookUrl = ''
-    }
-
     config.value = decoded
     if (!isEditor) {
       saveToHistory(decoded, window.location.href)

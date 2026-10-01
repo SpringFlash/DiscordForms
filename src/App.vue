@@ -38,6 +38,7 @@ import { onMounted, onUnmounted, watch } from 'vue'
 import { useFormConfigStore } from './stores/formConfig'
 import { useUiStore } from './stores/ui'
 import { useCommandPalette } from './composables/useCommandPalette'
+import { getUrlParams, updateUrl } from './services/config'
 import EditorLayout from './components/editor/EditorLayout.vue'
 import FormView from './components/form/FormView.vue'
 import WelcomeScreen from './components/common/WelcomeScreen.vue'
@@ -104,6 +105,15 @@ watch(
   () => formConfigStore.config.title,
   (title) => {
     document.title = title || 'Discord Forms'
+  },
+)
+
+watch(
+  () => uiStore.mode,
+  (mode) => {
+    if (mode === 'editor' && getUrlParams().mode !== 'editor') {
+      updateUrl(formConfigStore.config, true)
+    }
   },
 )
 
