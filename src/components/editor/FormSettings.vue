@@ -124,6 +124,10 @@ const organizations = [
   { code: 'LSSD', name: 'LSSD' },
   { code: 'WN', name: 'WN' },
   { code: 'EMS', name: 'EMS' },
+  { code: 'GOV', name: 'Government' },
+  { code: 'NG', name: 'National Guard' },
+  { code: 'FIB', name: 'FIB' },
+  { code: 'SASPA', name: 'SASPA' },
 ]
 
 function selectOrg(code: string): void {
