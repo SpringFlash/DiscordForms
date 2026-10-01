@@ -1,3 +1,4 @@
+import { DEFAULT_SERVER } from '../types'
 import type { FormConfig } from '../types'
 import { generateId } from './index'
 
@@ -19,6 +20,7 @@ function baseConfig(title: string, description: string): Omit<FormConfig, 'field
     webhookUsername: 'Форма обратной связи',
     webhookAvatarUrl: 'https://pngimg.com/uploads/discord/discord_PNG3.png',
     organization: 'LSPD',
+    server: DEFAULT_SERVER,
     sendAsPlainText: false,
     displayUsername: true,
     showAdvancedSettings: false,

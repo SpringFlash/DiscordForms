@@ -68,6 +68,12 @@
       </label>
     </div>
     <div class="setting-group">
+      <label>Сервер</label>
+      <select v-model="config.server" @change="store.updateConfig()">
+        <option v-for="server in SERVERS" :key="server" :value="server">{{ server }}</option>
+      </select>
+    </div>
+    <div class="setting-group">
       <label>Организация</label>
       <div class="org-picker-grid" role="radiogroup">
         <div
@@ -107,6 +113,7 @@
 
 <script setup lang="ts">
 import { useFormConfigStore } from '../../stores/formConfig'
+import { SERVERS } from '../../types'
 
 const store = useFormConfigStore()
 const config = store.config

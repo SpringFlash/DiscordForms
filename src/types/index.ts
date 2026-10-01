@@ -56,6 +56,12 @@ export interface ConditionalMessage {
   message: string
 }
 
+export type Server = 'Vinewood' | 'Mirror'
+
+export const SERVERS: readonly Server[] = ['Vinewood', 'Mirror']
+
+export const DEFAULT_SERVER: Server = 'Vinewood'
+
 export interface FormConfig {
   title: string
   description: string
@@ -64,6 +70,7 @@ export interface FormConfig {
   webhookUsername: string
   webhookAvatarUrl: string
   organization: string
+  server: Server
   sendAsPlainText: boolean
   displayUsername: boolean
   showAdvancedSettings: boolean

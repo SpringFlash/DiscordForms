@@ -1,4 +1,5 @@
 import LZString from 'lz-string'
+import { DEFAULT_SERVER } from '../types'
 import type { FormConfig, FieldOption } from '../types'
 
 function migrateOptions(options: unknown[]): FieldOption[] {
@@ -55,6 +56,7 @@ export function encodeConfig(config: FormConfig): string {
 }
 
 function migrateConfig(config: FormConfig): FormConfig {
+  config.server ??= DEFAULT_SERVER
   for (const field of config.fields ?? []) {
     if (Array.isArray(field.options)) {
       field.options = migrateOptions(field.options as unknown[])

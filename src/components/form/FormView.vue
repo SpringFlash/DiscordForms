@@ -12,7 +12,7 @@
   <div class="organization-logo">
     <img :src="orgLogoSrc" :alt="config.organization + ' Logo'" />
   </div>
-  <div class="vinewood-logo">VINEWOOD</div>
+  <div class="vinewood-logo">{{ config.server.toUpperCase() }}</div>
   <div class="header">
     <div class="header-top">
       <h1>{{ config.title }}</h1>

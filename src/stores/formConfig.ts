@@ -2,6 +2,7 @@ import { ref } from 'vue'
 
 type SaveStatus = 'idle' | 'saving' | 'saved'
 import { defineStore } from 'pinia'
+import { DEFAULT_SERVER } from '../types'
 import type { FormConfig, FormField, FieldOption, FieldType } from '../types'
 import { generateId } from '../utils'
 import { getUrlParams, decodeConfig, updateUrl, generateShareUrl } from '../services/config'
@@ -42,6 +43,7 @@ function createEmptyConfig(): FormConfig {
     webhookUsername: 'Форма обратной связи',
     webhookAvatarUrl: 'https://pngimg.com/uploads/discord/discord_PNG3.png',
     organization: 'LSPD',
+    server: DEFAULT_SERVER,
     sendAsPlainText: false,
     displayUsername: true,
     showAdvancedSettings: false,
@@ -234,6 +236,7 @@ export const useFormConfigStore = defineStore('formConfig', () => {
         try {
           const imported = JSON.parse(reader.result as string) as FormConfig
           imported.webhookUrl = ''
+          imported.server ??= DEFAULT_SERVER
           imported.fields = (imported.fields ?? []).map((f) => {
             const field = { ...createField(), ...f, customWebhook: null }
             if (Array.isArray(field.options)) {

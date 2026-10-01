@@ -205,6 +205,7 @@ JSON format:
   "webhookUsername": "Form Bot",
   "webhookAvatarUrl": "",
   "organization": "LSPD",
+  "server": "Vinewood",
   "sendAsPlainText": false,
   "displayUsername": true,
   "sendQuestionNumbers": true,

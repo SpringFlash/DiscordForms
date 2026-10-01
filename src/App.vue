@@ -1,5 +1,5 @@
 <template>
-  <LspdLegends v-if="uiStore.mode !== 'editor'" />
+  <LspdLegends v-if="uiStore.mode !== 'editor' && formConfigStore.config.server !== 'Mirror'" />
   <div class="container" :class="{ 'editor-mode': uiStore.mode === 'editor' }">
     <EditorLayout v-if="uiStore.mode === 'editor'" />
     <Transition name="form-enter" appear>
